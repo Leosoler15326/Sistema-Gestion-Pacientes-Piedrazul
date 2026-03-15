@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  devenv:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/miapp
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: miapp
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
