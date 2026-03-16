@@ -1,11 +1,11 @@
-//[dentro de Frontend]
+# [dentro de Frontend]
 	npm install
-//crear archivo de variables de entorno:
+# crear archivo de variables de entorno:
 	cp .env.example .env.local
 
-//[dentro de Backend]
+# [dentro de Backend]
 	mvn install -DskipTests
-//crear archivo de variables de entorno:
+# crear archivo de variables de entorno:
 	cp .env.example .env
 
 
@@ -26,6 +26,8 @@ VERIFICACIONES DE FUNCIONAMIENTO:
 # Frontend
 	http://localhost:5173
 
-APAGAR TODO:
-	ctrl+c [para front y back]
-	docker-compose stop [para docker]
+# APAGAR TODO:
+[para front y back]
+	ctrl+c 
+[para docker]
+	docker-compose stop 
