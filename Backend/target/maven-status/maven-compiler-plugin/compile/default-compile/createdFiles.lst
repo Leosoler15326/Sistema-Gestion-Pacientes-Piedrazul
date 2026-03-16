@@ -1,3 +1,4 @@
+com\SGPPiedrazul\Config\CorsConfig.class
 com\SGPPiedrazul\Controller\HealthController.class
 com\SGPPiedrazul\BackendApplication.class
 com\SGPPiedrazul\Config\SecurityConfig.class
