@@ -9,7 +9,7 @@ import ReagendarCitaPage from '../../modules/citas/pages/ReagendarCitaPage';
 import HistoriaClinicaListPage from '../../modules/historia-clinica/pages/HistoriaClinicaListPage';
 import HistoriaClinicaDetailPage from '../../modules/historia-clinica/pages/HistoriaClinicaDetailPage';
 import HistoriaClinicaFormPage from '../../modules/historia-clinica/pages/HistoriaClinicaFormPage';
-import PrivateRoute from './PrivateRoute';
+import LayoutWrapper from '../../components/layout/LayoutWrapper';
 import RoleRoute from './RoleRoute';
 import { APP_ROUTES } from './routes';
 
@@ -19,31 +19,32 @@ export default function AppRouter() {
       <Routes>
         <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
 
-        <Route element={<PrivateRoute />}>
-          <Route path={APP_ROUTES.HOME} element={<HomePage />} />
+        <Route element={<LayoutWrapper />}>
+            <Route path={APP_ROUTES.HOME} element={<HomePage />} />
 
-          <Route path={APP_ROUTES.CITAS} element={<CitasListPage />} />
-          <Route path={APP_ROUTES.CITAS_NUEVA} element={<CitaCreatePage />} />
-          <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />
-          <Route path={APP_ROUTES.CITAS_REAGENDAR} element={<ReagendarCitaPage />} />
+            <Route path={APP_ROUTES.CITAS} element={<CitasListPage />} />
+            <Route path={APP_ROUTES.CITAS_NUEVA} element={<CitaCreatePage />} />
+            <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />
+            <Route path={APP_ROUTES.CITAS_REAGENDAR} element={<ReagendarCitaPage />} />
 
-          <Route
+            <Route
             element={<RoleRoute allowedRoles={['ADMIN', 'MEDICO', 'TERAPISTA']} />}
-          >
+            >
             <Route
-              path={APP_ROUTES.HISTORIA_CLINICA}
-              element={<HistoriaClinicaListPage />}
+                path={APP_ROUTES.HISTORIA_CLINICA}
+                element={<HistoriaClinicaListPage />}
             />
             <Route
-              path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
-              element={<HistoriaClinicaFormPage />}
+                path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
+                element={<HistoriaClinicaFormPage />}
             />
             <Route
-              path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
-              element={<HistoriaClinicaDetailPage />}
+                path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
+                element={<HistoriaClinicaDetailPage />}
             />
-          </Route>
+            </Route>
         </Route>
+
 
         <Route path={APP_ROUTES.NOT_FOUND} element={<NotFoundPage />} />
         <Route path="" element={<Navigate to={APP_ROUTES.HOME} replace />} />
