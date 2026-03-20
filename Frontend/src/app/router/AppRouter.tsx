@@ -6,17 +6,12 @@ import CitasListPage from '../../modules/citas/pages/CitasListPage';
 import CitaCreatePage from '../../modules/citas/pages/CitaCreatePage';
 import CitaDetailPage from '../../modules/citas/pages/CitaDetailPage';
 import ReagendarCitaPage from '../../modules/citas/pages/ReagendarCitaPage';
+import HistoriaClinicaListPage from '../../modules/historia-clinica/pages/HistoriaClinicaListPage';
+import HistoriaClinicaDetailPage from '../../modules/historia-clinica/pages/HistoriaClinicaDetailPage';
+import HistoriaClinicaFormPage from '../../modules/historia-clinica/pages/HistoriaClinicaFormPage';
 import PrivateRoute from './PrivateRoute';
 import RoleRoute from './RoleRoute';
 import { APP_ROUTES } from './routes';
-
-function HistoriaClinicaPage() {
-  return <h1>Módulo de Historia Clínica</h1>;
-}
-
-function NuevaHistoriaClinicaPage() {
-  return <h1>Nueva Historia Clínica</h1>;
-}
 
 export default function AppRouter() {
   return (
@@ -37,11 +32,15 @@ export default function AppRouter() {
           >
             <Route
               path={APP_ROUTES.HISTORIA_CLINICA}
-              element={<HistoriaClinicaPage />}
+              element={<HistoriaClinicaListPage />}
             />
             <Route
               path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
-              element={<NuevaHistoriaClinicaPage />}
+              element={<HistoriaClinicaFormPage />}
+            />
+            <Route
+              path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
+              element={<HistoriaClinicaDetailPage />}
             />
           </Route>
         </Route>
