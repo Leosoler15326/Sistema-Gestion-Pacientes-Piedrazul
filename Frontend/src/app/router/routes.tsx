@@ -1,0 +1,15 @@
+export const APP_ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+
+  CITAS: '/citas',
+  CITAS_NUEVA: '/citas/nueva',
+  CITAS_DETALLE: '/citas/:id',
+  CITAS_REAGENDAR: '/citas/:id/reagendar',
+
+  HISTORIA_CLINICA: '/historia-clinica',
+  HISTORIA_CLINICA_NUEVA: '/historia-clinica/nueva',
+  HISTORIA_CLINICA_DETALLE: '/historia-clinica/:id',
+
+  NOT_FOUND: '*',
+} as const;

@@ -1,9 +1,37 @@
-export default function NotFoundPage() {
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import Loader from '../components/common/Loader';
+import PageHeader from '../components/common/PageHeader';
+
+export default function HomePage() {
+  const [status, setStatus] = useState('Conectando...');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/health')
+      .then((res) => {
+        setStatus(res.data.message ?? 'Backend conectado');
+      })
+      .catch(() => {
+        setStatus('Error de conexión');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <Loader message="Consultando estado del backend..." />;
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-gray-300">404</h1>
-        <p className="text-gray-500 mt-2">Página no encontrada</p>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <PageHeader
+        title="Panel principal"
+        subtitle="Resumen inicial del sistema Clínica Piedra Azul"
+      />
+
+      <div className="rounded-lg bg-white p-6 shadow">
+        <h2 className="mb-2 text-lg font-semibold">Estado del backend</h2>
+        <p className="text-green-600">{status}</p>
       </div>
     </div>
   );

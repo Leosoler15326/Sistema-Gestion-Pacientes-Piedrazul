@@ -1,10 +1,21 @@
-export default function NotFoundPage() {
+import type { EstadoCita } from '../types/cita.types';
+
+interface EstadoCitaBadgeProps {
+  estado: EstadoCita;
+}
+
+const stylesByEstado: Record<EstadoCita, string> = {
+  PENDIENTE: 'bg-yellow-100 text-yellow-800',
+  CONFIRMADA: 'bg-blue-100 text-blue-800',
+  CANCELADA: 'bg-red-100 text-red-800',
+  COMPLETADA: 'bg-green-100 text-green-800',
+  REAGENDADA: 'bg-purple-100 text-purple-800',
+};
+
+export default function EstadoCitaBadge({ estado }: EstadoCitaBadgeProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-gray-300">404</h1>
-        <p className="text-gray-500 mt-2">Página no encontrada</p>
-      </div>
-    </div>
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${stylesByEstado[estado]}`}>
+      {estado}
+    </span>
   );
 }
