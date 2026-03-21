@@ -15,3 +15,8 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:clave-super-secreta-piedrazul-2024-minimo-32-caracteres}
+  expiration-ms: 86400000
+  refresh-expiration-ms: 604800000
