@@ -8,9 +8,12 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/health')
+    api
+      .get('/health')
       .then((res) => {
-        setStatus(res.data.message ?? 'Backend conectado');
+        const backendMessage =
+          res.data?.message ?? `Estado: ${res.data?.status ?? 'OK'}`;
+        setStatus(backendMessage);
       })
       .catch(() => {
         setStatus('Error de conexión');

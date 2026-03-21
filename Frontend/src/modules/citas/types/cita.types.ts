@@ -1,71 +1,59 @@
 export type EstadoCita =
-  | 'PENDIENTE'
+  | 'PROGRAMADA'
   | 'CONFIRMADA'
   | 'CANCELADA'
   | 'COMPLETADA'
-  | 'REAGENDADA';
+  | 'REAGENDADA'
+  | string;
 
 export interface PacienteResumenDto {
-  id: number;
-  fullName: string;
-  documentNumber?: string;
+  id?: number;
+  nombres?: string;
+  nombreCompleto?: string;
+  documento?: string;
 }
 
 export interface ProfesionalResumenDto {
-  id: number;
-  fullName: string;
-  specialty?: string;
+  id?: number;
+  nombres?: string;
+  nombreCompleto?: string;
+  especialidad?: string;
+  tipo?: string;
 }
 
 export interface CitaDto {
   id: number;
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  estado: EstadoCita;
-  motivo: string;
-  observaciones?: string;
-  paciente: PacienteResumenDto;
-  profesional: ProfesionalResumenDto;
-  puedeCancelar?: boolean;
-  puedeReagendar?: boolean;
+  fechaHora: string;
+  tipoAtencion: string;
+  motivoConsulta?: string;
+  estado?: EstadoCita;
+  paciente?: PacienteResumenDto;
+  profesional?: ProfesionalResumenDto;
 }
 
 export interface CreateCitaRequestDto {
-  pacienteId: number;
   profesionalId: number;
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  motivo: string;
-  observaciones?: string;
-}
-
-export interface UpdateCitaRequestDto {
-  fecha?: string;
-  horaInicio?: string;
-  horaFin?: string;
-  motivo?: string;
-  observaciones?: string;
-  estado?: EstadoCita;
+  pacienteId: number;
+  fechaHora: string;
+  tipoAtencion: string;
+  motivoConsulta?: string;
 }
 
 export interface ReagendarCitaRequestDto {
+  nuevaFechaHora: string;
+  motivo?: string;
+}
+
+export interface CancelarCitaRequestDto {
+  motivo?: string;
+}
+
+export interface SlotsDisponiblesParamsDto {
+  profesionalId: number;
   fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  motivoReagenda?: string;
 }
 
-export interface CitasFiltersDto {
-  fecha?: string;
-  estado?: EstadoCita | '';
-  paciente?: string;
-  profesional?: string;
-}
-
-export interface DisponibilidadDto {
-  horaInicio: string;
-  horaFin: string;
-  disponible: boolean;
+export interface ListarCitasProfesionalParamsDto {
+  profesionalId: number;
+  fecha: string;
 }

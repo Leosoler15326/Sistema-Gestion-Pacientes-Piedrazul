@@ -1,16 +1,15 @@
-
 import { useParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import HistoriaClinicaViewer from '../components/HistoriaClinicaViewer';
-import { useHistoriaClinicaDetail } from '../hooks/useHistoriaClinica';
+import { useHistoriaPorCita } from '../hooks/useHistoriaClinica';
 
 export default function HistoriaClinicaDetailPage() {
   const params = useParams();
-  const id = Number(params.id);
+  const citaId = Number(params.id);
 
-  const { data, isLoading, isError } = useHistoriaClinicaDetail(id);
+  const { data, isLoading, isError } = useHistoriaPorCita(citaId);
 
   if (isLoading) return <Loader message="Cargando historia clínica..." />;
 
@@ -26,7 +25,7 @@ export default function HistoriaClinicaDetailPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
-        title={`Historia clínica #${data.id}`}
+        title={`Historia clínica de la cita #${data.citaId}`}
         subtitle="Detalle del registro clínico"
       />
 

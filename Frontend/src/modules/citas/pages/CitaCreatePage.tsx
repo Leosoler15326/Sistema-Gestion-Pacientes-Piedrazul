@@ -18,7 +18,7 @@ export default function CitaCreatePage() {
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
         title="Nueva cita"
-        subtitle="Registra una nueva cita médica en el sistema."
+        subtitle="Agenda una nueva cita."
       />
 
       <CitaForm

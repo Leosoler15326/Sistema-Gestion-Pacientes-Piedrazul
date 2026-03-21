@@ -12,13 +12,11 @@ export default function Navbar() {
 
   return (
     <header className="flex items-center justify-between bg-white px-6 py-4 shadow">
-      <h1 className="text-lg font-semibold text-gray-800">
-        Sistema Clínico
-      </h1>
+      <h1 className="text-lg font-semibold text-gray-800">Sistema Clínico</h1>
 
       <div className="flex items-center gap-4">
         <div className="text-sm text-gray-600">
-          {user?.fullName} ({user?.role})
+          {user?.nombreCompleto} ({user?.rol})
         </div>
 
         <button

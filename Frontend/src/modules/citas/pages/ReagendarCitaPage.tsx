@@ -25,7 +25,7 @@ export default function ReagendarCitaPage() {
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
         title="Reagendar cita"
-        subtitle={`Actualiza la fecha y hora de la cita #${id}`}
+        subtitle={`Actualiza la fecha de la cita #${id}`}
       />
 
       <ReagendarModal

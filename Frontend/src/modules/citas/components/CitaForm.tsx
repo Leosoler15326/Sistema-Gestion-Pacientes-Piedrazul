@@ -7,19 +7,25 @@ interface CitaFormProps {
 }
 
 export default function CitaForm({ onSubmit, loading = false }: CitaFormProps) {
-  const [form, setForm] = useState<CreateCitaRequestDto>({
+  const [fecha, setFecha] = useState('');
+  const [hora, setHora] = useState('');
+
+  const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
     pacienteId: 0,
     profesionalId: 0,
-    fecha: '',
-    horaInicio: '',
-    horaFin: '',
-    motivo: '',
-    observaciones: '',
+    tipoAtencion: '',
+    motivoConsulta: '',
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await onSubmit(form);
+
+    const fechaHora = `${fecha}T${hora}:00`;
+
+    await onSubmit({
+      ...form,
+      fechaHora,
+    });
   };
 
   return (
@@ -49,42 +55,38 @@ export default function CitaForm({ onSubmit, loading = false }: CitaFormProps) {
 
         <input
           type="date"
-          value={form.fecha}
-          onChange={(e) => setForm((prev) => ({ ...prev, fecha: e.target.value }))}
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
           className="rounded-lg border px-3 py-2"
           required
         />
 
         <input
           type="time"
-          value={form.horaInicio}
-          onChange={(e) => setForm((prev) => ({ ...prev, horaInicio: e.target.value }))}
+          value={hora}
+          onChange={(e) => setHora(e.target.value)}
           className="rounded-lg border px-3 py-2"
           required
         />
 
         <input
-          type="time"
-          value={form.horaFin}
-          onChange={(e) => setForm((prev) => ({ ...prev, horaFin: e.target.value }))}
-          className="rounded-lg border px-3 py-2"
+          type="text"
+          placeholder="Tipo de atención"
+          value={form.tipoAtencion}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, tipoAtencion: e.target.value }))
+          }
+          className="rounded-lg border px-3 py-2 md:col-span-2"
           required
         />
       </div>
 
-      <input
-        type="text"
-        placeholder="Motivo de la cita"
-        value={form.motivo}
-        onChange={(e) => setForm((prev) => ({ ...prev, motivo: e.target.value }))}
-        className="w-full rounded-lg border px-3 py-2"
-        required
-      />
-
       <textarea
-        placeholder="Observaciones"
-        value={form.observaciones}
-        onChange={(e) => setForm((prev) => ({ ...prev, observaciones: e.target.value }))}
+        placeholder="Motivo de consulta"
+        value={form.motivoConsulta}
+        onChange={(e) =>
+          setForm((prev) => ({ ...prev, motivoConsulta: e.target.value }))
+        }
         className="w-full rounded-lg border px-3 py-2"
         rows={4}
       />
@@ -94,7 +96,7 @@ export default function CitaForm({ onSubmit, loading = false }: CitaFormProps) {
         disabled={loading}
         className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
       >
-        {loading ? 'Guardando...' : 'Guardar cita'}
+        {loading ? 'Guardando...' : 'Agendar cita'}
       </button>
     </form>
   );

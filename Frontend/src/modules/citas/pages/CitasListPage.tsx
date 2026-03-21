@@ -1,62 +1,78 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
-import { APP_ROUTES } from '../../../app/router/routes';
-import CitaFilters from '../components/CitaFilters';
 import CitasTable from '../components/CitasTable';
-import { useCancelCita, useCitas } from '../hooks/UseCitas';
-import type { CitasFiltersDto } from '../types/cita.types';
+import { useCancelarCita, useCitasPorPaciente } from '../hooks/UseCitas';
 
 export default function CitasListPage() {
-  const [filters, setFilters] = useState<CitasFiltersDto>({});
+  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
   const [citaIdToCancel, setCitaIdToCancel] = useState<number | null>(null);
 
-  const { data, isLoading, isError } = useCitas(filters);
-  const cancelMutation = useCancelCita();
+  const { data, isLoading, isError, refetch } = useCitasPorPaciente(pacienteId);
+  const cancelMutation = useCancelarCita();
+
+  const handleBuscar = () => {
+    if (pacienteId) {
+      refetch();
+    }
+  };
 
   const handleConfirmCancel = async () => {
     if (!citaIdToCancel) return;
-    await cancelMutation.mutateAsync(citaIdToCancel);
+
+    await cancelMutation.mutateAsync({
+      id: citaIdToCancel,
+      payload: { motivo: 'Cancelada desde frontend' },
+    });
+
     setCitaIdToCancel(null);
   };
-
-  if (isLoading) return <Loader message="Cargando citas..." />;
-
-  if (isError) {
-    return (
-      <EmptyState
-        title="Error al cargar citas"
-        description="No fue posible consultar la lista de citas."
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
         title="Citas"
-        subtitle="Consulta, filtra y gestiona las citas registradas."
-        actions={
-          <Link
-            to={APP_ROUTES.CITAS_NUEVA}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Nueva cita
-          </Link>
-        }
+        subtitle="Consulta citas por paciente."
       />
 
-      <CitaFilters onApply={setFilters} />
+      <div className="mb-6 rounded-xl bg-white p-4 shadow">
+        <div className="flex gap-3">
+          <input
+            type="number"
+            placeholder="ID paciente"
+            value={pacienteId || ''}
+            onChange={(e) => setPacienteId(Number(e.target.value))}
+            className="rounded-lg border px-3 py-2"
+          />
+          <button
+            type="button"
+            onClick={handleBuscar}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
 
-      {!data || data.length === 0 ? (
+      {isLoading && <Loader message="Cargando citas..." />}
+
+      {!isLoading && isError && (
         <EmptyState
-          title="No hay citas registradas"
-          description="Aún no existen citas para mostrar con los filtros aplicados."
+          title="Error al cargar citas"
+          description="No fue posible consultar las citas."
         />
-      ) : (
+      )}
+
+      {!isLoading && !isError && pacienteId && (!data || data.length === 0) && (
+        <EmptyState
+          title="No hay citas"
+          description="No se encontraron citas para el paciente indicado."
+        />
+      )}
+
+      {!isLoading && !isError && data && data.length > 0 && (
         <CitasTable items={data} onCancel={setCitaIdToCancel} />
       )}
 

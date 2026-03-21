@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import AntecedentesSection from './AntecedentesSection';
 import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.types';
 
 interface HistoriaClinicaFormProps {
@@ -13,16 +12,7 @@ export default function HistoriaClinicaForm({
 }: HistoriaClinicaFormProps) {
   const [form, setForm] = useState<CreateHistoriaClinicaRequestDto>({
     citaId: 0,
-    motivoConsulta: '',
-    diagnostico: '',
-    tratamiento: '',
-    observaciones: '',
-    antecedentes: {
-      personales: '',
-      familiares: '',
-      alergias: '',
-      medicamentos: '',
-    },
+    descripcion: '',
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -33,7 +23,9 @@ export default function HistoriaClinicaForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-6 shadow">
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">ID de la cita</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          ID de la cita
+        </label>
         <input
           type="number"
           value={form.citaId || ''}
@@ -46,63 +38,17 @@ export default function HistoriaClinicaForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Motivo de consulta</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Descripción
+        </label>
         <textarea
-          rows={3}
-          value={form.motivoConsulta}
+          rows={6}
+          value={form.descripcion}
           onChange={(e) =>
-            setForm((prev) => ({ ...prev, motivoConsulta: e.target.value }))
+            setForm((prev) => ({ ...prev, descripcion: e.target.value }))
           }
           className="w-full rounded-lg border px-3 py-2"
           required
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Diagnóstico</label>
-        <textarea
-          rows={3}
-          value={form.diagnostico}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, diagnostico: e.target.value }))
-          }
-          className="w-full rounded-lg border px-3 py-2"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Tratamiento</label>
-        <textarea
-          rows={3}
-          value={form.tratamiento}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, tratamiento: e.target.value }))
-          }
-          className="w-full rounded-lg border px-3 py-2"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">Antecedentes</label>
-        <AntecedentesSection
-          value={form.antecedentes}
-          onChange={(antecedentes) =>
-            setForm((prev) => ({ ...prev, antecedentes }))
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Observaciones</label>
-        <textarea
-          rows={4}
-          value={form.observaciones}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, observaciones: e.target.value }))
-          }
-          className="w-full rounded-lg border px-3 py-2"
         />
       </div>
 

@@ -14,17 +14,19 @@ export default function ReagendarModal({
   onSubmit,
   loading = false,
 }: ReagendarModalProps) {
-  const [form, setForm] = useState<ReagendarCitaRequestDto>({
-    fecha: '',
-    horaInicio: '',
-    horaFin: '',
-    motivoReagenda: '',
-  });
+  const [fecha, setFecha] = useState('');
+  const [hora, setHora] = useState('');
+  const [motivo, setMotivo] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
-    await onSubmit(form);
+    const nuevaFechaHora = `${fecha}T${hora}:00`;
+
+    await onSubmit({
+      nuevaFechaHora,
+      motivo,
+    });
   };
 
   return (
@@ -35,32 +37,23 @@ export default function ReagendarModal({
         <div className="space-y-4">
           <input
             type="date"
-            value={form.fecha}
-            onChange={(e) => setForm((prev) => ({ ...prev, fecha: e.target.value }))}
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
             className="w-full rounded-lg border px-3 py-2"
           />
 
           <input
             type="time"
-            value={form.horaInicio}
-            onChange={(e) => setForm((prev) => ({ ...prev, horaInicio: e.target.value }))}
-            className="w-full rounded-lg border px-3 py-2"
-          />
-
-          <input
-            type="time"
-            value={form.horaFin}
-            onChange={(e) => setForm((prev) => ({ ...prev, horaFin: e.target.value }))}
+            value={hora}
+            onChange={(e) => setHora(e.target.value)}
             className="w-full rounded-lg border px-3 py-2"
           />
 
           <textarea
             rows={3}
-            placeholder="Motivo de reagendamiento"
-            value={form.motivoReagenda}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, motivoReagenda: e.target.value }))
-            }
+            placeholder="Motivo"
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
             className="w-full rounded-lg border px-3 py-2"
           />
         </div>

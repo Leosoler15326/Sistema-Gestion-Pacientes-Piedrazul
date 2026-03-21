@@ -6,8 +6,12 @@ export const useDisponibilidad = (
   fecha?: string
 ) => {
   return useQuery({
-    queryKey: ['disponibilidad', profesionalId, fecha],
-    queryFn: () => citasService.getDisponibilidad(profesionalId as number, fecha as string),
+    queryKey: ['slots-disponibles', profesionalId, fecha],
+    queryFn: () =>
+      citasService.obtenerSlotsDisponibles({
+        profesionalId: profesionalId as number,
+        fecha: fecha as string,
+      }),
     enabled: Boolean(profesionalId && fecha),
   });
 };

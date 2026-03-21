@@ -1,24 +1,31 @@
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { historiaClinicaService } from '../services/HistoriaClinica.service';
 import type {
   CreateHistoriaClinicaRequestDto,
-  HistoriaClinicaFiltersDto,
   UpdateHistoriaClinicaRequestDto,
 } from '../types/historiaClinica.types';
 
-export const useHistoriasClinicas = (filters?: HistoriaClinicaFiltersDto) => {
+export const useHistoriaPorCita = (citaId?: number) => {
   return useQuery({
-    queryKey: ['historias-clinicas', filters],
-    queryFn: () => historiaClinicaService.getAll(filters),
+    queryKey: ['historia-cita', citaId],
+    queryFn: () => historiaClinicaService.getByCitaId(citaId as number),
+    enabled: Boolean(citaId),
   });
 };
 
-export const useHistoriaClinicaDetail = (id?: number) => {
+export const useHistoriasPorPaciente = (pacienteId?: number) => {
   return useQuery({
-    queryKey: ['historia-clinica-detail', id],
-    queryFn: () => historiaClinicaService.getById(id as number),
-    enabled: Boolean(id),
+    queryKey: ['historias-paciente', pacienteId],
+    queryFn: () => historiaClinicaService.getByPacienteId(pacienteId as number),
+    enabled: Boolean(pacienteId),
+  });
+};
+
+export const useHistoriasPorProfesional = (profesionalId?: number) => {
+  return useQuery({
+    queryKey: ['historias-profesional', profesionalId],
+    queryFn: () => historiaClinicaService.getByProfesionalId(profesionalId as number),
+    enabled: Boolean(profesionalId),
   });
 };
 
@@ -29,7 +36,9 @@ export const useCreateHistoriaClinica = () => {
     mutationFn: (payload: CreateHistoriaClinicaRequestDto) =>
       historiaClinicaService.create(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['historias-clinicas'] });
+      queryClient.invalidateQueries({ queryKey: ['historias-paciente'] });
+      queryClient.invalidateQueries({ queryKey: ['historias-profesional'] });
+      queryClient.invalidateQueries({ queryKey: ['historia-cita'] });
     },
   });
 };
@@ -46,10 +55,10 @@ export const useUpdateHistoriaClinica = () => {
       payload: UpdateHistoriaClinicaRequestDto;
     }) => historiaClinicaService.update(id, payload),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['historias-clinicas'] });
-      queryClient.invalidateQueries({
-        queryKey: ['historia-clinica-detail', variables.id],
-      });
+      queryClient.invalidateQueries({ queryKey: ['historias-paciente'] });
+      queryClient.invalidateQueries({ queryKey: ['historias-profesional'] });
+      queryClient.invalidateQueries({ queryKey: ['historia-cita'] });
+      queryClient.invalidateQueries({ queryKey: ['historia-detail', variables.id] });
     },
   });
 };

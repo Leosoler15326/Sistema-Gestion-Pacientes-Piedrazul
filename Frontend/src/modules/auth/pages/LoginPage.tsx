@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import LoginForm from '../components/LoginForm';
+import { authService } from '../services/auth.service';
 import { authStore } from '../store/auth.store';
 import type { LoginRequestDto } from '../types/auth.types';
 import { APP_ROUTES } from '../../../app/router/routes';
-import { authService } from '../Services/auth.service';
-import LoginForm from '../Components/LoginForm';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const from = (location.state as { from?: string } | null)?.from || APP_ROUTES.HOME;
+  const from =
+    (location.state as { from?: string } | null)?.from || APP_ROUTES.HOME;
 
   const handleLogin = async (values: LoginRequestDto) => {
     try {
