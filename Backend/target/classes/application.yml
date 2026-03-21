@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/sgp_piedrazul}
-    username: ${DB_USER:dev}
-    password: ${DB_PASSWORD:devpass}
+    url: jdbc:postgresql://localhost:5432/sgp_piedrazul
+    username: dev
+    password: devpass
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -12,6 +12,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+  sql:
+    init:
+      mode: always       # ← ejecuta data.sql siempre al arrancar
 
 server:
   port: 8080
+
+jwt:
+  secret: clave-super-secreta-piedrazul-2024-minimo-32-caracteres
+  expiration-ms: 86400000
+  refresh-expiration-ms: 604800000
