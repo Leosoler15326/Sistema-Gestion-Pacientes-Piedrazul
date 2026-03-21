@@ -50,7 +50,8 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/registro",
                     "/api/auth/verificar-email",
-                    "/api/health"
+                    "/api/health",
+                    "/api/hash"
                 ).permitAll()
 
                 // Solo ADMINISTRADOR
