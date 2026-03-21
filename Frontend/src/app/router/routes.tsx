@@ -11,5 +11,9 @@ export const APP_ROUTES = {
   HISTORIA_CLINICA_NUEVA: '/historia-clinica/nueva',
   HISTORIA_CLINICA_DETALLE: '/historia-clinica/:id',
 
+  PROFESIONALES: '/profesionales',
+  PROFESIONALES_NUEVO: '/profesionales/nuevo',
+  PROFESIONALES_DETALLE: '/profesionales/:id',
+
   NOT_FOUND: '*',
 } as const;

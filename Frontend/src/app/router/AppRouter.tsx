@@ -11,6 +11,9 @@ import HistoriaClinicaDetailPage from '../../modules/historia-clinica/pages/Hist
 import HistoriaClinicaFormPage from '../../modules/historia-clinica/pages/HistoriaClinicaFormPage';
 import LayoutWrapper from '../../components/layout/LayoutWrapper';
 import RoleRoute from './RoleRoute';
+import ProfesionalesListPage from '../../modules/profesionales/pages/ProfesionalesListPage';
+import ProfesionalFormPage from '../../modules/profesionales/pages/ProfesionalFormPage';
+import ProfesionalDetailPage from '../../modules/profesionales/pages/ProfesionalDetailPage';
 import { APP_ROUTES } from './routes';
 
 export default function AppRouter() {
@@ -26,7 +29,12 @@ export default function AppRouter() {
             <Route path={APP_ROUTES.CITAS_NUEVA} element={<CitaCreatePage />} />
             <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />
             <Route path={APP_ROUTES.CITAS_REAGENDAR} element={<ReagendarCitaPage />} />
-
+            //mirar
+            <Route element={<RoleRoute allowedRoles={['ADMIN']} />}>
+              <Route path={APP_ROUTES.PROFESIONALES} element={<ProfesionalesListPage />} />
+              <Route path={APP_ROUTES.PROFESIONALES_NUEVO} element={<ProfesionalFormPage />} />
+              <Route path={APP_ROUTES.PROFESIONALES_DETALLE} element={<ProfesionalDetailPage />} />
+            </Route>
             <Route
             element={<RoleRoute allowedRoles={['ADMIN', 'MEDICO', 'TERAPISTA']} />}
             >
@@ -48,6 +56,7 @@ export default function AppRouter() {
 
         <Route path={APP_ROUTES.NOT_FOUND} element={<NotFoundPage />} />
         <Route path="" element={<Navigate to={APP_ROUTES.HOME} replace />} />
+        
       </Routes>
     </BrowserRouter>
   );
