@@ -1,16 +1,8 @@
 export type UserRole = 'ADMIN' | 'MEDICO' | 'TERAPISTA' | 'RECEPCIONISTA';
 
 export interface LoginRequestDto {
-  nombreUsuario: string;
+  nombreUsuario: string; // ajustar si backend usa email
   contrasena: string;
-}
-
-export interface RegisterRequestDto {
-  nombreUsuario: string;
-  contrasena: string;
-  nombreCompleto: string;
-  email: string;
-  rol: UserRole;
 }
 
 export interface LoginResponseDto {
@@ -20,6 +12,14 @@ export interface LoginResponseDto {
   nombreCompleto: string;
   rol: UserRole;
   id: number;
+}
+
+export interface RegisterRequestDto {
+  nombreUsuario: string;
+  contrasena: string;
+  nombreCompleto: string;
+  email: string;
+  rol: UserRole;
 }
 
 export interface AuthUserDto {
