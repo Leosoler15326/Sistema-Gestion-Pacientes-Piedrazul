@@ -4,6 +4,7 @@ import { authStore } from '../../modules/auth/store/auth.store';
 
 export default function Sidebar() {
   const user = authStore.getUser();
+
   const linkClass =
     'block rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-100';
 
@@ -33,17 +34,6 @@ export default function Sidebar() {
         >
           Citas
         </NavLink>
-//mirar
-        {user?.rol === 'ADMIN' && (
-          <NavLink
-            to={APP_ROUTES.PROFESIONALES}
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
-            }
-          >
-            Profesionales
-          </NavLink>
-        )}
 
         <NavLink
           to={APP_ROUTES.HISTORIA_CLINICA}
@@ -53,6 +43,17 @@ export default function Sidebar() {
         >
           Historia Clínica
         </NavLink>
+
+        {user?.rol === 'ADMIN' && (
+          <NavLink
+            to={APP_ROUTES.PROFESIONALES}
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
+            }
+          >
+            Personal
+          </NavLink>
+        )}
       </nav>
     </aside>
   );
