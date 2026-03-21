@@ -1,3 +1,4 @@
+import Long from "long";
 export type UserRole = 'ADMIN' | 'MEDICO' | 'TERAPISTA' | 'RECEPCIONISTA';
 
 export interface AuthUserDto {
@@ -14,8 +15,13 @@ export interface LoginRequestDto {
 }
 
 export interface LoginResponseDto {
-  token: string;
-  user: AuthUserDto;
+  accessToken: String;
+  refreshToken: String;
+  nombreUsuario: String;
+  nombreCompleto: String;
+  rol: String;
+  idUsuario: Long;
+  idProfesional: Long;//FALTA IMPLEMENTACION
 }
 
 export interface RegisterRequestDto {

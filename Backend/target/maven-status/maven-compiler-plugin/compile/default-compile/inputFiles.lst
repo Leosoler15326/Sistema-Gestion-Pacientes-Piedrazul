@@ -1,6 +1,8 @@
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\BackendApplication.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Config\CorsConfig.java
+C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Config\JwtConfig.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Config\SecurityConfig.java
+C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Config\SwaggerConfig.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Controller\AuthController.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Controller\CitaController.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Controller\HealthController.java
