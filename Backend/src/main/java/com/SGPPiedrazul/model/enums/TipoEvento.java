@@ -1,5 +1,5 @@
 package com.SGPPiedrazul.model.enums;
-
+//tipos de eventos para el sistema de auditoria.
 public enum TipoEvento {
     USUARIO_CREADO,
     USUARIO_MODIFICADO,
