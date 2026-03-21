@@ -1,11 +1,16 @@
 import type { AuthUserDto, LoginResponseDto } from '../types/auth.types';
 
-const TOKEN_KEY = 'auth_token';
+const ACCESS_TOKEN_KEY = 'auth_access_token';
+const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_KEY = 'auth_user';
 
 export const authStore = {
-  getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+  getAccessToken(): string | null {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  },
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
   },
 
   getUser(): AuthUserDto | null {
@@ -20,16 +25,25 @@ export const authStore = {
   },
 
   saveSession(data: LoginResponseDto): void {
-    localStorage.setItem(TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    const user: AuthUserDto = {
+      id: data.id,
+      nombreUsuario: data.nombreUsuario,
+      nombreCompleto: data.nombreCompleto,
+      rol: data.rol,
+    };
+
+    localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   },
 
   clearSession(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   },
 
   isAuthenticated(): boolean {
-    return Boolean(localStorage.getItem(TOKEN_KEY));
+    return Boolean(localStorage.getItem(ACCESS_TOKEN_KEY));
   },
 };

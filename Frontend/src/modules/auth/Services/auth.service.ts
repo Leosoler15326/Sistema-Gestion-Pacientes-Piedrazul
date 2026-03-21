@@ -14,15 +14,20 @@ export const authService = {
   },
 
   async register(payload: RegisterRequestDto): Promise<void> {
-    await api.post(`${AUTH_BASE}/register`, payload);
+    await api.post(`${AUTH_BASE}/registro`, payload);
   },
 
-  async me() {
-    const { data } = await api.get(`${AUTH_BASE}/me`);
+  async refreshToken(refreshToken: string): Promise<LoginResponseDto> {
+    const { data } = await api.post<LoginResponseDto>(`${AUTH_BASE}/refresh`, {
+      refreshToken,
+    });
     return data;
   },
 
-  async logout(): Promise<void> {
-    await api.post(`${AUTH_BASE}/logout`);
+  async verificarEmail(email: string): Promise<boolean> {
+    const { data } = await api.get<boolean>(`${AUTH_BASE}/verificar-email`, {
+      params: { email },
+    });
+    return data;
   },
 };

@@ -3,29 +3,25 @@ import { authStore } from '../store/auth.store';
 import type { UserRole } from '../types/auth.types';
 
 export const useAuth = () => {
-  const token = authStore.getToken();
+  const accessToken = authStore.getAccessToken();
+  const refreshToken = authStore.getRefreshToken();
   const user = authStore.getUser();
 
-  const isAuthenticated = Boolean(token);
+  const isAuthenticated = Boolean(accessToken);
 
   const hasRole = (roles: UserRole[]) => {
     if (!user) return false;
-    return roles.includes(user.role);
-  };
-
-  const hasPermission = (permission: string) => {
-    if (!user) return false;
-    return user.permissions.includes(permission);
+    return roles.includes(user.rol);
   };
 
   return useMemo(
     () => ({
-      token,
+      accessToken,
+      refreshToken,
       user,
       isAuthenticated,
       hasRole,
-      hasPermission,
     }),
-    [token, user, isAuthenticated]
+    [accessToken, refreshToken, user, isAuthenticated]
   );
 };

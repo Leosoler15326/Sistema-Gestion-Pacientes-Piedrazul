@@ -1,26 +1,30 @@
 export type UserRole = 'ADMIN' | 'MEDICO' | 'TERAPISTA' | 'RECEPCIONISTA';
 
-export interface AuthUserDto {
-  id: number;
-  fullName: string;
-  email: string;
-  role: UserRole;
-  permissions: string[];
-}
-
 export interface LoginRequestDto {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponseDto {
-  token: string;
-  user: AuthUserDto;
+  nombreUsuario: string;
+  contrasena: string;
 }
 
 export interface RegisterRequestDto {
-  fullName: string;
+  nombreUsuario: string;
+  contrasena: string;
+  nombreCompleto: string;
   email: string;
-  password: string;
-  role: UserRole;
+  rol: UserRole;
+}
+
+export interface LoginResponseDto {
+  accessToken: string;
+  refreshToken: string;
+  nombreUsuario: string;
+  nombreCompleto: string;
+  rol: UserRole;
+  id: number;
+}
+
+export interface AuthUserDto {
+  id: number;
+  nombreUsuario: string;
+  nombreCompleto: string;
+  rol: UserRole;
 }

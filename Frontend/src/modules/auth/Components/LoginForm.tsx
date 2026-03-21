@@ -8,8 +8,8 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSubmit, loading = false }: LoginFormProps) {
   const [form, setForm] = useState<LoginRequestDto>({
-    email: '',
-    password: '',
+    nombreUsuario: '',
+    contrasena: '',
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -20,23 +20,27 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email">Correo</label>
+        <label htmlFor="nombreUsuario">Usuario</label>
         <input
-          id="email"
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-          placeholder="correo@ejemplo.com"
+          id="nombreUsuario"
+          type="text"
+          value={form.nombreUsuario}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, nombreUsuario: e.target.value }))
+          }
+          placeholder="Ingresa tu usuario"
         />
       </div>
 
       <div>
-        <label htmlFor="password">Contraseña</label>
+        <label htmlFor="contrasena">Contraseña</label>
         <input
-          id="password"
+          id="contrasena"
           type="password"
-          value={form.password}
-          onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+          value={form.contrasena}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, contrasena: e.target.value }))
+          }
           placeholder="********"
         />
       </div>
