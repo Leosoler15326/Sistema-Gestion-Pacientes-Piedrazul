@@ -33,25 +33,11 @@ export default function CitaDetailPage() {
         <p><strong>Tipo de atención:</strong> {data.tipoAtencion}</p>
         <p><strong>Motivo:</strong> {data.motivoConsulta || 'Sin motivo'}</p>
         <p><strong>Estado:</strong> {data.estado || 'N/A'}</p>
-       <p>
-          <strong>Paciente:</strong>{' '}
-          {data.paciente?.nombreCompleto || 'N/A'}
-        </p>
-
-        <p>
-          <strong>Documento:</strong>{' '}
-          {data.paciente?.documento || 'N/A'}
-        </p>
-
-        <p>
-          <strong>Correo:</strong>{' '}
-          {data.paciente?.email || 'N/A'}
-        </p>
-
-        <p>
-          <strong>Teléfono:</strong>{' '}
-          {data.paciente?.telefono || 'N/A'}
-        </p>
+        <p><strong>Paciente:</strong> {data.pacienteNombre}</p>
+        <p><strong>Documento paciente:</strong> {data.pacienteDocumento || 'N/A'}</p>
+        <p><strong>Profesional:</strong> {data.profesionalNombre}</p>
+        <p><strong>Especialidad:</strong> {data.especialidad || 'N/A'}</p>
+        <p><strong>Creado por:</strong> {data.creadoPor || 'N/A'}</p>
       </div>
     </div>
   );

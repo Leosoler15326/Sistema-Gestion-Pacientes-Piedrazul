@@ -18,7 +18,7 @@ export const APP_ROUTES = {
   USUARIOS: '/usuarios',
   USUARIOS_NUEVO: '/usuarios/nuevo',
   USUARIOS_DETALLE: '/usuarios/:id',
-  
+
   PACIENTES: '/pacientes',
   PACIENTES_NUEVO: '/pacientes/nuevo',
   PACIENTES_DETALLE: '/pacientes/:id',

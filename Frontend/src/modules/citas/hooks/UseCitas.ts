@@ -12,7 +12,8 @@ export const useCitasPorProfesional = (
 ) => {
   return useQuery({
     queryKey: ['citas-profesional', params],
-    queryFn: () => citasService.listarPorProfesional(params as ListarCitasProfesionalParamsDto),
+    queryFn: () =>
+      citasService.listarPorProfesional(params as ListarCitasProfesionalParamsDto),
     enabled: Boolean(params?.profesionalId && params?.fecha),
   });
 };

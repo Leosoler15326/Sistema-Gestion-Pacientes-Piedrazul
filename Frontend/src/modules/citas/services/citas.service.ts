@@ -5,6 +5,7 @@ import type {
   CreateCitaRequestDto,
   ListarCitasProfesionalParamsDto,
   ReagendarCitaRequestDto,
+  SlotDisponibleDto,
   SlotsDisponiblesParamsDto,
 } from '../types/cita.types';
 
@@ -13,8 +14,8 @@ const CITAS_BASE = '/citas';
 export const citasService = {
   async obtenerSlotsDisponibles(
     params: SlotsDisponiblesParamsDto
-  ): Promise<string[]> {
-    const { data } = await api.get<string[]>(`${CITAS_BASE}/slots`, {
+  ): Promise<SlotDisponibleDto[]> {
+    const { data } = await api.get<SlotDisponibleDto[]>(`${CITAS_BASE}/slots`, {
       params,
     });
     return data;

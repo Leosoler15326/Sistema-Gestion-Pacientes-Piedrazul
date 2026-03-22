@@ -6,33 +6,22 @@ export type EstadoCita =
   | 'REAGENDADA'
   | string;
 
-export interface PacienteResumenDto {
-  id: number;
-  nombres: string;
-  apellidos?: string;
-  nombreCompleto: string;
-  documento?: string;
-  email?: string;
-  telefono?: string;
-  totalCitas?: number;
-}
-
-export interface ProfesionalResumenDto {
-  id?: number;
-  nombres?: string;
-  nombreCompleto?: string;
-  especialidad?: string;
-  tipo?: string;
-}
-
 export interface CitaDto {
   id: number;
   fechaHora: string;
   tipoAtencion: string;
   motivoConsulta?: string;
   estado?: EstadoCita;
-  paciente?: PacienteResumenDto;
-  profesional?: ProfesionalResumenDto;
+
+  pacienteId: number;
+  pacienteNombre: string;
+  pacienteDocumento?: string;
+
+  profesionalId: number;
+  profesionalNombre: string;
+  especialidad?: string;
+
+  creadoPor?: string;
 }
 
 export interface CreateCitaRequestDto {
@@ -50,6 +39,11 @@ export interface ReagendarCitaRequestDto {
 
 export interface CancelarCitaRequestDto {
   motivo?: string;
+}
+
+export interface SlotDisponibleDto {
+  fechaHora: string;
+  horaFormateada: string;
 }
 
 export interface SlotsDisponiblesParamsDto {

@@ -24,6 +24,7 @@ export default function CitaCreatePage() {
       <CitaForm
         onSubmit={handleSubmit}
         loading={createMutation.isPending}
+        slotsDisponibles={[]}
       />
     </div>
   );

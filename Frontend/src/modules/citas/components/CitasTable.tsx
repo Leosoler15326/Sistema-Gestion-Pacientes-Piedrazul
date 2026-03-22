@@ -15,7 +15,9 @@ export default function CitasTable({ items, onCancel }: CitasTableProps) {
           <tr>
             <th className="px-4 py-3 text-left">Fecha y hora</th>
             <th className="px-4 py-3 text-left">Paciente</th>
+            <th className="px-4 py-3 text-left">Documento</th>
             <th className="px-4 py-3 text-left">Profesional</th>
+            <th className="px-4 py-3 text-left">Especialidad</th>
             <th className="px-4 py-3 text-left">Tipo atención</th>
             <th className="px-4 py-3 text-left">Estado</th>
             <th className="px-4 py-3 text-left">Acciones</th>
@@ -25,12 +27,10 @@ export default function CitasTable({ items, onCancel }: CitasTableProps) {
           {items.map((cita) => (
             <tr key={cita.id} className="border-t">
               <td className="px-4 py-3">{cita.fechaHora}</td>
-             <td className="px-4 py-3">
-                {cita.paciente?.nombreCompleto || `${cita.paciente?.nombres ?? ''} ${cita.paciente?.apellidos ?? ''}`.trim() || 'N/A'}
-              </td>
-              <td className="px-4 py-3">
-                {cita.profesional?.nombres || cita.profesional?.nombreCompleto || 'N/A'}
-              </td>
+              <td className="px-4 py-3">{cita.pacienteNombre}</td>
+              <td className="px-4 py-3">{cita.pacienteDocumento || 'N/A'}</td>
+              <td className="px-4 py-3">{cita.profesionalNombre}</td>
+              <td className="px-4 py-3">{cita.especialidad || 'N/A'}</td>
               <td className="px-4 py-3">{cita.tipoAtencion}</td>
               <td className="px-4 py-3">{cita.estado || 'N/A'}</td>
               <td className="px-4 py-3">

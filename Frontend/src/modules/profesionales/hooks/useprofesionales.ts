@@ -1,6 +1,5 @@
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { profesionalesService } from '../services/Profesionales.service';
+import { profesionalesService } from '../services/profesionales.service';
 import type {
   ActualizarProfesionalDto,
   CrearProfesionalDto,
@@ -41,7 +40,8 @@ export const useCreateProfesional = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CrearProfesionalDto) => profesionalesService.crear(payload),
+    mutationFn: (payload: CrearProfesionalDto) =>
+      profesionalesService.crear(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profesionales'] });
       queryClient.invalidateQueries({ queryKey: ['profesionales-activos'] });
