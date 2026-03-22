@@ -4,6 +4,7 @@ import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import InlineMessage from '../../../components/common/InlineMessage';
 import PageHeader from '../../../components/common/PageHeader';
+import BackButton from '../../../components/common/BackButton';
 import { useCambiarEstadoProfesional, useProfesionalDetail } from '../hooks/useprofesionales';
 
 export default function ProfesionalDetailPage() {
@@ -41,11 +42,15 @@ export default function ProfesionalDetailPage() {
       <PageHeader
         title={`Profesional #${data.profesionalId}`}
         subtitle="Detalle del profesional"
+        actions={<BackButton />}
       />
 
       {message && (
         <div className="mb-4">
-          <InlineMessage type="info" message={message} />
+          <InlineMessage
+            type={message.includes('cambiado') ? 'success' : 'error'}
+            message={message}
+          />
         </div>
       )}
 

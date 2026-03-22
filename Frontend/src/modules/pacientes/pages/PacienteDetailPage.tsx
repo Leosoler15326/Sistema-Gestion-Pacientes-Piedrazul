@@ -1,10 +1,10 @@
-
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
-import { usePacienteDetail } from '../hooks/usePacientes';
+import BackButton from '../../../components/common/BackButton';
 import { APP_ROUTES } from '../../../app/router/routes';
+import { usePacienteDetail } from '../hooks/usePacientes';
 
 export default function PacienteDetailPage() {
   const params = useParams();
@@ -29,14 +29,16 @@ export default function PacienteDetailPage() {
         title={`Paciente #${data.id}`}
         subtitle="Detalle del paciente"
         actions={
-          <a
-            href={APP_ROUTES.PACIENTES_EDITAR.replace(':id', String(data.id))}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Editar paciente
-          </a>
+          <div className="flex gap-2">
+            <BackButton />
+            <Link
+              to={APP_ROUTES.PACIENTES_EDITAR.replace(':id', String(data.id))}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Editar paciente
+            </Link>
+          </div>
         }
-        
       />
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">

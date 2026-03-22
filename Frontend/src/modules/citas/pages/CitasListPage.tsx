@@ -1,42 +1,110 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
-import ConfirmDialog from '../../../components/common/ConfirmDialog';
-import CitasTable from '../components/CitasTable';
+import InlineMessage from '../../../components/common/InlineMessage';
 import { APP_ROUTES } from '../../../app/router/routes';
-import { Link } from 'react-router-dom';
-import { useCancelarCita, useCitasPorPaciente } from '../hooks/UseCitas';
+import CitasTable from '../components/CitasTable';
+import {
+  useCancelarCita,
+  useCitasPorPaciente,
+  useCitasPorProfesional,
+} from '../hooks/UseCitas';
+import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
+
+type SearchMode = 'paciente' | 'profesional';
 
 export default function CitasListPage() {
-  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
-  const [citaIdToCancel, setCitaIdToCancel] = useState<number | null>(null);
+  const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
 
-  const { data, isLoading, isError, refetch } = useCitasPorPaciente(pacienteId);
+  const [pacienteIdInput, setPacienteIdInput] = useState('');
+  const [profesionalIdInput, setProfesionalIdInput] = useState('');
+  const [fechaProfesional, setFechaProfesional] = useState('');
+
+  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
+  const [profesionalId, setProfesionalId] = useState<number | undefined>(undefined);
+  const [fecha, setFecha] = useState<string | undefined>(undefined);
+
+  const [citaIdToCancel, setCitaIdToCancel] = useState<number | null>(null);
+  const [message, setMessage] = useState('');
+
+  const { data: profesionales } = useProfesionalesActivos();
+
+  const pacienteQuery = useCitasPorPaciente(
+    searchMode === 'paciente' ? pacienteId : undefined
+  );
+
+  const profesionalQuery = useCitasPorProfesional(
+    searchMode === 'profesional' && profesionalId && fecha
+      ? { profesionalId, fecha }
+      : undefined
+  );
+
   const cancelMutation = useCancelarCita();
 
+  const activeQuery = searchMode === 'paciente' ? pacienteQuery : profesionalQuery;
+
   const handleBuscar = () => {
-    if (pacienteId) {
-      refetch();
+    setMessage('');
+
+    if (searchMode === 'paciente') {
+      if (!pacienteIdInput.trim()) {
+        setMessage('Debes ingresar un ID de paciente.');
+        return;
+      }
+
+      setPacienteId(Number(pacienteIdInput));
+      return;
     }
+
+    if (!profesionalIdInput.trim()) {
+      setMessage('Debes seleccionar un profesional.');
+      return;
+    }
+
+    if (!fechaProfesional) {
+      setMessage('Debes seleccionar una fecha.');
+      return;
+    }
+
+    setProfesionalId(Number(profesionalIdInput));
+    setFecha(fechaProfesional);
+  };
+
+  const handleLimpiar = () => {
+    setMessage('');
+    setPacienteIdInput('');
+    setProfesionalIdInput('');
+    setFechaProfesional('');
+    setPacienteId(undefined);
+    setProfesionalId(undefined);
+    setFecha(undefined);
   };
 
   const handleConfirmCancel = async () => {
     if (!citaIdToCancel) return;
 
-    await cancelMutation.mutateAsync({
-      id: citaIdToCancel,
-      payload: { motivo: 'Cancelada desde frontend' },
-    });
-
-    setCitaIdToCancel(null);
+    try {
+      setMessage('');
+      await cancelMutation.mutateAsync({
+        id: citaIdToCancel,
+        payload: { motivo: 'Cancelada desde frontend' },
+      });
+      setCitaIdToCancel(null);
+      setMessage('Cita cancelada correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No fue posible cancelar la cita.');
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
         title="Citas"
-        subtitle="Consulta y gestiona citas."
+        subtitle="Consulta y gestiona citas por paciente o por profesional."
         actions={
           <Link
             to={APP_ROUTES.CITAS_NUEVA}
@@ -47,44 +115,141 @@ export default function CitasListPage() {
         }
       />
 
-      <div className="mb-6 rounded-xl bg-white p-4 shadow">
-        <div className="flex gap-3">
-          <input
-            type="number"
-            placeholder="ID paciente"
-            value={pacienteId || ''}
-            onChange={(e) => setPacienteId(Number(e.target.value))}
-            className="rounded-lg border px-3 py-2"
+      {message && (
+        <div className="mb-4">
+          <InlineMessage
+            type={message.includes('correctamente') ? 'success' : 'error'}
+            message={message}
           />
+        </div>
+      )}
+
+      <div className="mb-6 rounded-xl bg-white p-4 shadow">
+        <div className="mb-4 flex gap-2">
           <button
             type="button"
-            onClick={handleBuscar}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            onClick={() => {
+              setSearchMode('paciente');
+              setMessage('');
+            }}
+            className={`rounded-lg px-4 py-2 ${
+              searchMode === 'paciente'
+                ? 'bg-blue-600 text-white'
+                : 'border border-gray-300 bg-white'
+            }`}
           >
-            Buscar
+            Buscar por paciente
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSearchMode('profesional');
+              setMessage('');
+            }}
+            className={`rounded-lg px-4 py-2 ${
+              searchMode === 'profesional'
+                ? 'bg-blue-600 text-white'
+                : 'border border-gray-300 bg-white'
+            }`}
+          >
+            Buscar por profesional
           </button>
         </div>
+
+        {searchMode === 'paciente' ? (
+          <div className="flex flex-col gap-3 md:flex-row">
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="ID paciente"
+              value={pacienteIdInput}
+              onChange={(e) => setPacienteIdInput(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+            />
+
+            <button
+              type="button"
+              onClick={handleBuscar}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Buscar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLimpiar}
+              className="rounded-lg border border-gray-300 px-4 py-2"
+            >
+              Limpiar
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 md:flex-row">
+            <select
+              value={profesionalIdInput}
+              onChange={(e) => setProfesionalIdInput(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+            >
+              <option value="">Selecciona un profesional</option>
+              {profesionales?.map((p) => (
+                <option key={p.profesionalId} value={p.profesionalId}>
+                  {p.nombres} - {p.especialidad}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              value={fechaProfesional}
+              onChange={(e) => setFechaProfesional(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+            />
+
+            <button
+              type="button"
+              onClick={handleBuscar}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Buscar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLimpiar}
+              className="rounded-lg border border-gray-300 px-4 py-2"
+            >
+              Limpiar
+            </button>
+          </div>
+        )}
       </div>
 
-      {isLoading && <Loader message="Cargando citas..." />}
+      {activeQuery.isLoading && <Loader message="Cargando citas..." />}
 
-      {!isLoading && isError && (
+      {!activeQuery.isLoading && activeQuery.isError && (
         <EmptyState
           title="Error al cargar citas"
           description="No fue posible consultar las citas."
         />
       )}
 
-      {!isLoading && !isError && pacienteId && (!data || data.length === 0) && (
-        <EmptyState
-          title="No hay citas"
-          description="No se encontraron citas para el paciente indicado."
-        />
-      )}
+      {!activeQuery.isLoading &&
+        !activeQuery.isError &&
+        activeQuery.data &&
+        activeQuery.data.length > 0 && (
+          <CitasTable items={activeQuery.data} onCancel={setCitaIdToCancel} />
+        )}
 
-      {!isLoading && !isError && data && data.length > 0 && (
-        <CitasTable items={data} onCancel={setCitaIdToCancel} />
-      )}
+      {!activeQuery.isLoading &&
+        !activeQuery.isError &&
+        activeQuery.data &&
+        activeQuery.data.length === 0 && (
+          <EmptyState
+            title="No hay citas"
+            description="No se encontraron citas para los criterios indicados."
+          />
+        )}
 
       <ConfirmDialog
         isOpen={Boolean(citaIdToCancel)}
