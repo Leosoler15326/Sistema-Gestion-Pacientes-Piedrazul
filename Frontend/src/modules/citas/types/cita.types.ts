@@ -7,10 +7,14 @@ export type EstadoCita =
   | string;
 
 export interface PacienteResumenDto {
-  id?: number;
-  nombres?: string;
-  nombreCompleto?: string;
+  id: number;
+  nombres: string;
+  apellidos?: string;
+  nombreCompleto: string;
   documento?: string;
+  email?: string;
+  telefono?: string;
+  totalCitas?: number;
 }
 
 export interface ProfesionalResumenDto {

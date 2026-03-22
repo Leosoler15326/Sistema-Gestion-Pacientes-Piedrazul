@@ -25,8 +25,8 @@ export default function CitasTable({ items, onCancel }: CitasTableProps) {
           {items.map((cita) => (
             <tr key={cita.id} className="border-t">
               <td className="px-4 py-3">{cita.fechaHora}</td>
-              <td className="px-4 py-3">
-                {cita.paciente?.nombres || cita.paciente?.nombreCompleto || 'N/A'}
+             <td className="px-4 py-3">
+                {cita.paciente?.nombreCompleto || `${cita.paciente?.nombres ?? ''} ${cita.paciente?.apellidos ?? ''}`.trim() || 'N/A'}
               </td>
               <td className="px-4 py-3">
                 {cita.profesional?.nombres || cita.profesional?.nombreCompleto || 'N/A'}
