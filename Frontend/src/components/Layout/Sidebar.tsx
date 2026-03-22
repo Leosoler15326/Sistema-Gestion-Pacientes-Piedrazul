@@ -14,7 +14,7 @@ export default function Sidebar() {
     .toUpperCase()
     .replace('ROLE_', '');
 
-  const esAdmin = normalizedRole === 'ADMIN' || normalizedRole === 'ADMINISTRADOR';
+  const esAdmin = normalizedRole === 'ADMINISTRADOR';
 
   return (
     <aside className="w-64 bg-white shadow-md">
@@ -50,25 +50,6 @@ export default function Sidebar() {
           Historia Clínica
         </NavLink>
 
-        {esAdmin && (
-          <NavLink
-            to={APP_ROUTES.PROFESIONALES}
-            className={({ isActive }) =>
-              `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
-            }
-          >
-            Personal
-          </NavLink>
-        )}
-
-        <NavLink
-          to={APP_ROUTES.USUARIOS}
-          className={({ isActive }) =>
-            `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
-          }
-        >
-          Usuarios
-        </NavLink>
         <NavLink
           to={APP_ROUTES.PACIENTES}
           className={({ isActive }) =>
@@ -77,6 +58,28 @@ export default function Sidebar() {
         >
           Pacientes
         </NavLink>
+
+        {esAdmin && (
+          <>
+            <NavLink
+              to={APP_ROUTES.PROFESIONALES}
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
+              }
+            >
+              Personal
+            </NavLink>
+
+            <NavLink
+              to={APP_ROUTES.USUARIOS}
+              className={({ isActive }) =>
+                `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
+              }
+            >
+              Usuarios
+            </NavLink>
+          </>
+        )}
       </nav>
     </aside>
   );

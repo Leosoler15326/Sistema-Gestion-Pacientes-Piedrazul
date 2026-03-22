@@ -1,6 +1,10 @@
 
 import { useState, type FormEvent } from 'react';
 import type { CrearProfesionalDto } from '../types/profesional.types';
+import {
+  ESPECIALIDAD_OPTIONS,
+  TIPO_PROFESIONAL_OPTIONS,
+} from '../../../constants/enums';
 
 interface ProfesionalFormProps {
   onSubmit: (values: CrearProfesionalDto) => Promise<void>;
@@ -64,23 +68,35 @@ export default function ProfesionalForm({
         required
       />
 
-      <input
-        type="text"
-        placeholder="Tipo profesional (ej: MEDICO)"
+      <select
         value={form.tipo}
         onChange={(e) => setForm((prev) => ({ ...prev, tipo: e.target.value }))}
         className="w-full rounded-lg border px-3 py-2"
         required
-      />
+      >
+        <option value="">Selecciona tipo profesional</option>
+        {TIPO_PROFESIONAL_OPTIONS.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
 
-      <input
-        type="text"
-        placeholder="Especialidad (ej: MEDICINA_GENERAL)"
+      <select
         value={form.especialidad}
-        onChange={(e) => setForm((prev) => ({ ...prev, especialidad: e.target.value }))}
+        onChange={(e) =>
+          setForm((prev) => ({ ...prev, especialidad: e.target.value }))
+        }
         className="w-full rounded-lg border px-3 py-2"
         required
-      />
+      >
+        <option value="">Selecciona especialidad</option>
+        {ESPECIALIDAD_OPTIONS.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
 
       <input
         type="text"

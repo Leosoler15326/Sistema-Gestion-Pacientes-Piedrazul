@@ -6,6 +6,7 @@ import InlineMessage from '../../../components/common/InlineMessage';
 import PageHeader from '../../../components/common/PageHeader';
 import BackButton from '../../../components/common/BackButton';
 import { useCambiarEstadoProfesional, useProfesionalDetail } from '../hooks/useprofesionales';
+import { ESTADO_PROFESIONAL_OPTIONS } from '../../../constants/enums';
 
 export default function ProfesionalDetailPage() {
   const params = useParams();
@@ -63,31 +64,18 @@ export default function ProfesionalDetailPage() {
         <p><strong>Estado:</strong> {data.estado}</p>
         <p><strong>Usuario vinculado:</strong> {data.usuarioVinculado ? 'Sí' : 'No'}</p>
 
-        <div className="flex gap-2 pt-4">
-          <button
-            type="button"
-            onClick={() => handleCambiarEstado('ACTIVO')}
-            className="rounded-lg bg-green-600 px-4 py-2 text-white"
-          >
-            Activar
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleCambiarEstado('INACTIVO')}
-            className="rounded-lg bg-yellow-600 px-4 py-2 text-white"
-          >
-            Inactivar
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleCambiarEstado('SUSPENDIDO')}
-            className="rounded-lg bg-red-600 px-4 py-2 text-white"
-          >
-            Suspender
-          </button>
-        </div>
+       <div className="flex gap-2 pt-4">
+            {ESTADO_PROFESIONAL_OPTIONS.map((estado) => (
+              <button
+                key={estado}
+                type="button"
+                onClick={() => handleCambiarEstado(estado)}
+                className="rounded-lg bg-slate-700 px-4 py-2 text-white"
+              >
+                {estado}
+              </button>
+            ))}
+          </div>
       </div>
     </div>
   );

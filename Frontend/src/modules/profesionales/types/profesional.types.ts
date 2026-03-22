@@ -1,23 +1,19 @@
 export type TipoProfesional =
   | 'MEDICO'
   | 'TERAPISTA'
-  | 'PSICOLOGO'
-  | 'ODONTOLOGO'
   | string;
 
 export type Especialidad =
-  | 'MEDICINA_GENERAL'
+  | 'TERAPIA_NEURAL'
+  | 'QUIROPRAXIA'
   | 'FISIOTERAPIA'
-  | 'PSICOLOGIA'
-  | 'ODONTOLOGIA'
   | string;
 
 export type EstadoProfesional =
   | 'ACTIVO'
   | 'INACTIVO'
-  | 'SUSPENDIDO'
   | string;
-
+  
 export interface ProfesionalDto {
   profesionalId: number;
   nombres: string;

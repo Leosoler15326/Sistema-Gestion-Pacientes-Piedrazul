@@ -39,41 +39,42 @@ export default function AppRouter() {
             <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />
             <Route path={APP_ROUTES.CITAS_REAGENDAR} element={<ReagendarCitaPage />} />
             //mirar
-            <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
+            <Route element={<RoleRoute allowedRoles={['ADMINISTRADOR']} />}>
               <Route path={APP_ROUTES.PROFESIONALES} element={<ProfesionalesListPage />} />
               <Route path={APP_ROUTES.PROFESIONALES_NUEVO} element={<ProfesionalFormPage />} />
               <Route path={APP_ROUTES.PROFESIONALES_DETALLE} element={<ProfesionalDetailPage />} />
+
+              <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
+              <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />
+              <Route path={APP_ROUTES.USUARIOS_DETALLE} element={<UsuarioDetailPage />} />
+              <Route path={APP_ROUTES.USUARIOS_EDITAR} element={<UsuarioEditPage />} />
             </Route>
             <Route
             element={<RoleRoute allowedRoles={['ADMIN', 'MEDICO', 'TERAPISTA']} />}
             >
-            <Route
-                path={APP_ROUTES.HISTORIA_CLINICA}
-                element={<HistoriaClinicaListPage />}
-            />
-              <Route
-                path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
-                element={<HistoriaClinicaFormPage />}
-              />
-            <Route
-                path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
-                element={<HistoriaClinicaDetailPage />}
-            />
-            <Route path={APP_ROUTES.PACIENTES_EDITAR} element={<PacienteEditPage />} />
-            <Route path={APP_ROUTES.HISTORIA_CLINICA_EDITAR} element={<HistoriaClinicaEditPage />} />
+            <Route element={<RoleRoute allowedRoles={['ADMINISTRADOR', 'MEDICO_TERAPISTA']} />}>
+              <Route path={APP_ROUTES.HISTORIA_CLINICA} element={<HistoriaClinicaListPage />} />
+              <Route path={APP_ROUTES.HISTORIA_CLINICA_NUEVA} element={<HistoriaClinicaFormPage />} />
+              <Route path={APP_ROUTES.HISTORIA_CLINICA_DETALLE} element={<HistoriaClinicaDetailPage />} />
+              <Route path={APP_ROUTES.HISTORIA_CLINICA_EDITAR} element={<HistoriaClinicaEditPage />} />
+            </Route>
 
             <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
               <Route path={APP_ROUTES.USUARIOS_EDITAR} element={<UsuarioEditPage />} />
             </Route>
-            </Route>
-            <Route path={APP_ROUTES.PACIENTES} element={<PacientesListPage />} />
-            <Route path={APP_ROUTES.PACIENTES_NUEVO} element={<PacienteFormPage />} />
-            <Route path={APP_ROUTES.PACIENTES_DETALLE} element={<PacienteDetailPage />} />
-            <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
-              <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
-              <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />
-              <Route path={APP_ROUTES.USUARIOS_DETALLE} element={<UsuarioDetailPage />} />
-            </Route>
+
+          </Route>
+              <Route path={APP_ROUTES.PACIENTES} element={<PacientesListPage />} />
+              <Route path={APP_ROUTES.PACIENTES_NUEVO} element={<PacienteFormPage />} />
+              <Route path={APP_ROUTES.PACIENTES_DETALLE} element={<PacienteDetailPage />} />
+              <Route path={APP_ROUTES.PACIENTES_EDITAR} element={<PacienteEditPage />} />
+
+
+              <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
+                <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
+                <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />
+                <Route path={APP_ROUTES.USUARIOS_DETALLE} element={<UsuarioDetailPage />} />
+              </Route>
         </Route>
 
 

@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 import type { CreateCitaRequestDto, SlotDisponibleDto } from '../types/cita.types';
+import { TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
 
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
@@ -123,16 +124,21 @@ export default function CitaForm({
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Tipo de atención
           </label>
-          <input
-            type="text"
-            placeholder="Tipo de atención"
+          <select
             value={form.tipoAtencion}
             onChange={(e) =>
               setForm((prev) => ({ ...prev, tipoAtencion: e.target.value }))
             }
             className="w-full rounded-lg border px-3 py-2"
             required
-          />
+          >
+            <option value="">Selecciona tipo de atención</option>
+            {TIPO_ATENCION_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

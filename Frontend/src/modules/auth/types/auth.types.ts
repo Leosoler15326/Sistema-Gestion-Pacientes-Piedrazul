@@ -1,5 +1,10 @@
-export type UserRole = 'ADMIN' | 'MEDICO' | 'TERAPISTA' | 'RECEPCIONISTA' | string;
-
+export type UserRole =
+  | 'ADMINISTRADOR'
+  | 'MEDICO_TERAPISTA'
+  | 'AGENDADOR'
+  | 'PACIENTE'
+  | string;
+  
 export interface LoginRequestDto {
   nombreUsuario: string;
   contrasena: string;

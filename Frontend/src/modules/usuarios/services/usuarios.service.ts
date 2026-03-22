@@ -1,4 +1,3 @@
-
 import api from '../../../services/api';
 import type {
   ActualizarUsuarioDto,
@@ -26,8 +25,7 @@ export const usuariosService = {
   },
 
   async actualizar(id: number, payload: ActualizarUsuarioDto): Promise<UsuarioDto> {
-    const responsable =
-      authStore.getUser()?.nombreUsuario || 'sistema';
+    const responsable = authStore.getUser()?.nombreUsuario || 'sistema';
 
     const { data } = await api.put<UsuarioDto>(`${USUARIOS_BASE}/${id}`, payload, {
       headers: {
@@ -39,18 +37,13 @@ export const usuariosService = {
   },
 
   async desactivar(id: number): Promise<void> {
-    const responsable =
-      authStore.getUser()?.nombreUsuario || 'sistema';
+    const responsable = authStore.getUser()?.nombreUsuario || 'sistema';
 
-    await api.patch(
-      `${USUARIOS_BASE}/${id}/desactivar`,
-      null,
-      {
-        headers: {
-          'X-Usuario-Responsable': responsable,
-        },
-      }
-    );
+    await api.patch(`${USUARIOS_BASE}/${id}/desactivar`, {}, {
+      headers: {
+        'X-Usuario-Responsable': responsable,
+      },
+    });
   },
 
   async verificarEmail(token: string): Promise<string> {

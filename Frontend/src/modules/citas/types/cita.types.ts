@@ -1,9 +1,9 @@
 export type EstadoCita =
   | 'PROGRAMADA'
-  | 'CONFIRMADA'
+  | 'ATENDIDA'
   | 'CANCELADA'
-  | 'COMPLETADA'
   | 'REAGENDADA'
+  | 'NO_ASISTIO'
   | string;
 
 export interface CitaDto {

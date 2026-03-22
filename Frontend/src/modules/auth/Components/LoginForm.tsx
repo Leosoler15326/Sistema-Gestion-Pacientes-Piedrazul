@@ -14,13 +14,23 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!form.nombreUsuario.trim() || !form.contrasena.trim()) {
+      return;
+    }
+
     await onSubmit(form);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label htmlFor="nombreUsuario">Usuario</label>
+        <label
+          htmlFor="nombreUsuario"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Usuario
+        </label>
         <input
           id="nombreUsuario"
           type="text"
@@ -29,11 +39,17 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
             setForm((prev) => ({ ...prev, nombreUsuario: e.target.value }))
           }
           placeholder="Ingresa tu usuario"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
       </div>
 
       <div>
-        <label htmlFor="contrasena">Contraseña</label>
+        <label
+          htmlFor="contrasena"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Contraseña
+        </label>
         <input
           id="contrasena"
           type="password"
@@ -41,11 +57,16 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
           onChange={(e) =>
             setForm((prev) => ({ ...prev, contrasena: e.target.value }))
           }
-          placeholder="********"
+          placeholder="Ingresa tu contraseña"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
       </div>
 
-      <button type="submit" disabled={loading}>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+      >
         {loading ? 'Ingresando...' : 'Iniciar sesión'}
       </button>
     </form>

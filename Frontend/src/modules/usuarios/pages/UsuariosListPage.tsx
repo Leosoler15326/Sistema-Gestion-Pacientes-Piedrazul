@@ -16,8 +16,14 @@ export default function UsuariosListPage() {
 
   const handleConfirmDisable = async () => {
     if (!usuarioIdToDisable) return;
-    await desactivarMutation.mutateAsync(usuarioIdToDisable);
-    setUsuarioIdToDisable(null);
+
+    try {
+      setUsuarioIdToDisable(null);
+      await desactivarMutation.mutateAsync(usuarioIdToDisable);
+    } catch (error) {
+      console.error('Error al desactivar usuario:', error);
+      alert('Error al desactivar usuario. Revisa consola y Network.');
+    }
   };
 
   if (isLoading) return <Loader message="Cargando usuarios..." />;
