@@ -69,6 +69,14 @@ export default function Sidebar() {
         >
           Usuarios
         </NavLink>
+        <NavLink
+          to={APP_ROUTES.PACIENTES}
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
+          }
+        >
+          Pacientes
+        </NavLink>
       </nav>
     </aside>
   );

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import type { CrearUsuarioDto } from '../types/Usuario.types';
+import type { CrearUsuarioDto } from '../types/usuario.types';
 
 interface UsuarioFormProps {
   onSubmit: (values: CrearUsuarioDto) => Promise<void>;

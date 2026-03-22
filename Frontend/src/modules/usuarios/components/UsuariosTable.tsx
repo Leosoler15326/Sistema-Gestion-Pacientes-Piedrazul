@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { UsuarioDto } from '../types/Usuario.types';
+import type { UsuarioDto } from '../types/usuario.types';
 import { APP_ROUTES } from '../../../app/router/routes';
 
 interface UsuariosTableProps {

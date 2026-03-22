@@ -3,7 +3,7 @@ import { usuariosService } from '../services/usuarios.service';
 import type {
   ActualizarUsuarioDto,
   CrearUsuarioDto,
-} from '../types/Usuario.types';
+} from '../types/usuario.types';
 
 export const useUsuarios = () => {
   return useQuery({

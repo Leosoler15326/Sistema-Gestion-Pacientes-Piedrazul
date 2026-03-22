@@ -4,7 +4,7 @@ import type {
   ActualizarUsuarioDto,
   CrearUsuarioDto,
   UsuarioDto,
-} from '../types/Usuario.types';
+} from '../types/usuario.types';
 import { authStore } from '../../auth/store/auth.store';
 
 const USUARIOS_BASE = '/usuarios';

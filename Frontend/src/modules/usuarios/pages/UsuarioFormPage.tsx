@@ -4,7 +4,7 @@ import PageHeader from '../../../components/common/PageHeader';
 import { APP_ROUTES } from '../../../app/router/routes';
 import UsuarioForm from '../components/UsuarioForm';
 import { useCreateUsuario } from '../hooks/useUsuarios';
-import type { CrearUsuarioDto } from '../types/Usuario.types';
+import type { CrearUsuarioDto } from '../types/usuario.types';
 
 export default function UsuarioFormPage() {
   const navigate = useNavigate();
