@@ -1,4 +1,5 @@
 com\SGPPiedrazul\security\UserDetailsServiceImpl.class
+com\SGPPiedrazul\service\PacienteService.class
 com\SGPPiedrazul\Config\SecurityConfig.class
 com\SGPPiedrazul\model\Profesional.class
 com\SGPPiedrazul\model\HistoriaClinica.class
@@ -28,6 +29,7 @@ com\SGPPiedrazul\repository\HistorialCitaRepository.class
 com\SGPPiedrazul\service\NotificacionService.class
 com\SGPPiedrazul\service\AuditoriaService.class
 com\SGPPiedrazul\repository\CitaRepository.class
+com\SGPPiedrazul\dto\PacienteDTO$Request.class
 com\SGPPiedrazul\BackendApplication.class
 com\SGPPiedrazul\repository\PacienteRepository.class
 com\SGPPiedrazul\model\enums\TipoAtencion.class
@@ -36,12 +38,15 @@ com\SGPPiedrazul\model\enums\TipoProfesional.class
 com\SGPPiedrazul\repository\FranjaHorariaRepository.class
 com\SGPPiedrazul\model\Auditoria.class
 com\SGPPiedrazul\Controller\CitaController.class
+com\SGPPiedrazul\dto\PacienteDTO.class
 com\SGPPiedrazul\dto\AuthDTO$TokenResponse.class
+com\SGPPiedrazul\dto\PacienteDTO$Response.class
 com\SGPPiedrazul\model\Usuario.class
 com\SGPPiedrazul\Controller\HealthController.class
 com\SGPPiedrazul\security\UserDetailsImpl.class
 com\SGPPiedrazul\Controller\AuthController.class
 com\SGPPiedrazul\repository\ProfesionalRepository.class
+com\SGPPiedrazul\Controller\PacienteController.class
 com\SGPPiedrazul\model\enums\Estado.class
 com\SGPPiedrazul\dto\AuthDTO.class
 com\SGPPiedrazul\model\enums\TipoEvento.class
