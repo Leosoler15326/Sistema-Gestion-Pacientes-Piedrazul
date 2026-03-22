@@ -30,7 +30,7 @@ export default function AppRouter() {
             <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />
             <Route path={APP_ROUTES.CITAS_REAGENDAR} element={<ReagendarCitaPage />} />
             //mirar
-            <Route element={<RoleRoute allowedRoles={['ADMIN']} />}>
+            <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
               <Route path={APP_ROUTES.PROFESIONALES} element={<ProfesionalesListPage />} />
               <Route path={APP_ROUTES.PROFESIONALES_NUEVO} element={<ProfesionalFormPage />} />
               <Route path={APP_ROUTES.PROFESIONALES_DETALLE} element={<ProfesionalDetailPage />} />

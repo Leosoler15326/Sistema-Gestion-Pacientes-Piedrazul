@@ -10,6 +10,12 @@ export default function Sidebar() {
 
   const activeClass = 'bg-blue-600 text-white';
 
+  const normalizedRole = String(user?.rol ?? '')
+    .toUpperCase()
+    .replace('ROLE_', '');
+
+  const esAdmin = normalizedRole === 'ADMIN' || normalizedRole === 'ADMINISTRADOR';
+
   return (
     <aside className="w-64 bg-white shadow-md">
       <div className="p-6 text-xl font-bold text-blue-600">
@@ -44,7 +50,7 @@ export default function Sidebar() {
           Historia Clínica
         </NavLink>
 
-        {user?.rol === 'ADMIN' && (
+        {esAdmin && (
           <NavLink
             to={APP_ROUTES.PROFESIONALES}
             className={({ isActive }) =>
