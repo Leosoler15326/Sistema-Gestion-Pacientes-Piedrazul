@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProfesionalService {
@@ -152,8 +152,12 @@ public class ProfesionalService {
                         "Profesional no encontrado con id: " + id));
     }
 
-    public List<Profesional> listarTodos() {
-        return profesionalRepository.findAll();
+    public List<ProfesionalResponseDTO> listarTodos() {
+        List<ProfesionalResponseDTO> dtos = new ArrayList<>();
+        for (Profesional p : profesionalRepository.findAll()) {
+            dtos.add(ProfesionalResponseDTO.conUsuario(p));
+        }
+        return dtos;
     }
 
     public List<Profesional> listarActivos() {

@@ -9,7 +9,7 @@ import ReagendarCitaPage from '../../modules/citas/pages/ReagendarCitaPage';
 import HistoriaClinicaListPage from '../../modules/historia-clinica/pages/HistoriaClinicaListPage';
 import HistoriaClinicaDetailPage from '../../modules/historia-clinica/pages/HistoriaClinicaDetailPage';
 import HistoriaClinicaFormPage from '../../modules/historia-clinica/pages/HistoriaClinicaFormPage';
-import LayoutWrapper from '../../components/layout/LayoutWrapper';
+import LayoutWrapper from '../../components/Layout/LayoutWrapper';
 import RoleRoute from './RoleRoute';
 import ProfesionalesListPage from '../../modules/profesionales/pages/ProfesionalesListPage';
 import ProfesionalFormPage from '../../modules/profesionales/pages/ProfesionalFormPage';
