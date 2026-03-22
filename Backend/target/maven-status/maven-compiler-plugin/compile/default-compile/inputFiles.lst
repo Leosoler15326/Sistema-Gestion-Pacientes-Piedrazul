@@ -11,9 +11,12 @@ C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\sr
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Controller\ProfesionalController.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\Controller\UsuarioController.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\AuthDTO.java
+C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\CitaDTO.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\CrearProfesionalDTO.java
+C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\HistoriaClinicaDTO.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\PacienteDTO.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\ProfesionalResponseDTO.java
+C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\dto\UsuarioDTO.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\model\Auditoria.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\model\Cita.java
 C:\Users\Usuario\Documents\GitHub\Sistema-Gestion-Pacientes-Piedrazul\Backend\src\main\java\com\SGPPiedrazul\model\enums\Especialidad.java

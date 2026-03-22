@@ -16,4 +16,6 @@ public interface ProfesionalRepository extends JpaRepository<Profesional, Long> 
     List<Profesional> findByEspecialidad(Especialidad especialidad);
 
     List<Profesional> findByEspecialidadAndEstado(Especialidad especialidad, Estado estado);
+
+    Profesional findByUsuarioId(Long usuarioId);
 }

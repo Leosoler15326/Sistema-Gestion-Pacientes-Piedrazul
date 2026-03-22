@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.service;
 
+import com.SGPPiedrazul.dto.HistoriaClinicaDTO;
 import com.SGPPiedrazul.model.Cita;
 import com.SGPPiedrazul.model.HistoriaClinica;
 import com.SGPPiedrazul.model.Profesional;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HistoriaClinicaService {
@@ -29,62 +31,99 @@ public class HistoriaClinicaService {
     }
 
     @Transactional
-    public HistoriaClinica registrar(Long citaId, String descripcion,
-                                      Profesional profesional, Usuario responsable) {
+    public HistoriaClinicaDTO.Response registrar(HistoriaClinicaDTO.Request dto,
+                                                   Profesional profesional,
+                                                   Usuario responsable) {
+        Cita cita = citaRepository.findById(dto.getCitaId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Cita no encontrada con id: " + dto.getCitaId()));
 
-        Cita cita = citaRepository.findById(citaId)
-                .orElseThrow(() -> new RuntimeException("Cita no encontrada con id: " + citaId));
-
-        if (historiaClinicaRepository.existsByCitaId(citaId)) {
-            throw new IllegalStateException("Ya existe una historia clínica para esta cita.");
+        if (historiaClinicaRepository.existsByCitaId(dto.getCitaId())) {
+            throw new IllegalStateException(
+                    "Ya existe una historia clínica para esta cita.");
         }
 
         HistoriaClinica historia = new HistoriaClinica();
         historia.setCita(cita);
         historia.setProfesional(profesional);
-        historia.setDescripcion(descripcion);
+        historia.setDescripcion(dto.getDescripcion());
 
-        // Marcar la cita como atendida
         cita.setEstado(EstadoCita.ATENDIDA);
         citaRepository.save(cita);
 
         HistoriaClinica guardada = historiaClinicaRepository.save(historia);
 
         auditoriaService.registrar(TipoEvento.HISTORIA_REGISTRADA,
-                "Historia clínica registrada para cita: " + citaId,
+                "Historia clínica registrada para cita: " + dto.getCitaId(),
                 responsable.getNombreUsuario());
 
-        return guardada;
+        return toResponse(guardada);
     }
 
     @Transactional
-    public HistoriaClinica actualizar(Long historiaId, String nuevaDescripcion, Usuario responsable) {
-        HistoriaClinica historia = buscarPorId(historiaId);
-        historia.setDescripcion(nuevaDescripcion);
+    public HistoriaClinicaDTO.Response actualizar(Long historiaId,
+                                                    HistoriaClinicaDTO.ActualizarRequest dto,
+                                                    Usuario responsable) {
+        HistoriaClinica historia = buscarEntidadPorId(historiaId);
+        historia.setDescripcion(dto.getDescripcion());
         HistoriaClinica actualizada = historiaClinicaRepository.save(historia);
 
         auditoriaService.registrar(TipoEvento.HISTORIA_MODIFICADA,
                 "Historia clínica " + historiaId + " modificada.",
                 responsable.getNombreUsuario());
 
-        return actualizada;
+        return toResponse(actualizada);
     }
 
-    public HistoriaClinica buscarPorId(Long id) {
+    @Transactional(readOnly = true)
+    public HistoriaClinicaDTO.Response buscarPorCita(Long citaId) {
+        return toResponse(historiaClinicaRepository.findByCitaId(citaId)
+                .orElseThrow(() -> new RuntimeException(
+                        "No hay historia clínica para la cita: " + citaId)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<HistoriaClinicaDTO.Response> listarPorPaciente(Long pacienteId) {
+        return historiaClinicaRepository.findByCitaPacienteId(pacienteId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<HistoriaClinicaDTO.Response> listarPorProfesional(Long profesionalId) {
+        return historiaClinicaRepository.findByProfesionalId(profesionalId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    public HistoriaClinica buscarEntidadPorId(Long id) {
         return historiaClinicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Historia clínica no encontrada con id: " + id));
+                .orElseThrow(() -> new RuntimeException(
+                        "Historia clínica no encontrada con id: " + id));
     }
 
-    public HistoriaClinica buscarPorCita(Long citaId) {
-        return historiaClinicaRepository.findByCitaId(citaId)
-                .orElseThrow(() -> new RuntimeException("No hay historia clínica para la cita: " + citaId));
-    }
+    private HistoriaClinicaDTO.Response toResponse(HistoriaClinica h) {
+        HistoriaClinicaDTO.Response dto = new HistoriaClinicaDTO.Response();
+        dto.setId(h.getId());
+        dto.setFechaAtencion(h.getFechaAtencion());
+        dto.setDescripcion(h.getDescripcion());
 
-    public List<HistoriaClinica> listarPorPaciente(Long pacienteId) {
-        return historiaClinicaRepository.findByCitaPacienteId(pacienteId);
-    }
+        if (h.getCita() != null) {
+            dto.setCitaId(h.getCita().getId());
+            dto.setFechaCita(h.getCita().getFechaHora());
 
-    public List<HistoriaClinica> listarPorProfesional(Long profesionalId) {
-        return historiaClinicaRepository.findByProfesionalId(profesionalId);
+            if (h.getCita().getPaciente() != null) {
+                dto.setPacienteId(h.getCita().getPaciente().getId());
+                dto.setPacienteNombre(h.getCita().getPaciente().getNombres()
+                        + " " + h.getCita().getPaciente().getApellidos());
+                dto.setPacienteDocumento(h.getCita().getPaciente().getDocumento());
+            }
+        }
+
+        if (h.getProfesional() != null) {
+            dto.setProfesionalId(h.getProfesional().getId());
+            dto.setProfesionalNombre(h.getProfesional().getNombres());
+            dto.setEspecialidad(h.getProfesional().getEspecialidad().name());
+        }
+
+        return dto;
     }
 }
