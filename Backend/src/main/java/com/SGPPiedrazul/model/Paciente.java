@@ -61,4 +61,6 @@ public class Paciente {
     public LocalDateTime getCreadoEn() { return creadoEn; }
 
     public List<Cita> getCitas() { return citas; }
+
+    public void setEstado() {}//falta implementar estado para pacientes.
 }
