@@ -15,5 +15,9 @@ export const APP_ROUTES = {
   PROFESIONALES_NUEVO: '/profesionales/nuevo',
   PROFESIONALES_DETALLE: '/profesionales/:id',
 
+  USUARIOS: '/usuarios',
+  USUARIOS_NUEVO: '/usuarios/nuevo',
+  USUARIOS_DETALLE: '/usuarios/:id',
+
   NOT_FOUND: '*',
 } as const;

@@ -60,6 +60,15 @@ export default function Sidebar() {
             Personal
           </NavLink>
         )}
+
+        <NavLink
+          to={APP_ROUTES.USUARIOS}
+          className={({ isActive }) =>
+            `${linkClass} ${isActive ? activeClass : 'text-gray-700'}`
+          }
+        >
+          Usuarios
+        </NavLink>
       </nav>
     </aside>
   );

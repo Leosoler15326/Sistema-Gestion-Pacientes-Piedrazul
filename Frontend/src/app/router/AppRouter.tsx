@@ -14,6 +14,9 @@ import RoleRoute from './RoleRoute';
 import ProfesionalesListPage from '../../modules/profesionales/pages/ProfesionalesListPage';
 import ProfesionalFormPage from '../../modules/profesionales/pages/ProfesionalFormPage';
 import ProfesionalDetailPage from '../../modules/profesionales/pages/ProfesionalDetailPage';
+import UsuariosListPage from '../../modules/usuarios/pages/UsuariosListPage';
+import UsuarioFormPage from '../../modules/usuarios/pages/UsuarioFormPage';
+import UsuarioDetailPage from '../../modules/usuarios/pages/UsuarioDetailPage';
 import { APP_ROUTES } from './routes';
 
 export default function AppRouter() {
@@ -50,6 +53,11 @@ export default function AppRouter() {
                 path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
                 element={<HistoriaClinicaDetailPage />}
             />
+            </Route>
+            <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
+              <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
+              <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />
+              <Route path={APP_ROUTES.USUARIOS_DETALLE} element={<UsuarioDetailPage />} />
             </Route>
         </Route>
 
