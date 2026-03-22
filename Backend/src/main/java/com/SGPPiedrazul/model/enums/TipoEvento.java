@@ -13,4 +13,4 @@ public enum TipoEvento {
     LOGIN_FALLIDO,
     PROFESIONAL_CREADO,
     PROFESIONAL_MODIFICADO
-}
+}//falta implementar eventos para pacientes.

@@ -18,13 +18,19 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditoriaService auditoriaService;
+    private final PacienteService pacienteService;
+    private final ProfesionalService profesionalService;
  
     public UsuarioService(UsuarioRepository usuarioRepository,
                           PasswordEncoder passwordEncoder,
-                          AuditoriaService auditoriaService) {
+                          AuditoriaService auditoriaService,
+                          PacienteService pacienteService,
+                          ProfesionalService profesionalService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditoriaService = auditoriaService;
+        this.pacienteService = pacienteService;
+        this.profesionalService = profesionalService;
     }
 
     @Transactional
@@ -75,6 +81,18 @@ public class UsuarioService {
         Usuario usuario = buscarEntidadPorId(id);
         usuario.setEstado(Estado.INACTIVO);
         usuarioRepository.save(usuario);
+        /*
+        if(usuario.getRol() == com.SGPPiedrazul.model.enums.RolUsuario.PACIENTE){
+            pacienteService.buscarEntidadPorId(id).setEstado();
+
+            auditoriaService.registrar(TipoEvento.USUARIO_DESACTIVADO, 
+                "Paciente desactivado: " + usuario.getNombreUsuario(), responsable);//falta implementar TipoEvento de pacientes.
+        }else{
+            profesionalService.cambiarEstado(id,Estado.INACTIVO,responsable);//asi deberia implementarse en pacientes
+
+            auditoriaService.registrar(TipoEvento.PROFESIONAL_MODIFICADO,
+                "Profesional desactivado: " + usuario.getNombreUsuario(), responsable);
+        }*/
  
         auditoriaService.registrar(TipoEvento.USUARIO_DESACTIVADO,
                 "Usuario desactivado: " + usuario.getNombreUsuario(), responsable);
