@@ -20,9 +20,25 @@ export default function ProfesionalForm({
     nombreUsuario: '',
     contrasena: '',
   });
+  const [intervaloInput, setIntervaloInput] = useState('30');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!form.nombres.trim()) {
+      alert('El nombre del profesional es obligatorio.');
+      return;
+    }
+
+    if (!form.tipo.trim() || !form.especialidad.trim()) {
+      alert('Tipo y especialidad son obligatorios.');
+      return;
+    }
+
+    if (form.crearUsuario && (!form.nombreUsuario?.trim() || !form.contrasena?.trim())) {
+      alert('Debes ingresar usuario y contraseña para crear usuario vinculado.');
+      return;
+    }
 
     const payload: CrearProfesionalDto = {
       nombres: form.nombres,
@@ -67,12 +83,17 @@ export default function ProfesionalForm({
       />
 
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
         placeholder="Intervalo en minutos"
-        value={form.intervaloMinutos}
-        onChange={(e) =>
-          setForm((prev) => ({ ...prev, intervaloMinutos: Number(e.target.value) }))
-        }
+        value={intervaloInput}
+        onChange={(e) => {
+          setIntervaloInput(e.target.value);
+          setForm((prev) => ({
+            ...prev,
+            intervaloMinutos: e.target.value ? Number(e.target.value) : 0,
+          }));
+        }}
         className="w-full rounded-lg border px-3 py-2"
         required
       />

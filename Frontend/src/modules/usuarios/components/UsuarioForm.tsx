@@ -20,6 +20,17 @@ export default function UsuarioForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!form.nombreUsuario.trim() || !form.contrasena.trim()) {
+      alert('Usuario y contraseña son obligatorios.');
+      return;
+    }
+
+    if (!form.nombreCompleto.trim() || !form.email.trim()) {
+      alert('Nombre completo y correo son obligatorios.');
+      return;
+    }
+
     await onSubmit(form);
   };
 

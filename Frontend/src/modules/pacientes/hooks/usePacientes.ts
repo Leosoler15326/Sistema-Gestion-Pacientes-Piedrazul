@@ -36,6 +36,7 @@ export const usePacienteDetail = (id?: number) => {
   });
 };
 
+
 export const useCreatePaciente = () => {
   const queryClient = useQueryClient();
 

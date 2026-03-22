@@ -1,6 +1,7 @@
-
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../../components/common/PageHeader';
+import InlineMessage from '../../../components/common/InlineMessage';
 import { APP_ROUTES } from '../../../app/router/routes';
 import UsuarioForm from '../components/UsuarioForm';
 import { useCreateUsuario } from '../hooks/useUsuarios';
@@ -9,10 +10,17 @@ import type { CrearUsuarioDto } from '../types/usuario.types';
 export default function UsuarioFormPage() {
   const navigate = useNavigate();
   const createMutation = useCreateUsuario();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (values: CrearUsuarioDto) => {
-    await createMutation.mutateAsync(values);
-    navigate(APP_ROUTES.USUARIOS);
+    try {
+      setErrorMessage('');
+      await createMutation.mutateAsync(values);
+      navigate(APP_ROUTES.USUARIOS);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('No fue posible registrar el usuario.');
+    }
   };
 
   return (
@@ -21,6 +29,12 @@ export default function UsuarioFormPage() {
         title="Nuevo usuario"
         subtitle="Registra un nuevo usuario del sistema."
       />
+
+      {errorMessage && (
+        <div className="mb-4">
+          <InlineMessage type="error" message={errorMessage} />
+        </div>
+      )}
 
       <UsuarioForm
         onSubmit={handleSubmit}

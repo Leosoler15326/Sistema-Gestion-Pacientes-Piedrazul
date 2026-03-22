@@ -4,19 +4,36 @@ import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.t
 interface HistoriaClinicaFormProps {
   onSubmit: (values: CreateHistoriaClinicaRequestDto) => Promise<void>;
   loading?: boolean;
+  initialCitaId?: number;
 }
 
 export default function HistoriaClinicaForm({
   onSubmit,
   loading = false,
+  initialCitaId,
 }: HistoriaClinicaFormProps) {
+  const [citaIdInput, setCitaIdInput] = useState(
+    initialCitaId ? String(initialCitaId) : ''
+  );
+
   const [form, setForm] = useState<CreateHistoriaClinicaRequestDto>({
-    citaId: 0,
+    citaId: initialCitaId ?? 0,
     descripcion: '',
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!form.citaId) {
+      alert('Debes indicar la cita.');
+      return;
+    }
+
+    if (!form.descripcion.trim()) {
+      alert('La descripción es obligatoria.');
+      return;
+    }
+
     await onSubmit(form);
   };
 
@@ -27,13 +44,19 @@ export default function HistoriaClinicaForm({
           ID de la cita
         </label>
         <input
-          type="number"
-          value={form.citaId || ''}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, citaId: Number(e.target.value) }))
-          }
+          type="text"
+          inputMode="numeric"
+          value={citaIdInput}
+          onChange={(e) => {
+            setCitaIdInput(e.target.value);
+            setForm((prev) => ({
+              ...prev,
+              citaId: e.target.value ? Number(e.target.value) : 0,
+            }));
+          }}
           className="w-full rounded-lg border px-3 py-2"
           required
+          disabled={Boolean(initialCitaId)}
         />
       </div>
 

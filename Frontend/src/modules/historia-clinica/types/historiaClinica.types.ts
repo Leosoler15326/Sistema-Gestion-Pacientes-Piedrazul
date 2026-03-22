@@ -2,9 +2,17 @@ export interface HistoriaClinicaDto {
   id: number;
   citaId: number;
   descripcion: string;
+
+  fechaAtencion?: string;
+  fechaCita?: string;
+
   pacienteId?: number;
+  pacienteNombre?: string;
+  pacienteDocumento?: string;
+
   profesionalId?: number;
-  fechaRegistro?: string;
+  profesionalNombre?: string;
+  especialidad?: string;
 }
 
 export interface CreateHistoriaClinicaRequestDto {

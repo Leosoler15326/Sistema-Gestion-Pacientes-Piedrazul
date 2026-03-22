@@ -55,3 +55,9 @@ export interface ListarCitasProfesionalParamsDto {
   profesionalId: number;
   fecha: string;
 }
+export interface CitasFiltersDto {
+  fecha?: string;
+  estado?: string;
+  paciente?: string;
+  profesional?: string;
+}

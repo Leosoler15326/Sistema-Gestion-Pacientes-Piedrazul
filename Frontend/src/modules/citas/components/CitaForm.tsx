@@ -17,6 +17,8 @@ export default function CitaForm({
   const [hora, setHora] = useState('');
   const [nombrePaciente, setNombrePaciente] = useState('');
 
+  const [profesionalIdInput, setProfesionalIdInput] = useState('');
+
   const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
     pacienteId: 0,
     profesionalId: 0,

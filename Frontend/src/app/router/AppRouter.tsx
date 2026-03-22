@@ -20,6 +20,9 @@ import UsuarioDetailPage from '../../modules/usuarios/pages/UsuarioDetailPage';
 import PacientesListPage from '../../modules/pacientes/pages/PacienteListPage';
 import PacienteFormPage from '../../modules/pacientes/pages/PacienteFormPage';
 import PacienteDetailPage from '../../modules/pacientes/pages/PacienteDetailPage';
+import PacienteEditPage from '../../modules/pacientes/pages/PacienteEditPage';
+import UsuarioEditPage from '../../modules/usuarios/pages/UsuarioEditPage';
+import HistoriaClinicaEditPage from '../../modules/historia-clinica/pages/HistoriClinicaEditPage';
 import { APP_ROUTES } from './routes';
 
 export default function AppRouter() {
@@ -48,14 +51,20 @@ export default function AppRouter() {
                 path={APP_ROUTES.HISTORIA_CLINICA}
                 element={<HistoriaClinicaListPage />}
             />
-            <Route
+              <Route
                 path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
                 element={<HistoriaClinicaFormPage />}
-            />
+              />
             <Route
                 path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
                 element={<HistoriaClinicaDetailPage />}
             />
+            <Route path={APP_ROUTES.PACIENTES_EDITAR} element={<PacienteEditPage />} />
+            <Route path={APP_ROUTES.HISTORIA_CLINICA_EDITAR} element={<HistoriaClinicaEditPage />} />
+
+            <Route element={<RoleRoute allowedRoles={['ADMIN', 'ADMINISTRADOR']} />}>
+              <Route path={APP_ROUTES.USUARIOS_EDITAR} element={<UsuarioEditPage />} />
+            </Route>
             </Route>
             <Route path={APP_ROUTES.PACIENTES} element={<PacientesListPage />} />
             <Route path={APP_ROUTES.PACIENTES_NUEVO} element={<PacienteFormPage />} />

@@ -4,6 +4,8 @@ import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import CitasTable from '../components/CitasTable';
+import { APP_ROUTES } from '../../../app/router/routes';
+import { Link } from 'react-router-dom';
 import { useCancelarCita, useCitasPorPaciente } from '../hooks/UseCitas';
 
 export default function CitasListPage() {
@@ -34,7 +36,15 @@ export default function CitasListPage() {
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
         title="Citas"
-        subtitle="Consulta citas por paciente."
+        subtitle="Consulta y gestiona citas."
+        actions={
+          <Link
+            to={APP_ROUTES.CITAS_NUEVA}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+          >
+            Nueva cita
+          </Link>
+        }
       />
 
       <div className="mb-6 rounded-xl bg-white p-4 shadow">

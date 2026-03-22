@@ -9,16 +9,29 @@ export default function HistoriaClinicaViewer({ item }: HistoriaClinicaViewerPro
     <div className="space-y-4 rounded-xl bg-white p-6 shadow">
       <p><strong>ID:</strong> {item.id}</p>
       <p><strong>Cita ID:</strong> {item.citaId}</p>
-      {item.fechaRegistro && (
-        <p><strong>Fecha de registro:</strong> {item.fechaRegistro}</p>
+
+      {item.fechaAtencion && (
+        <p><strong>Fecha de atención:</strong> {item.fechaAtencion}</p>
       )}
 
-      {item.pacienteId && (
-        <p><strong>Paciente ID:</strong> {item.pacienteId}</p>
+      {item.fechaCita && (
+        <p><strong>Fecha de cita:</strong> {item.fechaCita}</p>
       )}
 
-      {item.profesionalId && (
-        <p><strong>Profesional ID:</strong> {item.profesionalId}</p>
+      {item.pacienteNombre && (
+        <p><strong>Paciente:</strong> {item.pacienteNombre}</p>
+      )}
+
+      {item.pacienteDocumento && (
+        <p><strong>Documento paciente:</strong> {item.pacienteDocumento}</p>
+      )}
+
+      {item.profesionalNombre && (
+        <p><strong>Profesional:</strong> {item.profesionalNombre}</p>
+      )}
+
+      {item.especialidad && (
+        <p><strong>Especialidad:</strong> {item.especialidad}</p>
       )}
 
       <div>

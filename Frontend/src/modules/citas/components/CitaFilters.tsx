@@ -36,15 +36,20 @@ export default function CitaFilters({ onApply }: CitaFiltersProps) {
     >
       <input
         type="date"
-        value={filters.fecha}
-        onChange={(e) => setFilters((prev) => ({ ...prev, fecha: e.target.value }))}
+        value={filters.fecha ?? ''}
+        onChange={(e) =>
+          setFilters((prev: CitasFiltersDto) => ({
+            ...prev,
+            fecha: e.target.value,
+          }))
+        }
         className="rounded-lg border px-3 py-2"
       />
 
       <select
-        value={filters.estado}
+        value={filters.estado ?? ''}
         onChange={(e) =>
-          setFilters((prev) => ({
+          setFilters((prev: CitasFiltersDto) => ({
             ...prev,
             estado: e.target.value as EstadoCita | '',
           }))
@@ -52,7 +57,7 @@ export default function CitaFilters({ onApply }: CitaFiltersProps) {
         className="rounded-lg border px-3 py-2"
       >
         <option value="">Todos los estados</option>
-        <option value="PENDIENTE">Pendiente</option>
+        <option value="PROGRAMADA">Programada</option>
         <option value="CONFIRMADA">Confirmada</option>
         <option value="CANCELADA">Cancelada</option>
         <option value="COMPLETADA">Completada</option>
@@ -62,20 +67,30 @@ export default function CitaFilters({ onApply }: CitaFiltersProps) {
       <input
         type="text"
         placeholder="Paciente"
-        value={filters.paciente}
-        onChange={(e) => setFilters((prev) => ({ ...prev, paciente: e.target.value }))}
+        value={filters.paciente ?? ''}
+        onChange={(e) =>
+          setFilters((prev: CitasFiltersDto) => ({
+            ...prev,
+            paciente: e.target.value,
+          }))
+        }
         className="rounded-lg border px-3 py-2"
       />
 
       <input
         type="text"
         placeholder="Profesional"
-        value={filters.profesional}
-        onChange={(e) => setFilters((prev) => ({ ...prev, profesional: e.target.value }))}
+        value={filters.profesional ?? ''}
+        onChange={(e) =>
+          setFilters((prev: CitasFiltersDto) => ({
+            ...prev,
+            profesional: e.target.value,
+          }))
+        }
         className="rounded-lg border px-3 py-2"
       />
 
-      <div className="md:col-span-4 flex gap-3">
+      <div className="flex gap-3 md:col-span-4">
         <button
           type="submit"
           className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"

@@ -4,6 +4,9 @@ import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import { useUsuarioDetail } from '../hooks/useUsuarios';
+import { Link } from 'react-router-dom';
+import { APP_ROUTES } from '../../../app/router/routes';
+
 
 export default function UsuarioDetailPage() {
   const params = useParams();
@@ -27,6 +30,16 @@ export default function UsuarioDetailPage() {
       <PageHeader
         title={`Usuario #${data.id}`}
         subtitle="Detalle del usuario"
+
+        actions={
+          <Link
+            to={APP_ROUTES.PACIENTES_EDITAR.replace(':id', String(data.id))}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+          >
+            Editar paciente
+          </Link>
+        }
+        
       />
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">

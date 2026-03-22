@@ -5,26 +5,27 @@ import type { UserRole } from '../../modules/auth/types/auth.types';
 interface ProtectedSectionProps {
   children: ReactNode;
   allowedRoles?: UserRole[];
-  requiredPermission?: string;
   fallback?: ReactNode;
 }
 
 export default function ProtectedSection({
   children,
   allowedRoles,
-  requiredPermission,
   fallback = null,
 }: ProtectedSectionProps) {
   const user = authStore.getUser();
 
   if (!user) return <>{fallback}</>;
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <>{fallback}</>;
-  }
+  if (allowedRoles) {
+    const normalizedRole = String(user.rol).toUpperCase().replace('ROLE_', '');
+    const normalizedAllowedRoles = allowedRoles.map((role) =>
+      String(role).toUpperCase().replace('ROLE_', '')
+    );
 
-  if (requiredPermission && !user.permissions.includes(requiredPermission)) {
-    return <>{fallback}</>;
+    if (!normalizedAllowedRoles.includes(normalizedRole)) {
+      return <>{fallback}</>;
+    }
   }
 
   return <>{children}</>;

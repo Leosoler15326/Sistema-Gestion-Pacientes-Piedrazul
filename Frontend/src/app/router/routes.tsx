@@ -23,5 +23,9 @@ export const APP_ROUTES = {
   PACIENTES_NUEVO: '/pacientes/nuevo',
   PACIENTES_DETALLE: '/pacientes/:id',
 
+  PACIENTES_EDITAR: '/pacientes/:id/editar',
+USUARIOS_EDITAR: '/usuarios/:id/editar',
+HISTORIA_CLINICA_EDITAR: '/historia-clinica/:id/editar',
+
   NOT_FOUND: '*',
 } as const;
