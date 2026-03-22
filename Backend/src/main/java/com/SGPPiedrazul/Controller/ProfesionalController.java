@@ -26,7 +26,7 @@ public class ProfesionalController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Profesional>> listar() {
+    public ResponseEntity<List<ProfesionalResponseDTO>> listar() {
         return ResponseEntity.ok(profesionalService.listarTodos());
     }
 
