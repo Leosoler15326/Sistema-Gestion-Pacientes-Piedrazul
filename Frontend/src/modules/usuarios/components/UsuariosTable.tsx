@@ -41,13 +41,23 @@ export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProp
                   </Link>
 
                   {onDesactivar && (
-                    <button
-                      type="button"
-                      onClick={() => onDesactivar(item.id)}
-                      className="rounded-lg bg-red-600 px-3 py-1 text-sm text-white"
-                    >
-                      Desactivar acceso
-                    </button>
+                    item.rol === 'ADMINISTRADOR' ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="rounded-lg bg-gray-300 px-3 py-1 text-sm text-white"
+                      >
+                        No desactivable
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onDesactivar(item.id)}
+                        className="rounded-lg bg-red-600 px-3 py-1 text-sm text-white"
+                      >
+                        Desactivar acceso
+                      </button>
+                    )
                   )}
                 </div>
               </td>

@@ -8,15 +8,14 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="min-h-screen bg-slate-100">
+      <div className="flex">
+        <Sidebar />
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col">
-        <Navbar />
-
-        <main className="flex-1 p-6">{children}</main>
+        <div className="flex min-h-screen flex-1 flex-col">
+          <Navbar />
+          <main className="flex-1 p-6">{children}</main>
+        </div>
       </div>
     </div>
   );

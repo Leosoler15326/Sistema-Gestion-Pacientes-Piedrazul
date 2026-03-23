@@ -29,13 +29,29 @@ export default function PacientesTable({ items }: PacientesTableProps) {
               <td className="px-4 py-3">{item.telefono}</td>
               <td className="px-4 py-3">{item.totalCitas}</td>
               <td className="px-4 py-3">
+              <div className="flex flex-wrap gap-2">
                 <Link
                   to={APP_ROUTES.PACIENTES_DETALLE.replace(':id', String(item.id))}
                   className="rounded-lg bg-gray-800 px-3 py-1 text-sm text-white"
                 >
                   Ver
                 </Link>
-              </td>
+
+                <Link
+                  to={`${APP_ROUTES.CITAS}?pacienteId=${item.id}`}
+                  className="rounded-lg bg-blue-600 px-3 py-1 text-sm text-white"
+                >
+                  Ver citas
+                </Link>
+
+                <Link
+                  to={`${APP_ROUTES.HISTORIA_CLINICA}?pacienteId=${item.id}`}
+                  className="rounded-lg bg-emerald-600 px-3 py-1 text-sm text-white"
+                >
+                  Ver historia
+                </Link>
+              </div>
+            </td>
             </tr>
           ))}
         </tbody>

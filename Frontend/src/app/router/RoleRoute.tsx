@@ -20,6 +20,7 @@ export default function RoleRoute({ allowedRoles }: RoleRouteProps) {
     String(role).toUpperCase().replace('ROLE_', '')
   );
 
+  
   const hasAccess = normalizedAllowedRoles.includes(normalizedRole);
 
   if (!hasAccess) {
