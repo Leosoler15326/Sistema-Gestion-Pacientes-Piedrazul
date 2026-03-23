@@ -4,6 +4,7 @@ import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesiona
 import { useDisponibilidad } from '../hooks/UseDisponibilidad';
 import type { CreateCitaRequestDto } from '../types/cita.types';
 import { TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
+import { ESPECIALIDAD_OPTIONS } from '../../../constants/enums';
 
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
@@ -17,21 +18,28 @@ export default function CitaForm({
   const [fecha, setFecha] = useState('');
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [message, setMessage] = useState('');
-
+  const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState('');
+ const { data: profesionales } = useProfesionalesActivos();
   const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
     pacienteId: 0,
     profesionalId: 0,
     tipoAtencion: '',
     motivoConsulta: '',
   });
-
+  
   const [horaSeleccionada, setHoraSeleccionada] = useState('');
 
   const { data: pacientes, isLoading: pacientesLoading } =
     usePacientesPorNombre(nombrePaciente);
 
-  const { data: profesionales } = useProfesionalesActivos();
-
+  const profesionalesFiltrados = Array.isArray(profesionales)
+  ? profesionales.filter((p: any) =>
+      especialidadSeleccionada
+        ? p.especialidad === especialidadSeleccionada
+        : true
+    )
+  : [];
+  
   const { data: slots, isLoading: slotsLoading } = useDisponibilidad(
     form.profesionalId,
     fecha
@@ -136,35 +144,72 @@ export default function CitaForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          Profesional
-        </label>
+  <label className="mb-1 block text-sm font-medium text-gray-700">
+    Especialidad
+  </label>
 
-        <select
-          value={form.profesionalId || ''}
-          onChange={(e) => {
-            setForm((prev) => ({
-              ...prev,
-              profesionalId: Number(e.target.value),
-            }));
-            setHoraSeleccionada('');
-          }}
-          className="w-full rounded-lg border px-3 py-2"
-        >
-          <option value="">Selecciona un profesional</option>
-          {Array.isArray(profesionales) &&
-            profesionales.map((p: any) => (
-              <option
-                key={p.profesionalId ?? p.id}
-                value={p.profesionalId ?? p.id}
-              >
-                {(p.nombres ?? p.nombre ?? 'Profesional')}
-                {p.especialidad ? ` - ${p.especialidad}` : ''}
-              </option>
-            ))}
-        </select>
-      </div>
+  <select
+    value={especialidadSeleccionada}
+    onChange={(e) => {
+      setEspecialidadSeleccionada(e.target.value);
+      setForm((prev) => ({ ...prev, profesionalId: 0 }));
+      setHoraSeleccionada('');
+      setMessage('');
+    }}
+    className="w-full rounded-lg border px-3 py-2"
+  >
+    <option value="">Todas las especialidades</option>
 
+    {ESPECIALIDAD_OPTIONS.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+  </select>
+</div>
+
+    <div>
+      <label className="mb-1 block text-sm font-medium text-gray-700">
+        Profesional
+      </label>
+
+      <select
+        value={form.profesionalId ? String(form.profesionalId) : ''}
+        onChange={(e) => {
+          const selectedValue = e.target.value;
+
+          setForm((prev) => ({
+            ...prev,
+            profesionalId: selectedValue ? Number(selectedValue) : 0,
+          }));
+
+          setHoraSeleccionada('');
+          setMessage('');
+        }}
+        className="w-full rounded-lg border px-3 py-2"
+      >
+        <option value="">Selecciona un profesional</option>
+
+        {profesionalesFiltrados.map((p: any) => {
+          const optionValue = p.profesionalId ?? p.id;
+          const optionLabel = `${p.nombres ?? p.nombre ?? 'Profesional'}${
+            p.especialidad ? ` - ${p.especialidad}` : ''
+          }`;
+
+          return (
+            <option key={optionValue} value={String(optionValue)}>
+              {optionLabel}
+            </option>
+          );
+        })}
+      </select>
+
+      {especialidadSeleccionada && profesionalesFiltrados.length === 0 && (
+        <p className="mt-2 text-sm text-gray-500">
+          No hay profesionales disponibles para esta especialidad.
+        </p>
+      )}
+    </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Fecha

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
@@ -17,6 +17,9 @@ import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesiona
 type SearchMode = 'paciente' | 'profesional';
 
 export default function CitasListPage() {
+  const [searchParams] = useSearchParams();
+  const pacienteIdFromQuery = searchParams.get('pacienteId');
+
   const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
 
   const [pacienteIdInput, setPacienteIdInput] = useState('');
@@ -31,6 +34,14 @@ export default function CitasListPage() {
   const [message, setMessage] = useState('');
 
   const { data: profesionales } = useProfesionalesActivos();
+
+  useEffect(() => {
+    if (pacienteIdFromQuery) {
+      setSearchMode('paciente');
+      setPacienteIdInput(pacienteIdFromQuery);
+      setPacienteId(Number(pacienteIdFromQuery));
+    }
+  }, [pacienteIdFromQuery]);
 
   const pacienteQuery = useCitasPorPaciente(
     searchMode === 'paciente' ? pacienteId : undefined
@@ -192,7 +203,6 @@ export default function CitasListPage() {
               className="rounded-lg border px-3 py-2"
             >
               <option value="">Selecciona un profesional</option>
-
               {Array.isArray(profesionales) &&
                 profesionales.map((p: any) => (
                   <option
@@ -204,6 +214,7 @@ export default function CitasListPage() {
                   </option>
                 ))}
             </select>
+
             <input
               type="date"
               value={fechaProfesional}

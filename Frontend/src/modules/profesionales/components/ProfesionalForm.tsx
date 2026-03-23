@@ -82,22 +82,29 @@ export default function ProfesionalForm({
         ))}
       </select>
 
-      <select
-        value={form.especialidad}
-        onChange={(e) =>
-          setForm((prev) => ({ ...prev, especialidad: e.target.value }))
-        }
-        className="w-full rounded-lg border px-3 py-2"
-        required
-      >
-        <option value="">Selecciona especialidad</option>
-        {ESPECIALIDAD_OPTIONS.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Especialidad
+        </label>
 
+        <select
+          value={especialidadSeleccionada}
+          onChange={(e) => {
+            setEspecialidadSeleccionada(e.target.value);
+            setForm((prev) => ({ ...prev, profesionalId: 0 }));
+            setHoraSeleccionada('');
+          }}
+          className="w-full rounded-lg border px-3 py-2"
+        >
+          <option value="">Todas las especialidades</option>
+
+          {ESPECIALIDAD_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
       <input
         type="text"
         inputMode="numeric"
