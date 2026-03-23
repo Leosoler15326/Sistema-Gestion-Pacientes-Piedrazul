@@ -1,75 +1,64 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
+import BackButton from '../../../components/common/BackButton';
 import { APP_ROUTES } from '../../../app/router/routes';
-import HistoriaClinicaTable from '../components/HistoriaClinicaTable';
-import { useHistoriasPorPaciente } from '../hooks/useHistoriaClinica';
+import { useCitaDetail } from '../../citas/hooks/UseCitas';
 
-export default function HistoriaClinicaListPage() {
-  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
-  const { data, isLoading, isError, refetch } = useHistoriasPorPaciente(pacienteId);
+export default function CitaDetailPage() {
+  const params = useParams();
+  const id = Number(params.id);
 
-  const handleBuscar = () => {
-    if (pacienteId) {
-      refetch();
-    }
-  };
+  const { data, isLoading, isError } = useCitaDetail(id);
+
+  if (isLoading) return <Loader message="Cargando detalle de la cita..." />;
+
+  if (isError || !data) {
+    return (
+      <EmptyState
+        title="No se encontró la cita"
+        description="No fue posible obtener el detalle solicitado."
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
-        title="Historias clínicas"
-        subtitle="Consulta historias clínicas por paciente."
+        title={`Cita #${data.id}`}
+        subtitle="Detalle de la cita seleccionada"
         actions={
-          <Link
-            to={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Nueva historia clínica
-          </Link>
+          <div className="flex gap-2">
+            <BackButton />
+            <Link
+              to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${data.id}`}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Crear historia clínica
+            </Link>
+
+            <Link
+              to={APP_ROUTES.HISTORIA_CLINICA_DETALLE.replace(':id', String(data.id))}
+              className="rounded-lg bg-gray-800 px-4 py-2 text-white"
+            >
+              Ver historia clínica
+            </Link>
+          </div>
         }
       />
 
-      <div className="mb-6 rounded-xl bg-white p-4 shadow">
-        <div className="flex gap-3">
-          <input
-            type="number"
-            placeholder="ID paciente"
-            value={pacienteId || ''}
-            onChange={(e) => setPacienteId(Number(e.target.value))}
-            className="rounded-lg border px-3 py-2"
-          />
-          <button
-            type="button"
-            onClick={handleBuscar}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Buscar
-          </button>
-        </div>
+      <div className="space-y-4 rounded-xl bg-white p-6 shadow">
+        <p><strong>Fecha y hora:</strong> {data.fechaHora}</p>
+        <p><strong>Tipo de atención:</strong> {data.tipoAtencion}</p>
+        <p><strong>Motivo:</strong> {data.motivoConsulta || 'Sin motivo'}</p>
+        <p><strong>Estado:</strong> {data.estado || 'N/A'}</p>
+        <p><strong>Paciente:</strong> {data.pacienteNombre}</p>
+        <p><strong>Documento paciente:</strong> {data.pacienteDocumento || 'N/A'}</p>
+        <p><strong>Profesional:</strong> {data.profesionalNombre}</p>
+        <p><strong>Especialidad:</strong> {data.especialidad || 'N/A'}</p>
+        <p><strong>Creado por:</strong> {data.creadoPor || 'N/A'}</p>
       </div>
-
-      {isLoading && <Loader message="Cargando historias clínicas..." />}
-
-      {!isLoading && isError && (
-        <EmptyState
-          title="Error al cargar historias clínicas"
-          description="No fue posible consultar la información."
-        />
-      )}
-
-      {!isLoading && !isError && pacienteId && (!data || data.length === 0) && (
-        <EmptyState
-          title="No hay historias clínicas"
-          description="No se encontraron registros para el paciente indicado."
-        />
-      )}
-
-      {!isLoading && !isError && data && data.length > 0 && (
-        <HistoriaClinicaTable items={data} />
-      )}
     </div>
   );
 }

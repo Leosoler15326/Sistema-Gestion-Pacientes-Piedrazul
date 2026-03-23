@@ -10,8 +10,16 @@ const USUARIOS_BASE = '/usuarios';
 
 export const usuariosService = {
   async listar(): Promise<UsuarioDto[]> {
-    const { data } = await api.get<UsuarioDto[]>(USUARIOS_BASE);
-    return data;
+  const response = await api.get('/usuarios');
+  const data = response.data;
+
+  console.log('Respuesta /usuarios:', data);
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.content)) return data.content;
+
+  return [];
   },
 
   async buscarPorId(id: number): Promise<UsuarioDto> {

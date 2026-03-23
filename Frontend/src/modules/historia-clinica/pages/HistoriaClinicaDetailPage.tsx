@@ -15,12 +15,39 @@ export default function HistoriaClinicaDetailPage() {
 
   if (isLoading) return <Loader message="Cargando historia clínica..." />;
 
-  if (isError || !data) {
+  if (isError) {
     return (
       <EmptyState
-        title="No se encontró la historia clínica"
-        description="No existe una historia clínica asociada a esta cita o no fue posible cargarla."
+        title="Error al cargar historia clínica"
+        description="No fue posible consultar la información."
       />
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-6">
+        <PageHeader
+          title={`Historia clínica de la cita #${citaId}`}
+          subtitle="Aún no existe una historia clínica para esta cita."
+          actions={
+            <div className="flex gap-2">
+              <BackButton />
+              <Link
+                to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${citaId}`}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+              >
+                Crear historia clínica
+              </Link>
+            </div>
+          }
+        />
+
+        <EmptyState
+          title="Sin historia clínica"
+          description="Todavía no se ha registrado una historia clínica para esta cita."
+        />
+      </div>
     );
   }
 

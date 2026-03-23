@@ -41,7 +41,7 @@ export default function ProfesionalDetailPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
-        title={`Profesional #${data.profesionalId}`}
+        title={data.nombres}
         subtitle="Detalle del profesional"
         actions={<BackButton />}
       />
@@ -56,27 +56,33 @@ export default function ProfesionalDetailPage() {
       )}
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">
-        <p><strong>ID:</strong> {data.profesionalId}</p>
-        <p><strong>Nombres:</strong> {data.nombres}</p>
-        <p><strong>Tipo:</strong> {data.tipo}</p>
-        <p><strong>Especialidad:</strong> {data.especialidad}</p>
-        <p><strong>Intervalo:</strong> {data.intervaloMinutos} min</p>
-        <p><strong>Estado:</strong> {data.estado}</p>
-        <p><strong>Usuario vinculado:</strong> {data.usuarioVinculado ? 'Sí' : 'No'}</p>
+      <p><strong>Nombre:</strong> {data.nombres}</p>
+      <p><strong>Tipo:</strong> {data.tipo}</p>
+      <p><strong>Especialidad:</strong> {data.especialidad}</p>
+      <p><strong>Intervalo de agenda:</strong> {data.intervaloMinutos} min</p>
+      <p><strong>Estado laboral:</strong> {data.estado}</p>
+      <p><strong>Acceso al sistema:</strong> {data.usuarioVinculado ? 'Sí' : 'No'}</p>
 
-       <div className="flex gap-2 pt-4">
-            {ESTADO_PROFESIONAL_OPTIONS.map((estado) => (
-              <button
-                key={estado}
-                type="button"
-                onClick={() => handleCambiarEstado(estado)}
-                className="rounded-lg bg-slate-700 px-4 py-2 text-white"
-              >
-                {estado}
-              </button>
-            ))}
-          </div>
+      {data.usuarioVinculado && (
+        <>
+          <p><strong>Usuario vinculado:</strong> {data.nombreUsuario ?? 'N/A'}</p>
+          <p><strong>Rol de acceso:</strong> {data.rolUsuario ?? 'N/A'}</p>
+        </>
+      )}
+
+      <div className="flex gap-2 pt-4">
+        {['ACTIVO', 'INACTIVO'].map((estado) => (
+          <button
+            key={estado}
+            type="button"
+            onClick={() => handleCambiarEstado(estado)}
+            className="rounded-lg bg-slate-700 px-4 py-2 text-white"
+          >
+            {estado}
+          </button>
+        ))}
       </div>
+    </div>
     </div>
   );
 }

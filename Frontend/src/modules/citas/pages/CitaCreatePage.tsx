@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../../components/common/PageHeader';
 import InlineMessage from '../../../components/common/InlineMessage';
+import BackButton from '../../../components/common/BackButton';
 import { APP_ROUTES } from '../../../app/router/routes';
 import CitaForm from '../components/CitaForm';
 import { useCreateCita } from '../hooks/UseCitas';
@@ -28,6 +29,7 @@ export default function CitaCreatePage() {
       <PageHeader
         title="Nueva cita"
         subtitle="Agenda una nueva cita."
+        actions={<BackButton />}
       />
 
       {errorMessage && (

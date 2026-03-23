@@ -26,7 +26,7 @@ export default function UsuarioDetailPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
-        title={`Usuario #${data.id}`}
+        title={data.nombreCompleto||data.nombres|| `Detalle de usuario`}
         subtitle="Detalle del usuario"
         actions={
           <div className="flex gap-2">
@@ -42,12 +42,11 @@ export default function UsuarioDetailPage() {
       />
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">
-        <p><strong>ID:</strong> {data.id}</p>
         <p><strong>Usuario:</strong> {data.nombreUsuario || data.username || 'N/A'}</p>
         <p><strong>Nombre completo:</strong> {data.nombreCompleto || data.nombres || 'N/A'}</p>
         <p><strong>Email:</strong> {data.email || 'N/A'}</p>
         <p><strong>Rol:</strong> {data.rol || 'N/A'}</p>
-        <p><strong>Estado:</strong> {data.estado ?? (data.activo ? 'ACTIVO' : 'INACTIVO')}</p>
+        <p><strong>Estado de acceso:</strong> {data.estado ?? (data.activo ? 'ACTIVO' : 'INACTIVO')}</p>
       </div>
     </div>
   );

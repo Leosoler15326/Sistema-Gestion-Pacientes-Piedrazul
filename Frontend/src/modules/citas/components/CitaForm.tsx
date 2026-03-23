@@ -1,24 +1,22 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
-import type { CreateCitaRequestDto, SlotDisponibleDto } from '../types/cita.types';
+import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
+import { useDisponibilidad } from '../hooks/UseDisponibilidad';
+import type { CreateCitaRequestDto } from '../types/cita.types';
 import { TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
 
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
   loading?: boolean;
-  slotsDisponibles?: SlotDisponibleDto[];
 }
 
 export default function CitaForm({
   onSubmit,
   loading = false,
-  slotsDisponibles = [],
 }: CitaFormProps) {
   const [fecha, setFecha] = useState('');
-  const [hora, setHora] = useState('');
   const [nombrePaciente, setNombrePaciente] = useState('');
-
-  const [profesionalIdInput, setProfesionalIdInput] = useState('');
+  const [message, setMessage] = useState('');
 
   const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
     pacienteId: 0,
@@ -27,168 +25,219 @@ export default function CitaForm({
     motivoConsulta: '',
   });
 
-  const { data: pacientesEncontrados, isLoading: pacientesLoading } =
+  const [horaSeleccionada, setHoraSeleccionada] = useState('');
+
+  const { data: pacientes, isLoading: pacientesLoading } =
     usePacientesPorNombre(nombrePaciente);
 
+  const { data: profesionales } = useProfesionalesActivos();
+
+  const { data: slots, isLoading: slotsLoading } = useDisponibilidad(
+    form.profesionalId,
+    fecha
+  );
+
   const pacienteSeleccionado = useMemo(() => {
-    return pacientesEncontrados?.find((p) => p.id === form.pacienteId);
-  }, [pacientesEncontrados, form.pacienteId]);
+    return pacientes?.find((p) => p.id === form.pacienteId);
+  }, [pacientes, form.pacienteId]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setMessage('');
 
     if (!form.pacienteId) {
-      alert('Debes seleccionar un paciente.');
+      setMessage('Debes seleccionar un paciente.');
       return;
     }
 
-    const fechaHora = `${fecha}T${hora}:00`;
+    if (!form.profesionalId) {
+      setMessage('Debes seleccionar un profesional.');
+      return;
+    }
+
+    if (!fecha) {
+      setMessage('Debes seleccionar una fecha.');
+      return;
+    }
+
+    if (!horaSeleccionada) {
+      setMessage('Debes seleccionar un horario disponible.');
+      return;
+    }
+
+    if (!form.tipoAtencion) {
+      setMessage('Debes seleccionar el tipo de atención.');
+      return;
+    }
 
     await onSubmit({
       ...form,
-      fechaHora,
+      fechaHora: horaSeleccionada,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Buscar paciente por nombre
-          </label>
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-6 shadow">
+      {message && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {message}
+        </div>
+      )}
 
-          <input
-            type="text"
-            placeholder="Escribe el nombre del paciente"
-            value={nombrePaciente}
-            onChange={(e) => {
-              setNombrePaciente(e.target.value);
-              setForm((prev) => ({ ...prev, pacienteId: 0 }));
-            }}
-            className="w-full rounded-lg border px-3 py-2"
-          />
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Buscar paciente por nombre
+        </label>
 
-          {pacientesLoading && (
-            <p className="mt-2 text-sm text-gray-500">Buscando pacientes...</p>
-          )}
+        <input
+          type="text"
+          placeholder="Escribe el nombre del paciente"
+          value={nombrePaciente}
+          onChange={(e) => {
+            setNombrePaciente(e.target.value);
+            setForm((prev) => ({ ...prev, pacienteId: 0 }));
+          }}
+          className="w-full rounded-lg border px-3 py-2"
+        />
 
-          {!pacientesLoading &&
-            nombrePaciente.trim().length > 0 &&
-            pacientesEncontrados &&
-            pacientesEncontrados.length > 0 && (
-              <div className="mt-2 rounded-lg border bg-white">
-                {pacientesEncontrados.map((paciente) => (
-                  <button
-                    key={paciente.id}
-                    type="button"
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, pacienteId: paciente.id }));
-                      setNombrePaciente(paciente.nombreCompleto);
-                    }}
-                    className="block w-full border-b px-3 py-2 text-left hover:bg-blue-50 last:border-b-0"
-                  >
-                    <div className="font-medium">{paciente.nombreCompleto}</div>
-                    <div className="text-sm text-gray-500">
-                      Documento: {paciente.documento} · Email: {paciente.email}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+        {pacientesLoading && (
+          <p className="mt-2 text-sm text-gray-500">Buscando pacientes...</p>
+        )}
 
-          {pacienteSeleccionado && (
-            <div className="mt-3 rounded-lg bg-green-50 p-3 text-sm text-green-700">
-              Paciente seleccionado: <strong>{pacienteSeleccionado.nombreCompleto}</strong>
+        {!pacientesLoading &&
+          nombrePaciente.trim().length > 0 &&
+          pacientes &&
+          pacientes.length > 0 && (
+            <div className="mt-2 rounded-lg border bg-white">
+              {pacientes.map((paciente) => (
+                <button
+                  key={paciente.id}
+                  type="button"
+                  onClick={() => {
+                    setForm((prev) => ({ ...prev, pacienteId: paciente.id }));
+                    setNombrePaciente(paciente.nombreCompleto);
+                  }}
+                  className="block w-full border-b px-3 py-2 text-left hover:bg-blue-50 last:border-b-0"
+                >
+                  <div className="font-medium">{paciente.nombreCompleto}</div>
+                  <div className="text-sm text-gray-500">
+                    Documento: {paciente.documento} · Email: {paciente.email}
+                  </div>
+                </button>
+              ))}
             </div>
           )}
-        </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            ID profesional
-          </label>
-          <input
-            type="number"
-            placeholder="ID profesional"
-            value={form.profesionalId || ''}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, profesionalId: Number(e.target.value) }))
-            }
-            className="w-full rounded-lg border px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Tipo de atención
-          </label>
-          <select
-            value={form.tipoAtencion}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, tipoAtencion: e.target.value }))
-            }
-            className="w-full rounded-lg border px-3 py-2"
-            required
-          >
-            <option value="">Selecciona tipo de atención</option>
-            {TIPO_ATENCION_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Fecha
-          </label>
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Hora
-          </label>
-          <input
-            type="time"
-            value={hora}
-            onChange={(e) => setHora(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2"
-            required
-          />
-        </div>
+        {pacienteSeleccionado && (
+          <div className="mt-3 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+            Paciente seleccionado: <strong>{pacienteSeleccionado.nombreCompleto}</strong>
+          </div>
+        )}
       </div>
 
-      {slotsDisponibles.length > 0 && (
-        <div className="rounded-lg border bg-gray-50 p-4">
-          <h3 className="mb-2 font-semibold">Slots disponibles</h3>
-          <div className="flex flex-wrap gap-2">
-            {slotsDisponibles.map((slot) => (
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Profesional
+        </label>
+
+        <select
+          value={form.profesionalId || ''}
+          onChange={(e) => {
+            setForm((prev) => ({
+              ...prev,
+              profesionalId: Number(e.target.value),
+            }));
+            setHoraSeleccionada('');
+          }}
+          className="w-full rounded-lg border px-3 py-2"
+        >
+          <option value="">Selecciona un profesional</option>
+          {Array.isArray(profesionales) &&
+            profesionales.map((p: any) => (
+              <option
+                key={p.profesionalId ?? p.id}
+                value={p.profesionalId ?? p.id}
+              >
+                {(p.nombres ?? p.nombre ?? 'Profesional')}
+                {p.especialidad ? ` - ${p.especialidad}` : ''}
+              </option>
+            ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Fecha
+        </label>
+        <input
+          type="date"
+          value={fecha}
+          onChange={(e) => {
+            setFecha(e.target.value);
+            setHoraSeleccionada('');
+          }}
+          className="w-full rounded-lg border px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Tipo de atención
+        </label>
+
+        <select
+          value={form.tipoAtencion}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, tipoAtencion: e.target.value }))
+          }
+          className="w-full rounded-lg border px-3 py-2"
+          required
+        >
+          <option value="">Selecciona tipo de atención</option>
+          {TIPO_ATENCION_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Horarios disponibles
+        </label>
+
+        {!form.profesionalId || !fecha ? (
+          <div className="rounded-lg border bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            Selecciona profesional y fecha para consultar disponibilidad.
+          </div>
+        ) : slotsLoading ? (
+          <div className="rounded-lg border bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            Cargando horarios disponibles...
+          </div>
+        ) : Array.isArray(slots) && slots.length > 0 ? (
+          <div className="flex flex-wrap gap-2 rounded-lg border bg-gray-50 p-4">
+            {slots.map((slot) => (
               <button
                 key={slot.fechaHora}
                 type="button"
-                onClick={() => {
-                  const [slotFecha, slotHoraCompleta] = slot.fechaHora.split('T');
-                  setFecha(slotFecha);
-                  setHora(slotHoraCompleta.slice(0, 5));
-                }}
-                className="rounded-lg border px-3 py-1 text-sm hover:bg-blue-50"
+                onClick={() => setHoraSeleccionada(slot.fechaHora)}
+                className={`rounded-lg px-3 py-2 text-sm ${
+                  horaSeleccionada === slot.fechaHora
+                    ? 'bg-blue-600 text-white'
+                    : 'border bg-white hover:bg-blue-50'
+                }`}
               >
                 {slot.horaFormateada}
               </button>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="rounded-lg border bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            No hay horarios disponibles para la fecha seleccionada.
+          </div>
+        )}
+      </div>
 
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">

@@ -13,19 +13,17 @@ export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProp
       <table className="min-w-full border-collapse">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-3 text-left">ID</th>
             <th className="px-4 py-3 text-left">Usuario</th>
             <th className="px-4 py-3 text-left">Nombre completo</th>
             <th className="px-4 py-3 text-left">Email</th>
             <th className="px-4 py-3 text-left">Rol</th>
-            <th className="px-4 py-3 text-left">Estado</th>
+            <th className="px-4 py-3 text-left">Estado acceso</th>
             <th className="px-4 py-3 text-left">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
+          {Array.isArray(items)&&items.map((item) => (
             <tr key={item.id} className="border-t">
-              <td className="px-4 py-3">{item.id}</td>
               <td className="px-4 py-3">{item.nombreUsuario || item.username || 'N/A'}</td>
               <td className="px-4 py-3">{item.nombreCompleto || item.nombres || 'N/A'}</td>
               <td className="px-4 py-3">{item.email || 'N/A'}</td>
@@ -48,7 +46,7 @@ export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProp
                       onClick={() => onDesactivar(item.id)}
                       className="rounded-lg bg-red-600 px-3 py-1 text-sm text-white"
                     >
-                      Desactivar
+                      Desactivar acceso
                     </button>
                   )}
                 </div>

@@ -15,8 +15,16 @@ export const profesionalesService = {
   },
 
   async listarActivos(): Promise<ProfesionalDto[]> {
-    const { data } = await api.get<ProfesionalDto[]>(`${PROFESIONALES_BASE}/activos`);
-    return data;
+    const response = await api.get(`${PROFESIONALES_BASE}/activos`);
+    const data = response.data;
+
+    console.log('Respuesta /profesionales/activos:', data);
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.content)) return data.content;
+
+    return [];
   },
 
   async listarPorEspecialidad(especialidad: string): Promise<ProfesionalDto[]> {

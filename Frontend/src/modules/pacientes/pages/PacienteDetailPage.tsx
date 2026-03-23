@@ -26,7 +26,7 @@ export default function PacienteDetailPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <PageHeader
-        title={`Paciente #${data.id}`}
+        title={`Paciente #${data.nombreCompleto}`}
         subtitle="Detalle del paciente"
         actions={
           <div className="flex gap-2">
@@ -42,7 +42,6 @@ export default function PacienteDetailPage() {
       />
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">
-        <p><strong>ID:</strong> {data.id}</p>
         <p><strong>Nombres:</strong> {data.nombres}</p>
         <p><strong>Apellidos:</strong> {data.apellidos}</p>
         <p><strong>Nombre completo:</strong> {data.nombreCompleto}</p>

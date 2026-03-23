@@ -24,11 +24,18 @@ export const historiaClinicaService = {
     return data;
   },
 
-  async getByCitaId(citaId: number): Promise<HistoriaClinicaDto> {
-    const { data } = await api.get<HistoriaClinicaDto>(
-      `${HISTORIA_BASE}/cita/${citaId}`
-    );
-    return data;
+  async getByCitaId(citaId: number): Promise<HistoriaClinicaDto | null> {
+    try {
+      const { data } = await api.get<HistoriaClinicaDto>(
+        `${HISTORIA_BASE}/cita/${citaId}`
+      );
+      return data;
+    } catch (error: any) {
+      if (error?.response?.status === 404 || error?.response?.status === 400) {
+        return null;
+      }
+      throw error;
+    }
   },
 
   async getByPacienteId(pacienteId: number): Promise<HistoriaClinicaDto[]> {

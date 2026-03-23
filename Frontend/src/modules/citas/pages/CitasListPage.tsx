@@ -192,13 +192,18 @@ export default function CitasListPage() {
               className="rounded-lg border px-3 py-2"
             >
               <option value="">Selecciona un profesional</option>
-              {profesionales?.map((p) => (
-                <option key={p.profesionalId} value={p.profesionalId}>
-                  {p.nombres} - {p.especialidad}
-                </option>
-              ))}
-            </select>
 
+              {Array.isArray(profesionales) &&
+                profesionales.map((p: any) => (
+                  <option
+                    key={p.profesionalId ?? p.id}
+                    value={p.profesionalId ?? p.id}
+                  >
+                    {(p.nombres ?? p.nombre ?? 'Profesional')}
+                    {p.especialidad ? ` - ${p.especialidad}` : ''}
+                  </option>
+                ))}
+            </select>
             <input
               type="date"
               value={fechaProfesional}

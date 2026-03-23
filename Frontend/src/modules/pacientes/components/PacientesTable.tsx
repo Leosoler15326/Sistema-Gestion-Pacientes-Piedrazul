@@ -12,8 +12,7 @@ export default function PacientesTable({ items }: PacientesTableProps) {
       <table className="min-w-full border-collapse">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-3 text-left">ID</th>
-            <th className="px-4 py-3 text-left">Nombre completo</th>
+            <th className="px-4 py-3 text-left">Paciente</th>
             <th className="px-4 py-3 text-left">Documento</th>
             <th className="px-4 py-3 text-left">Email</th>
             <th className="px-4 py-3 text-left">Teléfono</th>
@@ -24,7 +23,6 @@ export default function PacientesTable({ items }: PacientesTableProps) {
         <tbody>
           {items.map((item) => (
             <tr key={item.id} className="border-t">
-              <td className="px-4 py-3">{item.id}</td>
               <td className="px-4 py-3">{item.nombreCompleto}</td>
               <td className="px-4 py-3">{item.documento}</td>
               <td className="px-4 py-3">{item.email}</td>

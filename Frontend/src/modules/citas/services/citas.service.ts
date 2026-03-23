@@ -15,10 +15,19 @@ export const citasService = {
   async obtenerSlotsDisponibles(
     params: SlotsDisponiblesParamsDto
   ): Promise<SlotDisponibleDto[]> {
-    const { data } = await api.get<SlotDisponibleDto[]>(`${CITAS_BASE}/slots`, {
+    const response = await api.get(`${CITAS_BASE}/slots`, {
       params,
     });
-    return data;
+
+    const data = response.data;
+
+    console.log('Respuesta /citas/slots:', data);
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.content)) return data.content;
+
+    return [];
   },
 
   async agendar(payload: CreateCitaRequestDto): Promise<CitaDto> {
