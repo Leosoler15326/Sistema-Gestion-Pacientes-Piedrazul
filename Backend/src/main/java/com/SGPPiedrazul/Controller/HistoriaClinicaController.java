@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/historias")
-@PreAuthorize("hasRole('MEDICO_TERAPISTA')")
+@PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
 public class HistoriaClinicaController {
 
     private final HistoriaClinicaService historiaClinicaService;

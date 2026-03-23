@@ -32,7 +32,6 @@ com\SGPPiedrazul\model\Paciente.class
 com\SGPPiedrazul\repository\HistoriaClinicaRepository.class
 com\SGPPiedrazul\Controller\UsuarioController.class
 com\SGPPiedrazul\dto\CitaDTO$SlotResponse.class
-com\SGPPiedrazul\repository\HistorialCitaRepository.class
 com\SGPPiedrazul\service\NotificacionService.class
 com\SGPPiedrazul\service\AuditoriaService.class
 com\SGPPiedrazul\repository\CitaRepository.class

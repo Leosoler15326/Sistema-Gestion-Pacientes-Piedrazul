@@ -19,7 +19,7 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final ProfesionalRepository profesionalRepository;
     private final PacienteRepository pacienteRepository;
-    private final HistorialCitaRepository historialCitaRepository;
+    private final HistoriaClinicaService historiaClinicaService;
     private final DisponibilidadService disponibilidadService;
     private final AuditoriaService auditoriaService;
     private final NotificacionService notificacionService;
@@ -27,14 +27,14 @@ public class CitaService {
     public CitaService(CitaRepository citaRepository,
                        ProfesionalRepository profesionalRepository,
                        PacienteRepository pacienteRepository,
-                       HistorialCitaRepository historialCitaRepository,
+                       HistoriaClinicaService historiaClinicaService,
                        DisponibilidadService disponibilidadService,
                        AuditoriaService auditoriaService,
                        NotificacionService notificacionService) {
         this.citaRepository = citaRepository;
         this.profesionalRepository = profesionalRepository;
         this.pacienteRepository = pacienteRepository;
-        this.historialCitaRepository = historialCitaRepository;
+        this.historiaClinicaService = historiaClinicaService;
         this.disponibilidadService = disponibilidadService;
         this.auditoriaService = auditoriaService;
         this.notificacionService = notificacionService;
@@ -92,7 +92,6 @@ public class CitaService {
         historial.setFechaNueva(dto.getNuevaFechaHora());
         historial.setMotivo(dto.getMotivo());
         historial.setResponsable(responsable);
-        historialCitaRepository.save(historial);
 
         cita.setFechaHora(dto.getNuevaFechaHora());
         cita.setEstado(EstadoCita.REAGENDADA);
