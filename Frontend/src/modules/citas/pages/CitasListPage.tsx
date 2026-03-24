@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
@@ -13,6 +13,7 @@ import {
   useCitasPorProfesional,
 } from '../hooks/UseCitas';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
+import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 
 type SearchMode = 'paciente' | 'profesional';
 
@@ -22,7 +23,7 @@ export default function CitasListPage() {
 
   const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
 
-  const [pacienteIdInput, setPacienteIdInput] = useState('');
+  const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
   const [fechaProfesional, setFechaProfesional] = useState('');
 
@@ -34,14 +35,19 @@ export default function CitasListPage() {
   const [message, setMessage] = useState('');
 
   const { data: profesionales } = useProfesionalesActivos();
+  const { data: pacientesEncontrados, isLoading: pacientesLoading } =
+    usePacientesPorNombre(nombrePaciente);
 
   useEffect(() => {
     if (pacienteIdFromQuery) {
       setSearchMode('paciente');
-      setPacienteIdInput(pacienteIdFromQuery);
       setPacienteId(Number(pacienteIdFromQuery));
     }
   }, [pacienteIdFromQuery]);
+
+  const pacienteSeleccionado = useMemo(() => {
+    return pacientesEncontrados?.find((p) => p.id === pacienteId);
+  }, [pacientesEncontrados, pacienteId]);
 
   const pacienteQuery = useCitasPorPaciente(
     searchMode === 'paciente' ? pacienteId : undefined
@@ -54,21 +60,10 @@ export default function CitasListPage() {
   );
 
   const cancelMutation = useCancelarCita();
-
   const activeQuery = searchMode === 'paciente' ? pacienteQuery : profesionalQuery;
 
-  const handleBuscar = () => {
+  const handleBuscarProfesional = () => {
     setMessage('');
-
-    if (searchMode === 'paciente') {
-      if (!pacienteIdInput.trim()) {
-        setMessage('Debes ingresar un ID de paciente.');
-        return;
-      }
-
-      setPacienteId(Number(pacienteIdInput));
-      return;
-    }
 
     if (!profesionalIdInput.trim()) {
       setMessage('Debes seleccionar un profesional.');
@@ -86,7 +81,7 @@ export default function CitasListPage() {
 
   const handleLimpiar = () => {
     setMessage('');
-    setPacienteIdInput('');
+    setNombrePaciente('');
     setProfesionalIdInput('');
     setFechaProfesional('');
     setPacienteId(undefined);
@@ -135,7 +130,7 @@ export default function CitasListPage() {
         </div>
       )}
 
-      <div className="mb-6 rounded-xl bg-white p-4 shadow">
+      <div className="mb-6 rounded-2xl bg-white p-4 shadow-sm">
         <div className="mb-4 flex gap-2">
           <button
             type="button"
@@ -169,31 +164,64 @@ export default function CitasListPage() {
         </div>
 
         {searchMode === 'paciente' ? (
-          <div className="flex flex-col gap-3 md:flex-row">
+          <div className="space-y-3">
             <input
               type="text"
-              inputMode="numeric"
-              placeholder="ID paciente"
-              value={pacienteIdInput}
-              onChange={(e) => setPacienteIdInput(e.target.value)}
-              className="rounded-lg border px-3 py-2"
+              placeholder="Buscar paciente por nombre"
+              value={nombrePaciente}
+              onChange={(e) => {
+                setNombrePaciente(e.target.value);
+                setPacienteId(undefined);
+                setMessage('');
+              }}
+              className="w-full rounded-lg border px-3 py-2"
             />
 
-            <button
-              type="button"
-              onClick={handleBuscar}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-            >
-              Buscar
-            </button>
+            {pacientesLoading && (
+              <p className="text-sm text-gray-500">Buscando pacientes...</p>
+            )}
 
-            <button
-              type="button"
-              onClick={handleLimpiar}
-              className="rounded-lg border border-gray-300 px-4 py-2"
-            >
-              Limpiar
-            </button>
+            {!pacientesLoading &&
+              nombrePaciente.trim().length > 0 &&
+              pacientesEncontrados &&
+              pacientesEncontrados.length > 0 && (
+                <div className="rounded-lg border bg-white">
+                  {pacientesEncontrados.map((paciente) => (
+                    <button
+                      key={paciente.id}
+                      type="button"
+                      onClick={() => {
+                        setPacienteId(paciente.id);
+                        setNombrePaciente(paciente.nombreCompleto);
+                        setMessage('');
+                      }}
+                      className="block w-full border-b px-3 py-2 text-left hover:bg-blue-50 last:border-b-0"
+                    >
+                      <div className="font-medium">{paciente.nombreCompleto}</div>
+                      <div className="text-sm text-gray-500">
+                        Documento: {paciente.documento} · Email: {paciente.email}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+            {pacienteSeleccionado && (
+              <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
+                Paciente seleccionado:{' '}
+                <strong>{pacienteSeleccionado.nombreCompleto}</strong>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleLimpiar}
+                className="rounded-lg border border-gray-300 px-4 py-2"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3 md:flex-row">
@@ -224,7 +252,7 @@ export default function CitasListPage() {
 
             <button
               type="button"
-              onClick={handleBuscar}
+              onClick={handleBuscarProfesional}
               className="rounded-lg bg-blue-600 px-4 py-2 text-white"
             >
               Buscar
