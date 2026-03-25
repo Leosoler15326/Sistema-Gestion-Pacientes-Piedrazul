@@ -36,7 +36,7 @@ public class CitaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<CitaDTO.Response> agendar(
             @Valid @RequestBody CitaDTO.AgendarRequest dto) {
         Usuario creadoPor = usuarioRepository

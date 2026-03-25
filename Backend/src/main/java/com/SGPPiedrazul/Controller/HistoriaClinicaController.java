@@ -1,11 +1,13 @@
 package com.SGPPiedrazul.controller;
 
 import com.SGPPiedrazul.dto.HistoriaClinicaDTO;
+import com.SGPPiedrazul.model.Cita;
 import com.SGPPiedrazul.model.Profesional;
 import com.SGPPiedrazul.model.Usuario;
 import com.SGPPiedrazul.repository.ProfesionalRepository;
 import com.SGPPiedrazul.repository.UsuarioRepository;
 import com.SGPPiedrazul.security.SecurityUtils;
+import com.SGPPiedrazul.service.CitaService;
 import com.SGPPiedrazul.service.HistoriaClinicaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,13 +25,16 @@ public class HistoriaClinicaController {
     private final HistoriaClinicaService historiaClinicaService;
     private final UsuarioRepository usuarioRepository;
     private final ProfesionalRepository profesionalRepository;
+    private final CitaService citaService;
 
     public HistoriaClinicaController(HistoriaClinicaService historiaClinicaService,
                                       UsuarioRepository usuarioRepository,
-                                      ProfesionalRepository profesionalRepository) {
+                                      ProfesionalRepository profesionalRepository,
+                                      CitaService citaService) {
         this.historiaClinicaService = historiaClinicaService;
         this.usuarioRepository = usuarioRepository;
         this.profesionalRepository = profesionalRepository;
+        this.citaService = citaService;
     }
 
     @PostMapping
@@ -41,9 +46,8 @@ public class HistoriaClinicaController {
                 .findByNombreUsuario(SecurityUtils.getNombreUsuarioActual())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
 
-        // Obtiene el profesional vinculado al usuario autenticado
-        Profesional profesional = profesionalRepository
-                .findByUsuarioId(responsable.getId());
+        Profesional profesional = profesionalRepository.findById(citaService.buscarPorId(dto.getCitaId()).getProfesionalId())
+                                                .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(historiaClinicaService.registrar(dto, profesional, responsable));
