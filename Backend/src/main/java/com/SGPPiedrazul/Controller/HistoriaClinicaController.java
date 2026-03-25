@@ -49,8 +49,9 @@ public class HistoriaClinicaController {
         Profesional profesional = profesionalRepository.findById(citaService.buscarPorId(dto.getCitaId()).getProfesionalId())
                                                 .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(historiaClinicaService.registrar(dto, profesional, responsable));
+        return ResponseEntity.ok(
+                historiaClinicaService.registrar(dto, profesional, responsable)
+        );
     }
 
     @PutMapping("/{id}")
