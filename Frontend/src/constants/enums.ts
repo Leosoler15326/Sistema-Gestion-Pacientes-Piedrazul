@@ -9,6 +9,7 @@ export const ROL_USUARIO_OPTIONS = [
   'MEDICO_TERAPISTA',
   'AGENDADOR',
   'PACIENTE',
+  'AGENDADOR',
 ] as const;
 
 export const TIPO_PROFESIONAL_OPTIONS = [

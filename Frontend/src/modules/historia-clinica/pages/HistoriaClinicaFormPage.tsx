@@ -7,6 +7,24 @@ import HistoriaClinicaForm from '../components/HistoriaClinicaForm';
 import { useCreateHistoriaClinica } from '../hooks/useHistoriaClinica';
 import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.types';
 
+function getErrorMessage(error: any) {
+  const status = error?.response?.status;
+  const backendMessage =
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.response?.data?.detalle;
+
+  if (status === 403) {
+    return 'No tienes permisos para registrar la historia clínica.';
+  }
+
+  if (backendMessage) {
+    return String(backendMessage);
+  }
+
+  return 'No fue posible registrar la historia clínica.';
+}
+
 export default function HistoriaClinicaFormPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -20,10 +38,12 @@ export default function HistoriaClinicaFormPage() {
     try {
       setErrorMessage('');
       await createMutation.mutateAsync(values);
-      navigate(APP_ROUTES.HISTORIA_CLINICA);
+      navigate(APP_ROUTES.HISTORIA_CLINICA, {
+        state: { successMessage: 'Historia clínica registrada correctamente.' },
+      });
     } catch (error) {
       console.error(error);
-      setErrorMessage('No fue posible registrar la historia clínica.');
+      setErrorMessage(getErrorMessage(error));
     }
   };
 
@@ -33,6 +53,15 @@ export default function HistoriaClinicaFormPage() {
         title="Nueva historia clínica"
         subtitle="Registra una nueva historia clínica asociada a una cita."
       />
+
+      {!initialCitaId && (
+        <div className="mb-4">
+          <InlineMessage
+            type="info"
+            message="Debes ingresar el ID de una cita existente para registrar la historia clínica."
+          />
+        </div>
+      )}
 
       {errorMessage && (
         <div className="mb-4">

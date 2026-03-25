@@ -12,6 +12,7 @@ export default function HistoriaClinicaForm({
   loading = false,
   initialCitaId,
 }: HistoriaClinicaFormProps) {
+  const [message, setMessage] = useState('');
   const [citaIdInput, setCitaIdInput] = useState(
     initialCitaId ? String(initialCitaId) : ''
   );
@@ -23,22 +24,34 @@ export default function HistoriaClinicaForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setMessage('');
 
     if (!form.citaId) {
-      alert('Debes indicar la cita.');
+      setMessage('Debes indicar una cita válida.');
       return;
     }
 
     if (!form.descripcion.trim()) {
-      alert('La descripción es obligatoria.');
+      setMessage('La descripción es obligatoria.');
       return;
     }
 
-    await onSubmit(form);
+    try {
+      await onSubmit(form);
+    } catch (error) {
+      console.error(error);
+      setMessage('No fue posible guardar la historia clínica.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-6 shadow">
+      {message && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {message}
+        </div>
+      )}
+
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           ID de la cita
@@ -58,6 +71,9 @@ export default function HistoriaClinicaForm({
           required
           disabled={Boolean(initialCitaId)}
         />
+        <p className="mt-2 text-xs text-gray-500">
+          La historia clínica se registra sobre una cita ya existente.
+        </p>
       </div>
 
       <div>
