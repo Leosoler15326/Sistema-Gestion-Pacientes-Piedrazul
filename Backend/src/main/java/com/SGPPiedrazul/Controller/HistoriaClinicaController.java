@@ -33,6 +33,7 @@ public class HistoriaClinicaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> registrar(
             @Valid @RequestBody HistoriaClinicaDTO.Request dto) {
 
@@ -49,6 +50,7 @@ public class HistoriaClinicaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody HistoriaClinicaDTO.ActualizarRequest dto) {
@@ -62,12 +64,14 @@ public class HistoriaClinicaController {
     }
 
     @GetMapping("/cita/{citaId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> buscarPorCita(
             @PathVariable Long citaId) {
         return ResponseEntity.ok(historiaClinicaService.buscarPorCita(citaId));
     }
 
     @GetMapping("/paciente/{pacienteId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<HistoriaClinicaDTO.Response>> listarPorPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(
@@ -75,6 +79,7 @@ public class HistoriaClinicaController {
     }
 
     @GetMapping("/profesional/{profesionalId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<HistoriaClinicaDTO.Response>> listarPorProfesional(
             @PathVariable Long profesionalId) {
         return ResponseEntity.ok(

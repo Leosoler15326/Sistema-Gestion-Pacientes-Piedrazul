@@ -62,9 +62,9 @@ public class ProfesionalController {
         return ResponseEntity.ok(profesionalService.buscarPorUsuarioId(usuarioId));
     }
 
-    // ─── Buscar por usuario_id (solo admin) ───
+    // ─── Buscar por usuario_id  ───
     @GetMapping("/usuario/{usuarioId}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<ProfesionalResponseDTO> buscarPorUsuarioId(
             @PathVariable Long usuarioId) {
         return ResponseEntity.ok(profesionalService.buscarPorUsuarioId(usuarioId));
