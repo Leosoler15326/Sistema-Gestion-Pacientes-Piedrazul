@@ -17,7 +17,10 @@ export default function CitaCreatePage() {
     try {
       setErrorMessage('');
       await createMutation.mutateAsync(values);
-      navigate(APP_ROUTES.CITAS);
+
+      navigate(APP_ROUTES.CITAS, {
+        state: { successMessage: 'Cita agendada correctamente.' },
+      });
     } catch (error) {
       console.error(error);
       setErrorMessage('No fue posible agendar la cita.');

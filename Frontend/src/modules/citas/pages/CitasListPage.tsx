@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import api from '../../../services/api';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
@@ -14,22 +15,44 @@ import {
 } from '../hooks/UseCitas';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 type SearchMode = 'paciente' | 'profesional';
 
+type ProfesionalPerfilDto = {
+  profesionalId?: number;
+  id?: number;
+  nombres?: string;
+  nombre?: string;
+};
+
+const hoy = () => new Date().toISOString().split('T')[0];
+
 export default function CitasListPage() {
+  const { user } = useAuth();
+  const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
+  const esProfesional = normalizedRole === 'MEDICO_TERAPISTA';
+
   const [searchParams] = useSearchParams();
   const pacienteIdFromQuery = searchParams.get('pacienteId');
+  const location = useLocation();
+  const successMessage = (location.state as { successMessage?: string } | null)?.successMessage;
 
-  const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
+  const [searchMode, setSearchMode] = useState<SearchMode>(
+    esProfesional ? 'profesional' : 'paciente'
+  );
 
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
-  const [fechaProfesional, setFechaProfesional] = useState('');
+  const [fechaProfesional, setFechaProfesional] = useState(esProfesional ? hoy() : '');
 
   const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
   const [profesionalId, setProfesionalId] = useState<number | undefined>(undefined);
-  const [fecha, setFecha] = useState<string | undefined>(undefined);
+  const [fecha, setFecha] = useState<string | undefined>(esProfesional ? hoy() : undefined);
+
+  const [profesionalActualNombre, setProfesionalActualNombre] = useState('');
+  const [perfilLoading, setPerfilLoading] = useState(false);
+  const [perfilError, setPerfilError] = useState('');
 
   const [citaIdToCancel, setCitaIdToCancel] = useState<number | null>(null);
   const [message, setMessage] = useState('');
@@ -44,6 +67,57 @@ export default function CitasListPage() {
       setPacienteId(Number(pacienteIdFromQuery));
     }
   }, [pacienteIdFromQuery]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cargarPerfilProfesional = async () => {
+      if (!esProfesional || !user?.id) return;
+
+      try {
+        setPerfilLoading(true);
+        setPerfilError('');
+
+        let data: ProfesionalPerfilDto;
+
+        try {
+          const response = await api.get<ProfesionalPerfilDto>('/profesionales/mi-perfil');
+          data = response.data;
+        } catch {
+          const response = await api.get<ProfesionalPerfilDto>(
+            `/profesionales/usuario/${user.id}`
+          );
+          data = response.data;
+        }
+
+        if (cancelled) return;
+
+        const resolvedProfesionalId = Number(data.profesionalId ?? data.id ?? 0);
+
+        setSearchMode('profesional');
+        setProfesionalId(resolvedProfesionalId);
+        setProfesionalIdInput(String(resolvedProfesionalId));
+        setFechaProfesional(hoy());
+        setFecha(hoy());
+        setProfesionalActualNombre(data.nombres ?? data.nombre ?? user.nombreCompleto ?? '');
+      } catch (error) {
+        console.error(error);
+        if (!cancelled) {
+          setPerfilError('No fue posible cargar el profesional autenticado.');
+        }
+      } finally {
+        if (!cancelled) {
+          setPerfilLoading(false);
+        }
+      }
+    };
+
+    cargarPerfilProfesional();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [esProfesional, user?.id, user?.nombreCompleto]);
 
   const pacienteSeleccionado = useMemo(() => {
     return pacientesEncontrados?.find((p) => p.id === pacienteId);
@@ -65,8 +139,18 @@ export default function CitasListPage() {
   const handleBuscarProfesional = () => {
     setMessage('');
 
-    if (!profesionalIdInput.trim()) {
-      setMessage('Debes seleccionar un profesional.');
+    const targetProfesionalId = esProfesional
+      ? profesionalId
+      : profesionalIdInput.trim()
+      ? Number(profesionalIdInput)
+      : undefined;
+
+    if (!targetProfesionalId) {
+      setMessage(
+        esProfesional
+          ? 'No fue posible identificar el profesional autenticado.'
+          : 'Debes seleccionar un profesional.'
+      );
       return;
     }
 
@@ -75,16 +159,25 @@ export default function CitasListPage() {
       return;
     }
 
-    setProfesionalId(Number(profesionalIdInput));
+    setProfesionalId(targetProfesionalId);
     setFecha(fechaProfesional);
   };
 
   const handleLimpiar = () => {
     setMessage('');
     setNombrePaciente('');
+    setPacienteId(undefined);
+
+    if (esProfesional) {
+      const fechaHoy = hoy();
+      setSearchMode('profesional');
+      setFechaProfesional(fechaHoy);
+      setFecha(fechaHoy);
+      return;
+    }
+
     setProfesionalIdInput('');
     setFechaProfesional('');
-    setPacienteId(undefined);
     setProfesionalId(undefined);
     setFecha(undefined);
   };
@@ -121,11 +214,17 @@ export default function CitasListPage() {
         }
       />
 
-      {message && (
+      {successMessage && (
+        <div className="mb-4">
+          <InlineMessage type="success" message={successMessage} />
+        </div>
+      )}
+
+      {(message || perfilError) && (
         <div className="mb-4">
           <InlineMessage
-            type={message.includes('correctamente') ? 'success' : 'error'}
-            message={message}
+            type={(message || perfilError).includes('correctamente') ? 'success' : 'error'}
+            message={perfilError || message}
           />
         </div>
       )}
@@ -208,8 +307,7 @@ export default function CitasListPage() {
 
             {pacienteSeleccionado && (
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
-                Paciente seleccionado:{' '}
-                <strong>{pacienteSeleccionado.nombreCompleto}</strong>
+                Paciente seleccionado: <strong>{pacienteSeleccionado.nombreCompleto}</strong>
               </div>
             )}
 
@@ -224,24 +322,32 @@ export default function CitasListPage() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 md:flex-row">
-            <select
-              value={profesionalIdInput}
-              onChange={(e) => setProfesionalIdInput(e.target.value)}
-              className="rounded-lg border px-3 py-2"
-            >
-              <option value="">Selecciona un profesional</option>
-              {Array.isArray(profesionales) &&
-                profesionales.map((p: any) => (
-                  <option
-                    key={p.profesionalId ?? p.id}
-                    value={p.profesionalId ?? p.id}
-                  >
-                    {(p.nombres ?? p.nombre ?? 'Profesional')}
-                    {p.especialidad ? ` - ${p.especialidad}` : ''}
-                  </option>
-                ))}
-            </select>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            {esProfesional ? (
+              <div className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-slate-700 md:min-w-[280px]">
+                {perfilLoading
+                  ? 'Cargando profesional autenticado...'
+                  : profesionalActualNombre || 'Profesional asignado automáticamente'}
+              </div>
+            ) : (
+              <select
+                value={profesionalIdInput}
+                onChange={(e) => setProfesionalIdInput(e.target.value)}
+                className="rounded-lg border px-3 py-2"
+              >
+                <option value="">Selecciona un profesional</option>
+                {Array.isArray(profesionales) &&
+                  profesionales.map((p: any) => (
+                    <option
+                      key={p.profesionalId ?? p.id}
+                      value={p.profesionalId ?? p.id}
+                    >
+                      {(p.nombres ?? p.nombre ?? 'Profesional')}
+                      {p.especialidad ? ` - ${p.especialidad}` : ''}
+                    </option>
+                  ))}
+              </select>
+            )}
 
             <input
               type="date"
@@ -253,7 +359,8 @@ export default function CitasListPage() {
             <button
               type="button"
               onClick={handleBuscarProfesional}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+              disabled={esProfesional && perfilLoading}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
             >
               Buscar
             </button>
@@ -269,7 +376,7 @@ export default function CitasListPage() {
         )}
       </div>
 
-      {activeQuery.isLoading && <Loader message="Cargando citas..." />}
+      {activeQuery.isLoading && <Loader message="Cargando citas." />}
 
       {!activeQuery.isLoading && activeQuery.isError && (
         <EmptyState

@@ -1,23 +1,40 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { usePacientesPorNombre, useCreatePaciente } from '../../pacientes/hooks/usePacientes';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import api from '../../../services/api';
+import { useAuth } from '../../auth/hooks/useAuth';
+import {
+  usePacientesPorNombre,
+  useCreatePaciente,
+} from '../../pacientes/hooks/usePacientes';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
 import { useDisponibilidad } from '../hooks/UseDisponibilidad';
 import type { CreateCitaRequestDto } from '../types/cita.types';
-import type { CrearPacienteDto, PacienteDto } from '../../pacientes/types/paciente.types';
-import {
-  ESPECIALIDAD_OPTIONS,
-  TIPO_ATENCION_OPTIONS,
-} from '../../../constants/enums';
+import type {
+  CrearPacienteDto,
+  PacienteDto,
+} from '../../pacientes/types/paciente.types';
+import { ESPECIALIDAD_OPTIONS, TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
 
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
   loading?: boolean;
 }
 
+type ProfesionalPerfilDto = {
+  profesionalId?: number;
+  id?: number;
+  nombres?: string;
+  nombre?: string;
+  especialidad?: string;
+};
+
 export default function CitaForm({
   onSubmit,
   loading = false,
 }: CitaFormProps) {
+  const { user } = useAuth();
+  const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
+  const esProfesional = normalizedRole === 'MEDICO_TERAPISTA';
+
   const [fecha, setFecha] = useState('');
   const [horaManual, setHoraManual] = useState('');
   const [horaSeleccionada, setHoraSeleccionada] = useState('');
@@ -25,6 +42,9 @@ export default function CitaForm({
   const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState('');
   const [message, setMessage] = useState('');
   const [showCreatePaciente, setShowCreatePaciente] = useState(false);
+  const [perfilLoading, setPerfilLoading] = useState(false);
+  const [profesionalActualNombre, setProfesionalActualNombre] = useState('');
+  const [perfilError, setPerfilError] = useState('');
 
   const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
     pacienteId: 0,
@@ -49,17 +69,67 @@ export default function CitaForm({
   const { data: profesionales } = useProfesionalesActivos();
   const createPacienteMutation = useCreatePaciente();
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const cargarPerfilProfesional = async () => {
+      if (!esProfesional || !user?.id) return;
+
+      try {
+        setPerfilLoading(true);
+        setPerfilError('');
+
+        let data: ProfesionalPerfilDto;
+
+        try {
+          const response = await api.get<ProfesionalPerfilDto>('/profesionales/mi-perfil');
+          data = response.data;
+        } catch {
+          const response = await api.get<ProfesionalPerfilDto>(
+            `/profesionales/usuario/${user.id}`
+          );
+          data = response.data;
+        }
+
+        if (cancelled) return;
+
+        const profesionalId = Number(data.profesionalId ?? data.id ?? 0);
+
+        setForm((prev) => ({
+          ...prev,
+          profesionalId,
+        }));
+
+        setProfesionalActualNombre(data.nombres ?? data.nombre ?? user.nombreCompleto ?? '');
+        setEspecialidadSeleccionada(data.especialidad ?? '');
+      } catch (error) {
+        console.error(error);
+        if (!cancelled) {
+          setPerfilError('No fue posible cargar el profesional autenticado.');
+        }
+      } finally {
+        if (!cancelled) {
+          setPerfilLoading(false);
+        }
+      }
+    };
+
+    cargarPerfilProfesional();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [esProfesional, user?.id, user?.nombreCompleto]);
+
   const profesionalesFiltrados = Array.isArray(profesionales)
     ? profesionales.filter((p: any) =>
-        especialidadSeleccionada
-          ? p.especialidad === especialidadSeleccionada
-          : true
+        especialidadSeleccionada ? p.especialidad === especialidadSeleccionada : true
       )
     : [];
 
   const { data: slots, isLoading: slotsLoading } = useDisponibilidad(
-    form.profesionalId,
-    fecha
+    form.profesionalId || undefined,
+    fecha || undefined
   );
 
   const pacienteSeleccionado = useMemo(() => {
@@ -116,7 +186,11 @@ export default function CitaForm({
     }
 
     if (!form.profesionalId) {
-      setMessage('Debes seleccionar un profesional.');
+      setMessage(
+        esProfesional
+          ? 'No fue posible identificar el profesional autenticado.'
+          : 'Debes seleccionar un profesional.'
+      );
       return;
     }
 
@@ -143,10 +217,15 @@ export default function CitaForm({
       fechaHoraFinal = `${fecha}T${horaManual}:00`;
     }
 
-    await onSubmit({
-      ...form,
-      fechaHora: fechaHoraFinal,
-    });
+    try {
+      await onSubmit({
+        ...form,
+        fechaHora: fechaHoraFinal,
+      });
+    } catch (error) {
+      console.error(error);
+      setMessage('No fue posible agendar la cita.');
+    }
   };
 
   return (
@@ -154,15 +233,15 @@ export default function CitaForm({
       onSubmit={handleSubmit}
       className="space-y-6 rounded-2xl bg-white p-6 shadow-sm"
     >
-      {message && (
+      {(message || perfilError) && (
         <div
           className={`rounded-xl border px-4 py-3 text-sm ${
-            message.includes('correctamente')
+            (message || perfilError).includes('correctamente')
               ? 'border-green-200 bg-green-50 text-green-700'
               : 'border-red-200 bg-red-50 text-red-700'
           }`}
         >
-          {message}
+          {perfilError || message}
         </div>
       )}
 
@@ -229,17 +308,14 @@ export default function CitaForm({
 
         {pacienteSeleccionado && (
           <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-            Paciente seleccionado:{' '}
-            <strong>{pacienteSeleccionado.nombreCompleto}</strong>
+            Paciente seleccionado: <strong>{pacienteSeleccionado.nombreCompleto}</strong>
           </div>
         )}
       </div>
 
       {showCreatePaciente && (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <h3 className="mb-4 text-base font-semibold text-slate-800">
-            Nuevo paciente
-          </h3>
+          <h3 className="mb-4 text-base font-semibold text-slate-800">Nuevo paciente</h3>
 
           <div className="grid gap-4 md:grid-cols-2">
             <input
@@ -300,87 +376,95 @@ export default function CitaForm({
               disabled={createPacienteMutation.isPending}
               className="rounded-xl bg-emerald-600 px-4 py-2.5 font-medium text-white transition hover:bg-emerald-700 disabled:opacity-60"
             >
-              {createPacienteMutation.isPending
-                ? 'Creando paciente...'
-                : 'Guardar paciente'}
+              {createPacienteMutation.isPending ? 'Creando paciente...' : 'Guardar paciente'}
             </button>
           </div>
         </div>
       )}
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Especialidad
-        </label>
+      {!esProfesional && (
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700">
+            Especialidad
+          </label>
 
-        <select
-          value={especialidadSeleccionada}
-          onChange={(e) => {
-            setEspecialidadSeleccionada(e.target.value);
-            setForm((prev) => ({ ...prev, profesionalId: 0 }));
-            setHoraSeleccionada('');
-            setHoraManual('');
-            setMessage('');
-          }}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-        >
-          <option value="">Todas las especialidades</option>
-          {ESPECIALIDAD_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
+          <select
+            value={especialidadSeleccionada}
+            onChange={(e) => {
+              setEspecialidadSeleccionada(e.target.value);
+              setForm((prev) => ({ ...prev, profesionalId: 0 }));
+              setHoraSeleccionada('');
+              setHoraManual('');
+              setMessage('');
+            }}
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+            <option value="">Todas las especialidades</option>
+            {ESPECIALIDAD_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-700">
           Profesional
         </label>
 
-        <select
-          value={form.profesionalId ? String(form.profesionalId) : ''}
-          onChange={(e) => {
-            const selectedValue = e.target.value;
+        {esProfesional ? (
+          <div className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-700">
+            {perfilLoading
+              ? 'Cargando profesional autenticado...'
+              : profesionalActualNombre || 'Profesional asignado automáticamente'}
+          </div>
+        ) : (
+          <>
+            <select
+              value={form.profesionalId ? String(form.profesionalId) : ''}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
 
-            setForm((prev) => ({
-              ...prev,
-              profesionalId: selectedValue ? Number(selectedValue) : 0,
-            }));
+                setForm((prev) => ({
+                  ...prev,
+                  profesionalId: selectedValue ? Number(selectedValue) : 0,
+                }));
 
-            setHoraSeleccionada('');
-            setHoraManual('');
-            setMessage('');
-          }}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-        >
-          <option value="">Selecciona un profesional</option>
+                setHoraSeleccionada('');
+                setHoraManual('');
+                setMessage('');
+              }}
+              className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Selecciona un profesional</option>
 
-          {profesionalesFiltrados.map((p: any) => {
-            const optionValue = p.profesionalId ?? p.id;
-            const optionLabel = `${p.nombres ?? p.nombre ?? 'Profesional'}${
-              p.especialidad ? ` - ${p.especialidad}` : ''
-            }`;
+              {profesionalesFiltrados.map((p: any) => {
+                const optionValue = p.profesionalId ?? p.id;
+                const optionLabel = `${p.nombres ?? p.nombre ?? 'Profesional'}${
+                  p.especialidad ? ` - ${p.especialidad}` : ''
+                }`;
 
-            return (
-              <option key={optionValue} value={String(optionValue)}>
-                {optionLabel}
-              </option>
-            );
-          })}
-        </select>
+                return (
+                  <option key={optionValue} value={String(optionValue)}>
+                    {optionLabel}
+                  </option>
+                );
+              })}
+            </select>
 
-        {especialidadSeleccionada && profesionalesFiltrados.length === 0 && (
-          <p className="mt-2 text-sm text-slate-500">
-            No hay profesionales disponibles para esta especialidad.
-          </p>
+            {especialidadSeleccionada && profesionalesFiltrados.length === 0 && (
+              <p className="mt-2 text-sm text-slate-500">
+                No hay profesionales disponibles para esta especialidad.
+              </p>
+            )}
+          </>
         )}
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Fecha
-        </label>
+        <label className="mb-2 block text-sm font-medium text-slate-700">Fecha</label>
 
         <input
           type="date"
@@ -503,7 +587,7 @@ export default function CitaForm({
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (esProfesional && perfilLoading)}
         className="rounded-xl bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:opacity-60"
       >
         {loading ? 'Guardando...' : 'Agendar cita'}
