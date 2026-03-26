@@ -5,10 +5,11 @@ import com.SGPPiedrazul.model.Profesional;
 import com.SGPPiedrazul.model.Usuario;
 import com.SGPPiedrazul.repository.ProfesionalRepository;
 import com.SGPPiedrazul.repository.UsuarioRepository;
+import com.SGPPiedrazul.security.JwtAuthFilter;
+import com.SGPPiedrazul.security.JwtService;
 import com.SGPPiedrazul.security.SecurityUtils;
+import com.SGPPiedrazul.security.UserDetailsServiceImpl;
 import com.SGPPiedrazul.service.HistoriaClinicaService;
-import com.SGPPiedrazul.security.SecurityUtils;
-import com.SGPPiedrazul.service.CitaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,10 +49,13 @@ class HistoriaClinicaControllerTest {
     private ProfesionalRepository profesionalRepository;
 
     @MockBean
-    private CitaService citaService;
+    private JwtService jwtService;
 
     @MockBean
-    private SecurityUtils securityUtils;
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
 
     private ObjectMapper objectMapper;
     private HistoriaClinicaDTO.Response historiaResponse;
@@ -86,8 +90,6 @@ class HistoriaClinicaControllerTest {
         profesionalMock.setId(2L);
         profesionalMock.setNombres("Dr. García");
     }
-
-    // ─── POST /api/historias ───
 
     @Test
     @DisplayName("Registrar historia clínica válida devuelve 201")
@@ -163,8 +165,6 @@ class HistoriaClinicaControllerTest {
         }
     }
 
-    // ─── PUT /api/historias/{id} ───
-
     @Test
     @DisplayName("Actualizar historia existente devuelve 200")
     void actualizar_existente_retorna200() throws Exception {
@@ -207,8 +207,6 @@ class HistoriaClinicaControllerTest {
         }
     }
 
-    // ─── GET /api/historias/cita/{citaId} ───
-
     @Test
     @DisplayName("Buscar historia por cita existente devuelve 200")
     void buscarPorCita_existente_retorna200() throws Exception {
@@ -217,7 +215,8 @@ class HistoriaClinicaControllerTest {
         mockMvc.perform(get("/api/historias/cita/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.citaId").value(1))
-                .andExpect(jsonPath("$.descripcion").value("Paciente presenta dolor lumbar."));
+                .andExpect(jsonPath("$.descripcion")
+                        .value("Paciente presenta dolor lumbar."));
     }
 
     @Test
@@ -230,8 +229,6 @@ class HistoriaClinicaControllerTest {
         mockMvc.perform(get("/api/historias/cita/99"))
                 .andExpect(status().isInternalServerError());
     }
-
-    // ─── GET /api/historias/paciente/{pacienteId} ───
 
     @Test
     @DisplayName("Listar historias por paciente devuelve 200 con lista")
@@ -254,8 +251,6 @@ class HistoriaClinicaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
-
-    // ─── GET /api/historias/profesional/{profesionalId} ───
 
     @Test
     @DisplayName("Listar historias por profesional devuelve 200 con lista")
