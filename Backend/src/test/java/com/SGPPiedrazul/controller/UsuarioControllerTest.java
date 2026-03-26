@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.controller;
 
+import com.SGPPiedrazul.Controller.UsuarioController;
 import com.SGPPiedrazul.dto.UsuarioDTO;
 import com.SGPPiedrazul.model.enums.RolUsuario;
 import com.SGPPiedrazul.security.SecurityUtils;

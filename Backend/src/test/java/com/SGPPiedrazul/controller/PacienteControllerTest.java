@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.controller;
 
+import com.SGPPiedrazul.Controller.PacienteController;
 import com.SGPPiedrazul.dto.PacienteDTO;
 import com.SGPPiedrazul.service.PacienteService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.controller;
 
+import com.SGPPiedrazul.Controller.HistoriaClinicaController;
 import com.SGPPiedrazul.dto.HistoriaClinicaDTO;
 import com.SGPPiedrazul.model.Profesional;
 import com.SGPPiedrazul.model.Usuario;

@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.controller;
 
+import com.SGPPiedrazul.Controller.AuthController;
 import com.SGPPiedrazul.dto.AuthDTO;
 import com.SGPPiedrazul.service.AuthService;
 import com.SGPPiedrazul.security.JwtService;

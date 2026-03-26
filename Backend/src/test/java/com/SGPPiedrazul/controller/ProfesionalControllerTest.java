@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.controller;
 
+import com.SGPPiedrazul.Controller.ProfesionalController;
 import com.SGPPiedrazul.dto.CrearProfesionalDTO;
 import com.SGPPiedrazul.dto.ProfesionalResponseDTO;
 import com.SGPPiedrazul.model.FranjaHoraria;

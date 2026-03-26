@@ -1,4 +1,4 @@
-package com.SGPPiedrazul.controller;
+package com.SGPPiedrazul.Controller;
 
 import com.SGPPiedrazul.dto.UsuarioDTO;
 import com.SGPPiedrazul.security.SecurityUtils;

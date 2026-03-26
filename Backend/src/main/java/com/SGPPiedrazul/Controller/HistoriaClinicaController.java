@@ -1,4 +1,4 @@
-package com.SGPPiedrazul.controller;
+package com.SGPPiedrazul.Controller;
 
 import com.SGPPiedrazul.dto.HistoriaClinicaDTO;
 import com.SGPPiedrazul.model.Cita;
