@@ -135,17 +135,21 @@ public class CitaService {
     }
 
     @Transactional(readOnly = true)
-    public List<CitaDTO.Response> listarPorProfesionalYFecha(Long profesionalId,
-                                                               LocalDate fecha) {
+    public List<CitaDTO.Response> listarPorProfesionalYRangoFechas(
+        Long profesionalId,
+        LocalDate fechaInicio,
+        LocalDate fechaFin) {
+
         Profesional profesional = profesionalRepository.findById(profesionalId)
-                .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
+            .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
+
         return citaRepository.findByProfesionalAndFechaHoraBetween(
-                        profesional,
-                        fecha.atStartOfDay(),
-                        fecha.atTime(23, 59, 59))
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+                    profesional,
+                    fechaInicio.atStartOfDay(),
+                    fechaFin.atTime(23, 59, 59))
+            .stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
