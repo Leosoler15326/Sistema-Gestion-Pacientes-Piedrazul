@@ -9,7 +9,7 @@ export const useAuth = () => {
 
   const isAuthenticated = Boolean(accessToken);
 
-  const hasRole = (roles: UserRole[]) => {
+  const hasAnyRole = (roles: UserRole[]) => {
     if (!user) return false;
     return roles.includes(user.rol);
   };
@@ -20,7 +20,7 @@ export const useAuth = () => {
       refreshToken,
       user,
       isAuthenticated,
-      hasRole,
+      hasAnyRole,
     }),
     [accessToken, refreshToken, user, isAuthenticated]
   );

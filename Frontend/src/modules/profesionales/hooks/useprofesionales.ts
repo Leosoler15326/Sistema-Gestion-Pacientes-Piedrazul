@@ -5,11 +5,23 @@ import type {
   CrearProfesionalDto,
   FranjaHorariaDto,
 } from '../types/profesional.types';
+import { authStore } from '../../auth/store/auth.store';
 
 export const useProfesionales = () => {
+  const user = authStore.getUser();
+
+  const normalizedRole = String(user?.rol ?? '')
+    .toUpperCase()
+    .replace('ROLE_', '');
+
+  const esAdmin = normalizedRole === 'ADMINISTRADOR';
+
   return useQuery({
-    queryKey: ['profesionales'],
-    queryFn: () => profesionalesService.listar(),
+    queryKey: ['profesionales', normalizedRole],
+    queryFn: () =>
+      esAdmin
+        ? profesionalesService.listar()
+        : profesionalesService.listarActivos(),
   });
 };
 

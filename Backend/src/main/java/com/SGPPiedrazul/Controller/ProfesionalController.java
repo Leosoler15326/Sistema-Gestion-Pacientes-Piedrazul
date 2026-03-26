@@ -56,7 +56,7 @@ public class ProfesionalController {
 
     // ─── Perfil del médico autenticado (obtiene su propio profesional desde el JWT) ───
     @GetMapping("/mi-perfil")
-    @PreAuthorize("hasRole('MEDICO_TERAPISTA')")
+    @PreAuthorize("hasAnyRole('MEDICO_TERAPISTA')")
     public ResponseEntity<ProfesionalResponseDTO> miPerfil() {
         Long usuarioId = SecurityUtils.getIdUsuarioActual();
         return ResponseEntity.ok(profesionalService.buscarPorUsuarioId(usuarioId));
@@ -72,7 +72,7 @@ public class ProfesionalController {
 
     // ─── Crear profesional (con o sin usuario en una sola transacción) ───
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     public ResponseEntity<ProfesionalResponseDTO> crear(
             @Valid @RequestBody CrearProfesionalDTO dto) {
         String responsable = SecurityUtils.getNombreUsuarioActual();
@@ -82,7 +82,7 @@ public class ProfesionalController {
 
     // ─── Actualizar datos clínicos ───
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     public ResponseEntity<ProfesionalResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody CrearProfesionalDTO dto) {
@@ -92,7 +92,7 @@ public class ProfesionalController {
 
     // ─── Cambiar estado activo/inactivo ───
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     public ResponseEntity<Void> cambiarEstado(
             @PathVariable Long id,
             @RequestParam Estado estado) {
@@ -110,7 +110,7 @@ public class ProfesionalController {
 
     // ─── Actualizar franjas horarias ───
     @PutMapping("/{id}/franjas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     public ResponseEntity<Void> actualizarFranjas(
             @PathVariable Long id,
             @RequestBody List<FranjaHoraria> franjas) {

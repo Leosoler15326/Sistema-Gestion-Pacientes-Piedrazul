@@ -55,16 +55,44 @@ export default function AppRouter() {
               <RoleRoute allowedRoles={['ADMINISTRADOR', 'MEDICO_TERAPISTA']} />
             }
           >
-            <Route path={APP_ROUTES.HISTORIA_CLINICA} element={<HistoriaClinicaListPage />} />
-            <Route path={APP_ROUTES.HISTORIA_CLINICA_NUEVA} element={<HistoriaClinicaFormPage />} />
-            <Route path={APP_ROUTES.HISTORIA_CLINICA_DETALLE} element={<HistoriaClinicaDetailPage />} />
-            <Route path={APP_ROUTES.HISTORIA_CLINICA_EDITAR} element={<HistoriaClinicaEditPage />} />
+            <Route
+              path={APP_ROUTES.HISTORIA_CLINICA}
+              element={<HistoriaClinicaListPage />}
+            />
+            <Route
+              path={APP_ROUTES.HISTORIA_CLINICA_NUEVA}
+              element={<HistoriaClinicaFormPage />}
+            />
+            <Route
+              path={APP_ROUTES.HISTORIA_CLINICA_DETALLE}
+              element={<HistoriaClinicaDetailPage />}
+            />
+            <Route
+              path={APP_ROUTES.HISTORIA_CLINICA_EDITAR}
+              element={<HistoriaClinicaEditPage />}
+            />
+          </Route>
+
+          <Route
+            element={
+              <RoleRoute allowedRoles={['ADMINISTRADOR', 'AGENDADOR']} />
+            }
+          >
+            <Route
+              path={APP_ROUTES.PROFESIONALES}
+              element={<ProfesionalesListPage />}
+            />
+            <Route
+              path={APP_ROUTES.PROFESIONALES_DETALLE}
+              element={<ProfesionalDetailPage />}
+            />
           </Route>
 
           <Route element={<RoleRoute allowedRoles={['ADMINISTRADOR']} />}>
-            <Route path={APP_ROUTES.PROFESIONALES} element={<ProfesionalesListPage />} />
-            <Route path={APP_ROUTES.PROFESIONALES_NUEVO} element={<ProfesionalFormPage />} />
-            <Route path={APP_ROUTES.PROFESIONALES_DETALLE} element={<ProfesionalDetailPage />} />
+            <Route
+              path={APP_ROUTES.PROFESIONALES_NUEVO}
+              element={<ProfesionalFormPage />}
+            />
 
             <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
             <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />
