@@ -28,6 +28,8 @@ type ProfesionalPerfilDto = {
 
 const hoy = () => new Date().toISOString().split('T')[0];
 
+const finDeAnoActual = () => `${new Date().getFullYear()}-12-31`;
+
 export default function CitasListPage() {
   const { user } = useAuth();
   const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
@@ -45,7 +47,7 @@ export default function CitasListPage() {
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
   const [fechaDesdeProfesional, setFechaDesdeProfesional] = useState(hoy());
-  const [fechaHastaProfesional, setFechaHastaProfesional] = useState('');
+  const [fechaHastaProfesional, setFechaHastaProfesional] = useState(finDeAnoActual());
 
   const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
   const [profesionalParams, setProfesionalParams] = useState<
@@ -101,14 +103,16 @@ export default function CitasListPage() {
 
         const resolvedProfesionalId = Number(data.profesionalId ?? data.id ?? 0);
         const fechaHoy = hoy();
+        const fechaFinDefault = finDeAnoActual();
 
         setSearchMode('profesional');
         setProfesionalIdInput(String(resolvedProfesionalId));
         setFechaDesdeProfesional(fechaHoy);
-        setFechaHastaProfesional('');
+        setFechaHastaProfesional(fechaFinDefault);
         setProfesionalParams({
           profesionalId: resolvedProfesionalId,
           fechaDesde: fechaHoy,
+          fechaHasta: fechaFinDefault,
         });
         setProfesionalActualNombre(data.nombres ?? data.nombre ?? user.nombreCompleto ?? '');
       } catch (error) {
@@ -145,14 +149,18 @@ export default function CitasListPage() {
   const cancelMutation = useCancelarCita();
   const activeQuery = searchMode === 'paciente' ? pacienteQuery : profesionalQuery;
 
+  const getTargetProfesionalId = () => {
+    if (esProfesional) {
+      return profesionalParams?.profesionalId || Number(profesionalIdInput);
+    }
+
+    return profesionalIdInput.trim() ? Number(profesionalIdInput) : undefined;
+  };
+
   const handleBuscarProfesional = () => {
     setMessage('');
 
-    const targetProfesionalId = esProfesional
-      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
-      : profesionalIdInput.trim()
-      ? Number(profesionalIdInput)
-      : undefined;
+    const targetProfesionalId = getTargetProfesionalId();
 
     if (!targetProfesionalId) {
       setMessage(
@@ -168,7 +176,9 @@ export default function CitasListPage() {
       return;
     }
 
-    if (fechaHastaProfesional && fechaHastaProfesional < fechaDesdeProfesional) {
+    const fechaFin = fechaHastaProfesional || fechaDesdeProfesional;
+
+    if (fechaFin < fechaDesdeProfesional) {
       setMessage('La fecha final no puede ser menor que la fecha inicial.');
       return;
     }
@@ -176,7 +186,7 @@ export default function CitasListPage() {
     setProfesionalParams({
       profesionalId: targetProfesionalId,
       fechaDesde: fechaDesdeProfesional,
-      fechaHasta: fechaHastaProfesional || undefined,
+      fechaHasta: fechaFin,
     });
   };
 
@@ -184,14 +194,14 @@ export default function CitasListPage() {
     setMessage('');
 
     const fechaHoy = hoy();
-    const targetProfesionalId = esProfesional
-      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
-      : profesionalIdInput.trim()
-      ? Number(profesionalIdInput)
-      : undefined;
+    const targetProfesionalId = getTargetProfesionalId();
 
     if (!targetProfesionalId) {
-      setMessage('Debes seleccionar un profesional.');
+      setMessage(
+        esProfesional
+          ? 'No fue posible identificar el profesional autenticado.'
+          : 'Debes seleccionar un profesional.'
+      );
       return;
     }
 
@@ -208,22 +218,24 @@ export default function CitasListPage() {
     setMessage('');
 
     const fechaHoy = hoy();
-    const targetProfesionalId = esProfesional
-      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
-      : profesionalIdInput.trim()
-      ? Number(profesionalIdInput)
-      : undefined;
+    const fechaFinDefault = finDeAnoActual();
+    const targetProfesionalId = getTargetProfesionalId();
 
     if (!targetProfesionalId) {
-      setMessage('Debes seleccionar un profesional.');
+      setMessage(
+        esProfesional
+          ? 'No fue posible identificar el profesional autenticado.'
+          : 'Debes seleccionar un profesional.'
+      );
       return;
     }
 
     setFechaDesdeProfesional(fechaHoy);
-    setFechaHastaProfesional('');
+    setFechaHastaProfesional(fechaFinDefault);
     setProfesionalParams({
       profesionalId: targetProfesionalId,
       fechaDesde: fechaHoy,
+      fechaHasta: fechaFinDefault,
     });
   };
 
@@ -234,16 +246,19 @@ export default function CitasListPage() {
 
     if (esProfesional) {
       const fechaHoy = hoy();
-      const resolvedProfesionalId = profesionalParams?.profesionalId || Number(profesionalIdInput);
+      const fechaFinDefault = finDeAnoActual();
+      const targetProfesionalId = getTargetProfesionalId();
 
       setSearchMode('profesional');
       setFechaDesdeProfesional(fechaHoy);
-      setFechaHastaProfesional('');
+      setFechaHastaProfesional(fechaFinDefault);
+
       setProfesionalParams(
-        resolvedProfesionalId
+        targetProfesionalId
           ? {
-              profesionalId: resolvedProfesionalId,
+              profesionalId: targetProfesionalId,
               fechaDesde: fechaHoy,
+              fechaHasta: fechaFinDefault,
             }
           : undefined
       );
@@ -252,7 +267,7 @@ export default function CitasListPage() {
 
     setProfesionalIdInput('');
     setFechaDesdeProfesional(hoy());
-    setFechaHastaProfesional('');
+    setFechaHastaProfesional(finDeAnoActual());
     setProfesionalParams(undefined);
   };
 
@@ -477,8 +492,8 @@ export default function CitasListPage() {
             </div>
 
             <p className="text-xs text-gray-500">
-              Si dejas la fecha final vacía, se mostrarán las citas desde la fecha inicial
-              en adelante. Si eliges ambas fechas, se buscará dentro de ese rango.
+              Si dejas la fecha final vacía, se tomará la misma fecha inicial. Si eliges ambas
+              fechas, se buscará dentro de ese rango.
             </p>
           </div>
         )}

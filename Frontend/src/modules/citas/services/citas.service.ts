@@ -1,4 +1,5 @@
 import api from '../../../services/api';
+
 import type {
   CancelarCitaRequestDto,
   CitaDto,
@@ -53,12 +54,17 @@ export const citasService = {
     await api.patch(`${CITAS_BASE}/${id}/cancelar`, payload);
   },
 
-  async listarPorProfesional(
+    async listarPorProfesional(
     params: ListarCitasProfesionalParamsDto
   ): Promise<CitaDto[]> {
     const { data } = await api.get<CitaDto[]>(`${CITAS_BASE}/profesional`, {
-      params,
+      params: {
+        profesionalId: params.profesionalId,
+        fechaInicio: params.fechaDesde,
+        fechaFin: params.fechaHasta ?? params.fechaDesde,
+      },
     });
+
     return data;
   },
 
