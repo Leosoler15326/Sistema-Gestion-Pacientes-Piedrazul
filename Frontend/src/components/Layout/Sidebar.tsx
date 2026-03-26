@@ -10,19 +10,16 @@ export default function Sidebar() {
     .replace('ROLE_', '');
 
   const esAdmin = normalizedRole === 'ADMINISTRADOR';
-        const puedeVerHistoria =
-          normalizedRole === 'ADMINISTRADOR' ||
-          normalizedRole === 'MEDICO_TERAPISTA';
+  const esAgendador = normalizedRole === 'AGENDADOR';
 
-        {puedeVerHistoria && (
-          <NavLink
-            to={APP_ROUTES.HISTORIA_CLINICA}
-            className={({ isActive }) => getLinkClass(isActive)}
-          >
-            Historia clínica
-          </NavLink>
-        )}  
-  
+  const puedeVerHistoria =
+    normalizedRole === 'ADMINISTRADOR' ||
+    normalizedRole === 'MEDICO_TERAPISTA';
+
+  const puedeVerPersonal =
+    normalizedRole === 'ADMINISTRADOR' ||
+    normalizedRole === 'AGENDADOR';
+
   const getLinkClass = (isActive: boolean) =>
     [
       'flex items-center rounded-xl px-4 py-3 text-sm font-medium transition',
@@ -55,34 +52,52 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-2 px-4 py-4">
-        <NavLink to={APP_ROUTES.HOME} className={({ isActive }) => getLinkClass(isActive)}>
+        <NavLink
+          to={APP_ROUTES.HOME}
+          className={({ isActive }) => getLinkClass(isActive)}
+        >
           Dashboard
         </NavLink>
 
-        <NavLink to={APP_ROUTES.PACIENTES} className={({ isActive }) => getLinkClass(isActive)}>
+        <NavLink
+          to={APP_ROUTES.PACIENTES}
+          className={({ isActive }) => getLinkClass(isActive)}
+        >
           Pacientes
         </NavLink>
 
-        <NavLink to={APP_ROUTES.CITAS} className={({ isActive }) => getLinkClass(isActive)}>
+        <NavLink
+          to={APP_ROUTES.CITAS}
+          className={({ isActive }) => getLinkClass(isActive)}
+        >
           Citas
         </NavLink>
 
-        {esAdmin && (
-          <>
-            <NavLink
-              to={APP_ROUTES.PROFESIONALES}
-              className={({ isActive }) => getLinkClass(isActive)}
-            >
-              Personal
-            </NavLink>
+        {puedeVerHistoria && (
+          <NavLink
+            to={APP_ROUTES.HISTORIA_CLINICA}
+            className={({ isActive }) => getLinkClass(isActive)}
+          >
+            Historia clínica
+          </NavLink>
+        )}
 
-            <NavLink
-              to={APP_ROUTES.USUARIOS}
-              className={({ isActive }) => getLinkClass(isActive)}
-            >
-              Usuarios
-            </NavLink>
-          </>
+        {puedeVerPersonal && (
+          <NavLink
+            to={APP_ROUTES.PROFESIONALES}
+            className={({ isActive }) => getLinkClass(isActive)}
+          >
+            Personal
+          </NavLink>
+        )}
+
+        {esAdmin && (
+          <NavLink
+            to={APP_ROUTES.USUARIOS}
+            className={({ isActive }) => getLinkClass(isActive)}
+          >
+            Usuarios
+          </NavLink>
         )}
       </nav>
 

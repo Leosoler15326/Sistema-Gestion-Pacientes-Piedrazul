@@ -45,6 +45,13 @@ export default function PacientesTable({ items }: PacientesTableProps) {
                 </Link>
 
                 <Link
+                  to={`${APP_ROUTES.CITAS_NUEVA}?pacienteId=${item.id}&pacienteNombre=${encodeURIComponent(item.nombreCompleto)}`}
+                  className="rounded-lg bg-sky-600 px-3 py-1 text-sm text-white"
+                >
+                  Nueva cita
+                </Link>
+
+                <Link
                   to={`${APP_ROUTES.HISTORIA_CLINICA}?pacienteId=${item.id}`}
                   className="rounded-lg bg-emerald-600 px-3 py-1 text-sm text-white"
                 >

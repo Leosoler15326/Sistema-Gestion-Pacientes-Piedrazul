@@ -295,7 +295,13 @@ export default function CitasListPage() {
         subtitle="Consulta y gestiona citas por paciente o por profesional."
         actions={
           <Link
-            to={APP_ROUTES.CITAS_NUEVA}
+            to={
+              searchMode === 'paciente' && pacienteId && pacienteSeleccionado
+                ? `${APP_ROUTES.CITAS_NUEVA}?pacienteId=${pacienteId}&pacienteNombre=${encodeURIComponent(
+                    pacienteSeleccionado.nombreCompleto
+                  )}`
+                : APP_ROUTES.CITAS_NUEVA
+            }
             className="rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
             Nueva cita

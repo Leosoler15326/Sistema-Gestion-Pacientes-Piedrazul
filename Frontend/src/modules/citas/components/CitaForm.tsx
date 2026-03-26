@@ -17,6 +17,8 @@ import { ESPECIALIDAD_OPTIONS, TIPO_ATENCION_OPTIONS } from '../../../constants/
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
   loading?: boolean;
+  initialPacienteId?: number;
+  initialPacienteNombre?: string;
 }
 
 type ProfesionalPerfilDto = {
@@ -30,6 +32,8 @@ type ProfesionalPerfilDto = {
 export default function CitaForm({
   onSubmit,
   loading = false,
+  initialPacienteId,
+  initialPacienteNombre,
 }: CitaFormProps) {
   const { user } = useAuth();
   const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
@@ -38,7 +42,7 @@ export default function CitaForm({
   const [fecha, setFecha] = useState('');
   const [horaManual, setHoraManual] = useState('');
   const [horaSeleccionada, setHoraSeleccionada] = useState('');
-  const [nombrePaciente, setNombrePaciente] = useState('');
+  const [nombrePaciente, setNombrePaciente] = useState(initialPacienteNombre ?? '');
   const [especialidadSeleccionada, setEspecialidadSeleccionada] = useState('');
   const [message, setMessage] = useState('');
   const [showCreatePaciente, setShowCreatePaciente] = useState(false);
@@ -46,8 +50,9 @@ export default function CitaForm({
   const [profesionalActualNombre, setProfesionalActualNombre] = useState('');
   const [perfilError, setPerfilError] = useState('');
 
+
   const [form, setForm] = useState<Omit<CreateCitaRequestDto, 'fechaHora'>>({
-    pacienteId: 0,
+    pacienteId: initialPacienteId ?? 0,
     profesionalId: 0,
     tipoAtencion: '',
     motivoConsulta: '',
@@ -66,8 +71,10 @@ export default function CitaForm({
     isLoading: pacientesLoading,
   } = usePacientesPorNombre(nombrePaciente);
 
+
   const { data: profesionales } = useProfesionalesActivos();
   const createPacienteMutation = useCreatePaciente();
+
 
   useEffect(() => {
     let cancelled = false;
@@ -121,7 +128,20 @@ export default function CitaForm({
     };
   }, [esProfesional, user?.id, user?.nombreCompleto]);
 
-  const profesionalesFiltrados = Array.isArray(profesionales)
+
+    useEffect(() => {
+    if (initialPacienteId) {
+      setForm((prev) => ({
+        ...prev,
+        pacienteId: initialPacienteId,
+      }));
+    }
+
+    if (initialPacienteNombre) {
+      setNombrePaciente(initialPacienteNombre);
+    }
+  }, [initialPacienteId, initialPacienteNombre]);
+   const profesionalesFiltrados = Array.isArray(profesionales)
     ? profesionales.filter((p: any) =>
         especialidadSeleccionada ? p.especialidad === especialidadSeleccionada : true
       )
@@ -133,8 +153,15 @@ export default function CitaForm({
   );
 
   const pacienteSeleccionado = useMemo(() => {
+    if (initialPacienteId && initialPacienteNombre) {
+      return {
+        id: initialPacienteId,
+        nombreCompleto: initialPacienteNombre,
+      };
+    }
+
     return pacientes?.find((p) => p.id === form.pacienteId);
-  }, [pacientes, form.pacienteId]);
+  }, [pacientes, form.pacienteId, initialPacienteId, initialPacienteNombre]);
 
   const handleCrearPaciente = async () => {
     try {
@@ -251,16 +278,18 @@ export default function CitaForm({
             Buscar paciente por nombre
           </label>
 
-          <button
-            type="button"
-            onClick={() => {
-              setShowCreatePaciente((prev) => !prev);
-              setMessage('');
-            }}
-            className="rounded-lg border border-blue-200 px-3 py-1 text-sm text-blue-700 hover:bg-blue-50"
-          >
-            {showCreatePaciente ? 'Cancelar nuevo paciente' : 'Crear nuevo paciente'}
-          </button>
+          {!initialPacienteId && (
+            <button
+              type="button"
+              onClick={() => {
+                setShowCreatePaciente((prev) => !prev);
+                setMessage('');
+              }}
+              className="rounded-lg border border-blue-200 px-3 py-1 text-sm text-blue-700 hover:bg-blue-50"
+            >
+              {showCreatePaciente ? 'Cancelar nuevo paciente' : 'Crear nuevo paciente'}
+            </button>
+          )}
         </div>
 
         <input
@@ -273,6 +302,7 @@ export default function CitaForm({
             setMessage('');
           }}
           className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          disabled={Boolean(initialPacienteId)}
         />
 
         {pacientesLoading && (
