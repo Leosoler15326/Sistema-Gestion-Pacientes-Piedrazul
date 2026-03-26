@@ -71,6 +71,7 @@ public class JwtService {
             String username = extraerNombreUsuario(token);
             return username.equals(userDetails.getUsername()) && !estaExpirado(token);
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("Token inválido:");
             return false;
         }
     }

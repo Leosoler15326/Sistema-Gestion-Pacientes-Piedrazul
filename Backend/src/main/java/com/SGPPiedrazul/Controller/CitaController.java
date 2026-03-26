@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/citas")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
 public class CitaController {
 
     private final CitaService citaService;
@@ -36,7 +37,6 @@ public class CitaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<CitaDTO.Response> agendar(
             @Valid @RequestBody CitaDTO.AgendarRequest dto) {
         Usuario creadoPor = usuarioRepository
@@ -47,7 +47,6 @@ public class CitaController {
     }
 
     @PutMapping("/{id}/reagendar")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<CitaDTO.Response> reagendar(
             @PathVariable Long id,
             @Valid @RequestBody CitaDTO.ReagendarRequest dto) {
@@ -58,7 +57,6 @@ public class CitaController {
     }
 
     @PatchMapping("/{id}/cancelar")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<Void> cancelar(
             @PathVariable Long id,
             @RequestBody CitaDTO.CancelarRequest dto) {
@@ -70,7 +68,6 @@ public class CitaController {
     }
 
     @GetMapping("/profesional")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorProfesional(
         @RequestParam Long profesionalId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
@@ -78,12 +75,11 @@ public class CitaController {
 
         return ResponseEntity.ok(
             citaService.listarPorProfesionalYRangoFechas(profesionalId, fechaInicio, fechaFin)
-    );
-}
+        );
+    }
     
 
     @GetMapping("/paciente/{pacienteId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(citaService.listarPorPaciente(pacienteId));

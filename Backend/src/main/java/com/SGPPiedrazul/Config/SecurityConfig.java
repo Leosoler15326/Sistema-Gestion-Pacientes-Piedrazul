@@ -60,16 +60,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/profesionales/**").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PATCH, "/api/profesionales/**").hasRole("ADMINISTRADOR")
 
-                // ADMINISTRADOR y AGENDADOR pueden agendar manualmente
-                .requestMatchers(HttpMethod.POST, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA", "PACIENTE")
-                .requestMatchers(HttpMethod.PUT, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
-                .requestMatchers(HttpMethod.GET, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
-                .requestMatchers(HttpMethod.PATCH, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
-
+                // Citas — ADMINISTRADOR, AGENDADOR, MEDICO_TERAPISTA pueden crear/reagendar/cancelar; PACIENTE solo crear
+                .requestMatchers("/api/citas/**").hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
 
                 // Historias clínicas — solo MEDICO_TERAPISTA
                 .requestMatchers("/api/historias/**").hasRole("MEDICO_TERAPISTA")
