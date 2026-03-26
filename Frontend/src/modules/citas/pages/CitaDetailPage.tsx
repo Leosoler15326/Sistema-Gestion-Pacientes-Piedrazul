@@ -5,6 +5,7 @@ import PageHeader from '../../../components/common/PageHeader';
 import BackButton from '../../../components/common/BackButton';
 import { APP_ROUTES } from '../../../app/router/routes';
 import { useCitaDetail } from '../hooks/UseCitas';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 function formatFechaHora(value?: string) {
   if (!value) return 'Sin fecha';
@@ -20,6 +21,11 @@ function formatFechaHora(value?: string) {
 export default function CitaDetailPage() {
   const params = useParams();
   const id = Number(params.id);
+  const { user } = useAuth();
+
+  const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
+  const puedeGestionarHistoria =
+    normalizedRole === 'MEDICO_TERAPISTA' || normalizedRole === 'ADMINISTRADOR';
 
   const { data, isLoading, isError } = useCitaDetail(id);
 
@@ -43,19 +49,23 @@ export default function CitaDetailPage() {
           <div className="flex gap-2">
             <BackButton />
 
-            <Link
-              to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${data.id}`}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-            >
-              Crear historia clínica
-            </Link>
+            {puedeGestionarHistoria && (
+              <>
+                <Link
+                  to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${data.id}`}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+                >
+                  Crear historia clínica
+                </Link>
 
-            <Link
-              to={APP_ROUTES.HISTORIA_CLINICA_DETALLE.replace(':id', String(data.id))}
-              className="rounded-lg bg-gray-800 px-4 py-2 text-white"
-            >
-              Ver historia clínica
-            </Link>
+                <Link
+                  to={APP_ROUTES.HISTORIA_CLINICA_DETALLE.replace(':id', String(data.id))}
+                  className="rounded-lg bg-gray-800 px-4 py-2 text-white"
+                >
+                  Ver historia clínica
+                </Link>
+              </>
+            )}
           </div>
         }
       />
