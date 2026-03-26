@@ -1,16 +1,18 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.types';
 
 interface HistoriaClinicaFormProps {
   onSubmit: (values: CreateHistoriaClinicaRequestDto) => Promise<void>;
   loading?: boolean;
   initialCitaId?: number;
+  citaLabel?: string;
 }
 
 export default function HistoriaClinicaForm({
   onSubmit,
   loading = false,
   initialCitaId,
+  citaLabel,
 }: HistoriaClinicaFormProps) {
   const [message, setMessage] = useState('');
   const [citaIdInput, setCitaIdInput] = useState(
@@ -22,12 +24,29 @@ export default function HistoriaClinicaForm({
     descripcion: '',
   });
 
+  useEffect(() => {
+    if (initialCitaId) {
+      setCitaIdInput(String(initialCitaId));
+      setForm((prev) => ({
+        ...prev,
+        citaId: initialCitaId,
+      }));
+      setMessage('');
+    } else {
+      setCitaIdInput('');
+      setForm((prev) => ({
+        ...prev,
+        citaId: 0,
+      }));
+    }
+  }, [initialCitaId]);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage('');
 
     if (!form.citaId) {
-      setMessage('Debes indicar una cita válida.');
+      setMessage('Debes seleccionar una cita válida.');
       return;
     }
 
@@ -37,7 +56,10 @@ export default function HistoriaClinicaForm({
     }
 
     try {
-      await onSubmit(form);
+      await onSubmit({
+        citaId: form.citaId,
+        descripcion: form.descripcion.trim(),
+      });
     } catch (error) {
       console.error(error);
       setMessage('No fue posible guardar la historia clínica.');
@@ -56,6 +78,7 @@ export default function HistoriaClinicaForm({
         <label className="mb-1 block text-sm font-medium text-gray-700">
           ID de la cita
         </label>
+
         <input
           type="text"
           inputMode="numeric"
@@ -71,6 +94,11 @@ export default function HistoriaClinicaForm({
           required
           disabled={Boolean(initialCitaId)}
         />
+
+        {citaLabel && (
+          <p className="mt-2 text-sm text-gray-600">{citaLabel}</p>
+        )}
+
         <p className="mt-2 text-xs text-gray-500">
           La historia clínica se registra sobre una cita ya existente.
         </p>
@@ -80,6 +108,7 @@ export default function HistoriaClinicaForm({
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Descripción
         </label>
+
         <textarea
           rows={6}
           value={form.descripcion}
