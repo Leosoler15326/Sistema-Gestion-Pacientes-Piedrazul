@@ -6,6 +6,17 @@ import BackButton from '../../../components/common/BackButton';
 import { APP_ROUTES } from '../../../app/router/routes';
 import { useCitaDetail } from '../hooks/UseCitas';
 
+function formatFechaHora(value?: string) {
+  if (!value) return 'Sin fecha';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat('es-CO', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+
 export default function CitaDetailPage() {
   const params = useParams();
   const id = Number(params.id);
@@ -31,6 +42,7 @@ export default function CitaDetailPage() {
         actions={
           <div className="flex gap-2">
             <BackButton />
+
             <Link
               to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${data.id}`}
               className="rounded-lg bg-blue-600 px-4 py-2 text-white"
@@ -49,15 +61,20 @@ export default function CitaDetailPage() {
       />
 
       <div className="space-y-4 rounded-xl bg-white p-6 shadow">
-        <p><strong>Fecha y hora:</strong> {data.fechaHora}</p>
+        <p><strong>Fecha y hora:</strong> {formatFechaHora(data.fechaHora)}</p>
         <p><strong>Tipo de atención:</strong> {data.tipoAtencion}</p>
         <p><strong>Motivo:</strong> {data.motivoConsulta || 'Sin motivo'}</p>
         <p><strong>Estado:</strong> {data.estado || 'N/A'}</p>
+
+        <hr />
+
         <p><strong>Paciente:</strong> {data.pacienteNombre}</p>
-        <p><strong>Documento paciente:</strong> {data.pacienteDocumento || 'N/A'}</p>
+        <p><strong>ID paciente:</strong> {data.pacienteId}</p>
+
+        <hr />
+
         <p><strong>Profesional:</strong> {data.profesionalNombre}</p>
-        <p><strong>Especialidad:</strong> {data.especialidad || 'N/A'}</p>
-        <p><strong>Creado por:</strong> {data.creadoPor || 'N/A'}</p>
+        <p><strong>ID profesional:</strong> {data.profesionalId}</p>
       </div>
     </div>
   );
