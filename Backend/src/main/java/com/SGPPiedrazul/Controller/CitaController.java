@@ -72,11 +72,15 @@ public class CitaController {
     @GetMapping("/profesional")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorProfesional(
-            @RequestParam Long profesionalId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        @RequestParam Long profesionalId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+
         return ResponseEntity.ok(
-                citaService.listarPorProfesionalYFecha(profesionalId, fecha));
-    }
+            citaService.listarPorProfesionalYRangoFechas(profesionalId, fechaInicio, fechaFin)
+    );
+}
+    
 
     @GetMapping("/paciente/{pacienteId}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
