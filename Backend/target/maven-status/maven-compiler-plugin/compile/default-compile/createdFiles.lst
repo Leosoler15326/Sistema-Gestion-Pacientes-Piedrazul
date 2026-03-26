@@ -58,6 +58,7 @@ com\SGPPiedrazul\security\UserDetailsImpl.class
 com\SGPPiedrazul\Controller\AuthController.class
 com\SGPPiedrazul\repository\ProfesionalRepository.class
 com\SGPPiedrazul\Controller\PacienteController.class
+com\SGPPiedrazul\Config\JacksonConfig.class
 com\SGPPiedrazul\model\enums\Estado.class
 com\SGPPiedrazul\dto\AuthDTO.class
 com\SGPPiedrazul\dto\UsuarioDTO$ActualizarRequest.class
