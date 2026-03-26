@@ -1,6 +1,7 @@
 com\SGPPiedrazul\dto\UsuarioDTO$Response.class
 com\SGPPiedrazul\security\UserDetailsServiceImpl.class
 com\SGPPiedrazul\service\PacienteService.class
+com\SGPPiedrazul\Config\GlobalExceptionHandler.class
 com\SGPPiedrazul\Config\SecurityConfig.class
 com\SGPPiedrazul\dto\CitaDTO.class
 com\SGPPiedrazul\model\Profesional.class

@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+Test set: com.SGPPiedrazul.controller.ProfesionalControllerTest
+-------------------------------------------------------------------------------
+Tests run: 15, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.391 s <<< FAILURE! -- in com.SGPPiedrazul.controller.ProfesionalControllerTest
+com.SGPPiedrazul.controller.ProfesionalControllerTest.buscarPorId_inexistente_retornaError -- Time elapsed: 0.008 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<500> but was:<404>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.SGPPiedrazul.controller.ProfesionalControllerTest.buscarPorId_inexistente_retornaError(ProfesionalControllerTest.java:150)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.SGPPiedrazul.controller.ProfesionalControllerTest.miPerfil_sinVinculo_retornaError -- Time elapsed: 0.006 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<500> but was:<404>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.SGPPiedrazul.controller.ProfesionalControllerTest.miPerfil_sinVinculo_retornaError(ProfesionalControllerTest.java:178)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
