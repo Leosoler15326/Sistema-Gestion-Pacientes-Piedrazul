@@ -69,7 +69,7 @@ public class SecurityConfig {
                     .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
 
                 // Historias clínicas — solo MEDICO_TERAPISTA
-                .requestMatchers("/api/historias/**").hasRole("MEDICO_TERAPISTA")
+                .requestMatchers("/api/historias/**").hasAnyRole("ADMINISTRADOR", "MEDICO_TERAPISTA")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
