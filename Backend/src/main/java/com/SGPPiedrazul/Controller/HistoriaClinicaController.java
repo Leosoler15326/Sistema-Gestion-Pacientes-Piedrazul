@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/historias")
-@PreAuthorize("hasAnyRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
+@PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
 public class HistoriaClinicaController {
 
     private final HistoriaClinicaService historiaClinicaService;
@@ -38,6 +38,7 @@ public class HistoriaClinicaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> registrar(
             @Valid @RequestBody HistoriaClinicaDTO.Request dto) {
 
@@ -48,12 +49,12 @@ public class HistoriaClinicaController {
         Profesional profesional = profesionalRepository.findById(citaService.buscarPorId(dto.getCitaId()).getProfesionalId())
                                                 .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
 
-        return ResponseEntity.ok(
-                historiaClinicaService.registrar(dto, profesional, responsable)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(historiaClinicaService.registrar(dto, profesional, responsable));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody HistoriaClinicaDTO.ActualizarRequest dto) {
@@ -67,12 +68,14 @@ public class HistoriaClinicaController {
     }
 
     @GetMapping("/cita/{citaId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<HistoriaClinicaDTO.Response> buscarPorCita(
             @PathVariable Long citaId) {
         return ResponseEntity.ok(historiaClinicaService.buscarPorCita(citaId));
     }
 
     @GetMapping("/paciente/{pacienteId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<HistoriaClinicaDTO.Response>> listarPorPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(
@@ -80,6 +83,7 @@ public class HistoriaClinicaController {
     }
 
     @GetMapping("/profesional/{profesionalId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<HistoriaClinicaDTO.Response>> listarPorProfesional(
             @PathVariable Long profesionalId) {
         return ResponseEntity.ok(

@@ -44,11 +44,18 @@ export default function CitasListPage() {
 
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
-  const [fechaProfesional, setFechaProfesional] = useState(esProfesional ? hoy() : '');
+  const [fechaDesdeProfesional, setFechaDesdeProfesional] = useState(hoy());
+  const [fechaHastaProfesional, setFechaHastaProfesional] = useState('');
 
   const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
-  const [profesionalId, setProfesionalId] = useState<number | undefined>(undefined);
-  const [fecha, setFecha] = useState<string | undefined>(esProfesional ? hoy() : undefined);
+  const [profesionalParams, setProfesionalParams] = useState<
+    | {
+        profesionalId: number;
+        fechaDesde: string;
+        fechaHasta?: string;
+      }
+    | undefined
+  >(undefined);
 
   const [profesionalActualNombre, setProfesionalActualNombre] = useState('');
   const [perfilLoading, setPerfilLoading] = useState(false);
@@ -93,12 +100,16 @@ export default function CitasListPage() {
         if (cancelled) return;
 
         const resolvedProfesionalId = Number(data.profesionalId ?? data.id ?? 0);
+        const fechaHoy = hoy();
 
         setSearchMode('profesional');
-        setProfesionalId(resolvedProfesionalId);
         setProfesionalIdInput(String(resolvedProfesionalId));
-        setFechaProfesional(hoy());
-        setFecha(hoy());
+        setFechaDesdeProfesional(fechaHoy);
+        setFechaHastaProfesional('');
+        setProfesionalParams({
+          profesionalId: resolvedProfesionalId,
+          fechaDesde: fechaHoy,
+        });
         setProfesionalActualNombre(data.nombres ?? data.nombre ?? user.nombreCompleto ?? '');
       } catch (error) {
         console.error(error);
@@ -128,9 +139,7 @@ export default function CitasListPage() {
   );
 
   const profesionalQuery = useCitasPorProfesional(
-    searchMode === 'profesional' && profesionalId && fecha
-      ? { profesionalId, fecha }
-      : undefined
+    searchMode === 'profesional' ? profesionalParams : undefined
   );
 
   const cancelMutation = useCancelarCita();
@@ -140,7 +149,7 @@ export default function CitasListPage() {
     setMessage('');
 
     const targetProfesionalId = esProfesional
-      ? profesionalId
+      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
       : profesionalIdInput.trim()
       ? Number(profesionalIdInput)
       : undefined;
@@ -154,13 +163,68 @@ export default function CitasListPage() {
       return;
     }
 
-    if (!fechaProfesional) {
-      setMessage('Debes seleccionar una fecha.');
+    if (!fechaDesdeProfesional) {
+      setMessage('Debes seleccionar la fecha inicial.');
       return;
     }
 
-    setProfesionalId(targetProfesionalId);
-    setFecha(fechaProfesional);
+    if (fechaHastaProfesional && fechaHastaProfesional < fechaDesdeProfesional) {
+      setMessage('La fecha final no puede ser menor que la fecha inicial.');
+      return;
+    }
+
+    setProfesionalParams({
+      profesionalId: targetProfesionalId,
+      fechaDesde: fechaDesdeProfesional,
+      fechaHasta: fechaHastaProfesional || undefined,
+    });
+  };
+
+  const handleVerSoloHoy = () => {
+    setMessage('');
+
+    const fechaHoy = hoy();
+    const targetProfesionalId = esProfesional
+      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
+      : profesionalIdInput.trim()
+      ? Number(profesionalIdInput)
+      : undefined;
+
+    if (!targetProfesionalId) {
+      setMessage('Debes seleccionar un profesional.');
+      return;
+    }
+
+    setFechaDesdeProfesional(fechaHoy);
+    setFechaHastaProfesional(fechaHoy);
+    setProfesionalParams({
+      profesionalId: targetProfesionalId,
+      fechaDesde: fechaHoy,
+      fechaHasta: fechaHoy,
+    });
+  };
+
+  const handleVerProximas = () => {
+    setMessage('');
+
+    const fechaHoy = hoy();
+    const targetProfesionalId = esProfesional
+      ? profesionalParams?.profesionalId || Number(profesionalIdInput)
+      : profesionalIdInput.trim()
+      ? Number(profesionalIdInput)
+      : undefined;
+
+    if (!targetProfesionalId) {
+      setMessage('Debes seleccionar un profesional.');
+      return;
+    }
+
+    setFechaDesdeProfesional(fechaHoy);
+    setFechaHastaProfesional('');
+    setProfesionalParams({
+      profesionalId: targetProfesionalId,
+      fechaDesde: fechaHoy,
+    });
   };
 
   const handleLimpiar = () => {
@@ -170,16 +234,26 @@ export default function CitasListPage() {
 
     if (esProfesional) {
       const fechaHoy = hoy();
+      const resolvedProfesionalId = profesionalParams?.profesionalId || Number(profesionalIdInput);
+
       setSearchMode('profesional');
-      setFechaProfesional(fechaHoy);
-      setFecha(fechaHoy);
+      setFechaDesdeProfesional(fechaHoy);
+      setFechaHastaProfesional('');
+      setProfesionalParams(
+        resolvedProfesionalId
+          ? {
+              profesionalId: resolvedProfesionalId,
+              fechaDesde: fechaHoy,
+            }
+          : undefined
+      );
       return;
     }
 
     setProfesionalIdInput('');
-    setFechaProfesional('');
-    setProfesionalId(undefined);
-    setFecha(undefined);
+    setFechaDesdeProfesional(hoy());
+    setFechaHastaProfesional('');
+    setProfesionalParams(undefined);
   };
 
   const handleConfirmCancel = async () => {
@@ -322,56 +396,90 @@ export default function CitasListPage() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 md:flex-row md:items-center">
-            {esProfesional ? (
-              <div className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-slate-700 md:min-w-[280px]">
-                {perfilLoading
-                  ? 'Cargando profesional autenticado...'
-                  : profesionalActualNombre || 'Profesional asignado automáticamente'}
-              </div>
-            ) : (
-              <select
-                value={profesionalIdInput}
-                onChange={(e) => setProfesionalIdInput(e.target.value)}
+          <div className="space-y-3">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              {esProfesional ? (
+                <div className="rounded-lg border bg-slate-50 px-3 py-2 text-sm text-slate-700 md:min-w-[280px]">
+                  {perfilLoading
+                    ? 'Cargando profesional autenticado...'
+                    : profesionalActualNombre || 'Profesional asignado automáticamente'}
+                </div>
+              ) : (
+                <select
+                  value={profesionalIdInput}
+                  onChange={(e) => setProfesionalIdInput(e.target.value)}
+                  className="rounded-lg border px-3 py-2"
+                >
+                  <option value="">Selecciona un profesional</option>
+                  {Array.isArray(profesionales) &&
+                    profesionales.map((p: any) => (
+                      <option
+                        key={p.profesionalId ?? p.id}
+                        value={p.profesionalId ?? p.id}
+                      >
+                        {(p.nombres ?? p.nombre ?? 'Profesional')}
+                        {p.especialidad ? ` - ${p.especialidad}` : ''}
+                      </option>
+                    ))}
+                </select>
+              )}
+
+              <input
+                type="date"
+                value={fechaDesdeProfesional}
+                onChange={(e) => setFechaDesdeProfesional(e.target.value)}
                 className="rounded-lg border px-3 py-2"
+                title="Fecha inicial"
+              />
+
+              <input
+                type="date"
+                value={fechaHastaProfesional}
+                onChange={(e) => setFechaHastaProfesional(e.target.value)}
+                className="rounded-lg border px-3 py-2"
+                title="Fecha final"
+              />
+
+              <button
+                type="button"
+                onClick={handleBuscarProfesional}
+                disabled={esProfesional && perfilLoading}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
               >
-                <option value="">Selecciona un profesional</option>
-                {Array.isArray(profesionales) &&
-                  profesionales.map((p: any) => (
-                    <option
-                      key={p.profesionalId ?? p.id}
-                      value={p.profesionalId ?? p.id}
-                    >
-                      {(p.nombres ?? p.nombre ?? 'Profesional')}
-                      {p.especialidad ? ` - ${p.especialidad}` : ''}
-                    </option>
-                  ))}
-              </select>
-            )}
+                Buscar
+              </button>
 
-            <input
-              type="date"
-              value={fechaProfesional}
-              onChange={(e) => setFechaProfesional(e.target.value)}
-              className="rounded-lg border px-3 py-2"
-            />
+              <button
+                type="button"
+                onClick={handleLimpiar}
+                className="rounded-lg border border-gray-300 px-4 py-2"
+              >
+                Limpiar
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={handleBuscarProfesional}
-              disabled={esProfesional && perfilLoading}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
-            >
-              Buscar
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleVerProximas}
+                className="rounded-lg border border-blue-200 px-3 py-2 text-sm text-blue-700 hover:bg-blue-50"
+              >
+                Ver desde hoy en adelante
+              </button>
 
-            <button
-              type="button"
-              onClick={handleLimpiar}
-              className="rounded-lg border border-gray-300 px-4 py-2"
-            >
-              Limpiar
-            </button>
+              <button
+                type="button"
+                onClick={handleVerSoloHoy}
+                className="rounded-lg border border-blue-200 px-3 py-2 text-sm text-blue-700 hover:bg-blue-50"
+              >
+                Ver solo hoy
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500">
+              Si dejas la fecha final vacía, se mostrarán las citas desde la fecha inicial
+              en adelante. Si eliges ambas fechas, se buscará dentro de ese rango.
+            </p>
           </div>
         )}
       </div>
@@ -398,7 +506,11 @@ export default function CitasListPage() {
         activeQuery.data.length === 0 && (
           <EmptyState
             title="No hay citas"
-            description="No se encontraron citas para los criterios indicados."
+            description={
+              searchMode === 'paciente'
+                ? 'No se encontraron citas para este paciente.'
+                : 'No se encontraron citas para el rango seleccionado.'
+            }
           />
         )}
 

@@ -67,8 +67,9 @@ public class SecurityConfig {
                 // Reagendar — AGENDADOR y MEDICO_TERAPISTA
                 .requestMatchers(HttpMethod.PUT, "/api/citas/**")
                     .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
-                // Historias clínicas — solo MEDICO_TERAPISTA y admin
-                .requestMatchers("/api/historias/**").hasAnyRole("ADMINISTRADOR", "MEDICO_TERAPISTA")
+
+                // Historias clínicas — solo MEDICO_TERAPISTA
+                .requestMatchers("/api/historias/**").hasRole("MEDICO_TERAPISTA")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()

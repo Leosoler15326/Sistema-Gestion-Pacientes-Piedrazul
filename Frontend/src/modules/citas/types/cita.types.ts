@@ -1,40 +1,32 @@
 export type EstadoCita =
   | 'PROGRAMADA'
-  | 'ATENDIDA'
+  | 'CONFIRMADA'
   | 'CANCELADA'
-  | 'REAGENDADA'
-  | 'NO_ASISTIO'
+  | 'COMPLETADA'
   | string;
 
 export interface CitaDto {
   id: number;
-  fechaHora: string;
-  tipoAtencion: string;
-  motivoConsulta?: string;
-  estado?: EstadoCita;
-
   pacienteId: number;
   pacienteNombre: string;
-  pacienteDocumento?: string;
-
   profesionalId: number;
   profesionalNombre: string;
-  especialidad?: string;
-
-  creadoPor?: string;
+  fechaHora: string;
+  estado: EstadoCita;
+  tipoAtencion: string;
+  motivoConsulta?: string;
 }
 
 export interface CreateCitaRequestDto {
-  profesionalId: number;
   pacienteId: number;
+  profesionalId: number;
   fechaHora: string;
   tipoAtencion: string;
   motivoConsulta?: string;
 }
 
 export interface ReagendarCitaRequestDto {
-  nuevaFechaHora: string;
-  motivo?: string;
+  fechaHora: string;
 }
 
 export interface CancelarCitaRequestDto {
@@ -53,7 +45,8 @@ export interface SlotsDisponiblesParamsDto {
 
 export interface ListarCitasProfesionalParamsDto {
   profesionalId: number;
-  fecha: string;
+  fechaDesde: string;
+  fechaHasta?: string;
 }
 export interface CitasFiltersDto {
   fecha?: string;
