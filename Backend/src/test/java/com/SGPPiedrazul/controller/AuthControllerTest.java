@@ -2,10 +2,10 @@ package com.SGPPiedrazul.controller;
 
 import com.SGPPiedrazul.Controller.AuthController;
 import com.SGPPiedrazul.dto.AuthDTO;
-import com.SGPPiedrazul.service.AuthService;
+import com.SGPPiedrazul.security.JwtAuthFilter;
 import com.SGPPiedrazul.security.JwtService;
-import com.SGPPiedrazul.security.UserDetailsImpl;
 import com.SGPPiedrazul.security.UserDetailsServiceImpl;
+import com.SGPPiedrazul.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,11 +42,11 @@ class AuthControllerTest {
     @MockBean
     private JwtService jwtService;
 
-        @MockBean
-        private UserDetailsServiceImpl userDetailsService;
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
 
-        @MockBean
-        private UserDetailsImpl userDetails;
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
 
     private AuthDTO.TokenResponse tokenResponse;
 
@@ -61,8 +61,6 @@ class AuthControllerTest {
                 1L
         );
     }
-
-    // ─── POST /api/auth/login ───
 
     @Test
     @DisplayName("Login exitoso devuelve 200 con token")
@@ -89,15 +87,14 @@ class AuthControllerTest {
         request.setNombreUsuario("admin");
         request.setContrasena("wrongpass");
 
-        when(authService.login(any())).thenThrow(new BadCredentialsException("Credenciales inválidas."));
+        when(authService.login(any()))
+                .thenThrow(new BadCredentialsException("Credenciales inválidas."));
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
     }
-
-    // ─── POST /api/auth/registro ───
 
     @Test
     @DisplayName("Registro exitoso devuelve 200 con token")
@@ -129,15 +126,14 @@ class AuthControllerTest {
         request.setRol("ADMINISTRADOR");
 
         when(authService.registro(any()))
-                .thenThrow(new IllegalArgumentException("El nombre de usuario ya está en uso."));
+                .thenThrow(new IllegalArgumentException(
+                        "El nombre de usuario ya está en uso."));
 
         mockMvc.perform(post("/api/auth/registro")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
-
-    // ─── POST /api/auth/refresh ───
 
     @Test
     @DisplayName("Refresh token válido devuelve nuevo access token")
@@ -164,8 +160,6 @@ class AuthControllerTest {
                                 Map.of("refreshToken", "expired.token"))))
                 .andExpect(status().isInternalServerError());
     }
-
-    // ─── GET /api/auth/verificar-email ───
 
     @Test
     @DisplayName("Token de verificación válido devuelve 200")

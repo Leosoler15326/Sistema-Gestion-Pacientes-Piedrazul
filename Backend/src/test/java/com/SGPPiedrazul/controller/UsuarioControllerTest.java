@@ -3,7 +3,10 @@ package com.SGPPiedrazul.controller;
 import com.SGPPiedrazul.Controller.UsuarioController;
 import com.SGPPiedrazul.dto.UsuarioDTO;
 import com.SGPPiedrazul.model.enums.RolUsuario;
+import com.SGPPiedrazul.security.JwtAuthFilter;
+import com.SGPPiedrazul.security.JwtService;
 import com.SGPPiedrazul.security.SecurityUtils;
+import com.SGPPiedrazul.security.UserDetailsServiceImpl;
 import com.SGPPiedrazul.service.UsuarioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +41,13 @@ class UsuarioControllerTest {
     private UsuarioService usuarioService;
 
     @MockBean
-    private SecurityUtils securityUtils;
+    private JwtService jwtService;
 
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
 
     private UsuarioDTO.Response usuarioResponse;
     private UsuarioDTO.Request usuarioRequest;
@@ -65,8 +73,6 @@ class UsuarioControllerTest {
         actualizarRequest.setRol(RolUsuario.ADMINISTRADOR);
     }
 
-    // ─── GET /api/usuarios ───
-
     @Test
     @DisplayName("Listar todos los usuarios devuelve 200 con lista")
     void listar_retorna200ConLista() throws Exception {
@@ -88,8 +94,6 @@ class UsuarioControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
-    // ─── GET /api/usuarios/activos ───
-
     @Test
     @DisplayName("Listar activos devuelve solo usuarios activos")
     void listarActivos_retornaUsuariosActivos() throws Exception {
@@ -99,8 +103,6 @@ class UsuarioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].estado").value("ACTIVO"));
     }
-
-    // ─── GET /api/usuarios/{id} ───
 
     @Test
     @DisplayName("Buscar usuario por ID existente devuelve 200")
@@ -124,8 +126,6 @@ class UsuarioControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    // ─── POST /api/usuarios ───
-
     @Test
     @DisplayName("Crear usuario con datos válidos devuelve 201")
     void crear_datosValidos_retorna201() throws Exception {
@@ -147,7 +147,8 @@ class UsuarioControllerTest {
         try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
             su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("admin");
             when(usuarioService.crear(any(), anyString()))
-                    .thenThrow(new IllegalArgumentException("El nombre de usuario ya está en uso."));
+                    .thenThrow(new IllegalArgumentException(
+                            "El nombre de usuario ya está en uso."));
 
             mockMvc.perform(post("/api/usuarios")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -167,8 +168,6 @@ class UsuarioControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // ─── PUT /api/usuarios/{id} ───
-
     @Test
     @DisplayName("Actualizar usuario existente devuelve 200")
     void actualizar_datosValidos_retorna200() throws Exception {
@@ -184,8 +183,6 @@ class UsuarioControllerTest {
                     .andExpect(jsonPath("$.id").value(1));
         }
     }
-
-    // ─── PATCH /api/usuarios/{id}/desactivar ───
 
     @Test
     @DisplayName("Desactivar usuario existente devuelve 204")

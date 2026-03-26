@@ -6,8 +6,12 @@ import com.SGPPiedrazul.dto.ProfesionalResponseDTO;
 import com.SGPPiedrazul.model.FranjaHoraria;
 import com.SGPPiedrazul.model.enums.Especialidad;
 import com.SGPPiedrazul.model.enums.Estado;
+import com.SGPPiedrazul.model.enums.RolUsuario;
 import com.SGPPiedrazul.model.enums.TipoProfesional;
+import com.SGPPiedrazul.security.JwtAuthFilter;
+import com.SGPPiedrazul.security.JwtService;
 import com.SGPPiedrazul.security.SecurityUtils;
+import com.SGPPiedrazul.security.UserDetailsServiceImpl;
 import com.SGPPiedrazul.service.ProfesionalService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +44,15 @@ class ProfesionalControllerTest {
 
     @MockBean
     private ProfesionalService profesionalService;
-    
+
     @MockBean
-        private SecurityUtils securityUtils;
+    private JwtService jwtService;
+
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
 
     private ProfesionalResponseDTO profesionalResponse;
     private ProfesionalResponseDTO profesionalConUsuario;
@@ -50,11 +60,8 @@ class ProfesionalControllerTest {
 
     @BeforeEach
     void setUp() {
-        profesionalResponse = buildResponse(1L, "Dr. García",
-                "FISIOTERAPIA", false, null, null);
-
-        profesionalConUsuario = buildResponse(2L, "Dra. López",
-                "QUIROPRAXIA", true, 5L, "dlopez");
+        profesionalResponse = crearDTOSinUsuario("Dr. García", "FISIOTERAPIA");
+        profesionalConUsuario = crearDTOConUsuario("Dra. López", "QUIROPRAXIA", "dlopez");
 
         crearDTO = new CrearProfesionalDTO();
         crearDTO.setNombres("Dr. García");
@@ -64,23 +71,7 @@ class ProfesionalControllerTest {
         crearDTO.setCrearUsuario(false);
     }
 
-    private ProfesionalResponseDTO buildResponse(Long id, String nombres,
-                                                   String especialidad,
-                                                   boolean conUsuario,
-                                                   Long usuarioId,
-                                                   String nombreUsuario) {
-        // Usamos reflexión mínima para construir el DTO de respuesta
-        // ya que sus setters son privados (solo tiene factory methods)
-        // En las pruebas unitarias, simulamos el retorno directamente del service
-        ProfesionalResponseDTO dto = conUsuario
-                ? crearDTOConUsuario(id, nombres, especialidad, usuarioId, nombreUsuario)
-                : crearDTOSinUsuario(id, nombres, especialidad);
-        return dto;
-    }
-
-    private ProfesionalResponseDTO crearDTOSinUsuario(Long id, String nombres,
-                                                        String especialidad) {
-        // Simulamos una entidad mínima para el factory method
+    private ProfesionalResponseDTO crearDTOSinUsuario(String nombres, String especialidad) {
         com.SGPPiedrazul.model.Profesional p = new com.SGPPiedrazul.model.Profesional();
         p.setNombres(nombres);
         p.setEspecialidad(Especialidad.valueOf(especialidad));
@@ -90,13 +81,11 @@ class ProfesionalControllerTest {
         return ProfesionalResponseDTO.sinUsuario(p);
     }
 
-    private ProfesionalResponseDTO crearDTOConUsuario(Long id, String nombres,
-                                                       String especialidad,
-                                                       Long usuarioId,
+    private ProfesionalResponseDTO crearDTOConUsuario(String nombres, String especialidad,
                                                        String nombreUsuario) {
         com.SGPPiedrazul.model.Usuario u = new com.SGPPiedrazul.model.Usuario();
         u.setNombreUsuario(nombreUsuario);
-        u.setRol(com.SGPPiedrazul.model.enums.RolUsuario.MEDICO_TERAPISTA);
+        u.setRol(RolUsuario.MEDICO_TERAPISTA);
 
         com.SGPPiedrazul.model.Profesional p = new com.SGPPiedrazul.model.Profesional();
         p.setNombres(nombres);
@@ -107,8 +96,6 @@ class ProfesionalControllerTest {
         p.setUsuario(u);
         return ProfesionalResponseDTO.conUsuario(p);
     }
-
-    // ─── GET /api/profesionales ───
 
     @Test
     @DisplayName("Listar profesionales devuelve 200 con lista")
@@ -121,8 +108,6 @@ class ProfesionalControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
-    // ─── GET /api/profesionales/activos ───
-
     @Test
     @DisplayName("Listar activos devuelve solo profesionales activos")
     void listarActivos_retornaActivos() throws Exception {
@@ -132,8 +117,6 @@ class ProfesionalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
-
-    // ─── GET /api/profesionales/especialidad/{especialidad} ───
 
     @Test
     @DisplayName("Listar por especialidad devuelve profesionales filtrados")
@@ -145,8 +128,6 @@ class ProfesionalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
-
-    // ─── GET /api/profesionales/{id} ───
 
     @Test
     @DisplayName("Buscar por ID existente devuelve 200")
@@ -168,8 +149,6 @@ class ProfesionalControllerTest {
         mockMvc.perform(get("/api/profesionales/99"))
                 .andExpect(status().isInternalServerError());
     }
-
-    // ─── GET /api/profesionales/mi-perfil ───
 
     @Test
     @DisplayName("Mi perfil devuelve el profesional del usuario autenticado")
@@ -200,8 +179,6 @@ class ProfesionalControllerTest {
         }
     }
 
-    // ─── GET /api/profesionales/usuario/{usuarioId} ───
-
     @Test
     @DisplayName("Buscar por usuarioId existente devuelve el profesional vinculado")
     void buscarPorUsuarioId_existente_retorna200() throws Exception {
@@ -212,8 +189,6 @@ class ProfesionalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.usuarioVinculado").value(true));
     }
-
-    // ─── POST /api/profesionales ───
 
     @Test
     @DisplayName("Crear profesional sin usuario devuelve 201")
@@ -272,8 +247,6 @@ class ProfesionalControllerTest {
         }
     }
 
-    // ─── PUT /api/profesionales/{id} ───
-
     @Test
     @DisplayName("Actualizar profesional existente devuelve 200")
     void actualizar_existente_retorna200() throws Exception {
@@ -289,8 +262,6 @@ class ProfesionalControllerTest {
         }
     }
 
-    // ─── PATCH /api/profesionales/{id}/estado ───
-
     @Test
     @DisplayName("Cambiar estado a INACTIVO devuelve 204")
     void cambiarEstado_aInactivo_retorna204() throws Exception {
@@ -305,8 +276,6 @@ class ProfesionalControllerTest {
         }
     }
 
-    // ─── GET /api/profesionales/{id}/franjas ───
-
     @Test
     @DisplayName("Listar franjas de profesional devuelve 200")
     void listarFranjas_retorna200() throws Exception {
@@ -315,8 +284,6 @@ class ProfesionalControllerTest {
         mockMvc.perform(get("/api/profesionales/1/franjas"))
                 .andExpect(status().isOk());
     }
-
-    // ─── PUT /api/profesionales/{id}/franjas ───
 
     @Test
     @DisplayName("Actualizar franjas devuelve 204")

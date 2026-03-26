@@ -2,6 +2,9 @@ package com.SGPPiedrazul.controller;
 
 import com.SGPPiedrazul.Controller.PacienteController;
 import com.SGPPiedrazul.dto.PacienteDTO;
+import com.SGPPiedrazul.security.JwtAuthFilter;
+import com.SGPPiedrazul.security.JwtService;
+import com.SGPPiedrazul.security.UserDetailsServiceImpl;
 import com.SGPPiedrazul.service.PacienteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +37,15 @@ class PacienteControllerTest {
     @MockBean
     private PacienteService pacienteService;
 
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
     private PacienteDTO.Response pacienteResponse;
     private PacienteDTO.Request pacienteRequest;
 
@@ -44,6 +56,7 @@ class PacienteControllerTest {
                 "12345678", "juan@email.com", "3001234567", 2
         );
 
+
         pacienteRequest = new PacienteDTO.Request();
         pacienteRequest.setNombres("Juan");
         pacienteRequest.setApellidos("Pérez García");
@@ -51,8 +64,6 @@ class PacienteControllerTest {
         pacienteRequest.setEmail("juan@email.com");
         pacienteRequest.setTelefono("3001234567");
     }
-
-    // ─── GET /api/pacientes ───
 
     @Test
     @DisplayName("Listar pacientes devuelve 200 con lista resumida")
@@ -74,8 +85,6 @@ class PacienteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
-
-    // ─── GET /api/pacientes/buscar ───
 
     @Test
     @DisplayName("Buscar por nombre devuelve coincidencias")
@@ -99,8 +108,6 @@ class PacienteControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
-    // ─── GET /api/pacientes/documento/{documento} ───
-
     @Test
     @DisplayName("Buscar por documento existente devuelve 200")
     void buscarPorDocumento_existente_retorna200() throws Exception {
@@ -117,13 +124,12 @@ class PacienteControllerTest {
     @DisplayName("Buscar por documento inexistente devuelve 500")
     void buscarPorDocumento_inexistente_retornaError() throws Exception {
         when(pacienteService.buscarPorDocumento("99999999"))
-                .thenThrow(new RuntimeException("Paciente no encontrado con documento: 99999999"));
+                .thenThrow(new RuntimeException(
+                        "Paciente no encontrado con documento: 99999999"));
 
         mockMvc.perform(get("/api/pacientes/documento/99999999"))
                 .andExpect(status().isInternalServerError());
     }
-
-    // ─── GET /api/pacientes/{id} ───
 
     @Test
     @DisplayName("Buscar por ID existente devuelve 200 con detalle completo")
@@ -146,8 +152,6 @@ class PacienteControllerTest {
         mockMvc.perform(get("/api/pacientes/99"))
                 .andExpect(status().isInternalServerError());
     }
-
-    // ─── POST /api/pacientes ───
 
     @Test
     @DisplayName("Crear paciente con datos válidos devuelve 201")
@@ -195,8 +199,6 @@ class PacienteControllerTest {
                         .content(objectMapper.writeValueAsString(pacienteRequest)))
                 .andExpect(status().isBadRequest());
     }
-
-    // ─── PUT /api/pacientes/{id} ───
 
     @Test
     @DisplayName("Actualizar paciente existente devuelve 200")
