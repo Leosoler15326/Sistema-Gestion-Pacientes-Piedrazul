@@ -55,21 +55,16 @@ public class SecurityConfig {
                 ).permitAll()
 
                 // Solo ADMINISTRADOR
-                .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.POST, "/api/profesionales/**").hasRole("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.PUT, "/api/profesionales/**").hasRole("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.PATCH, "/api/profesionales/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/api/usuarios/**").hasAnyRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.POST, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PUT, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PATCH, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")
 
-                // ADMINISTRADOR y AGENDADOR pueden agendar manualmente
-                .requestMatchers(HttpMethod.POST, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA", "PACIENTE")
-
-                // Reagendar — AGENDADOR y MEDICO_TERAPISTA
-                .requestMatchers(HttpMethod.PUT, "/api/citas/**")
-                    .hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
+                // Citas — ADMINISTRADOR, AGENDADOR, MEDICO_TERAPISTA pueden crear/reagendar/cancelar; PACIENTE solo crear
+                .requestMatchers("/api/citas/**").hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
 
                 // Historias clínicas — solo MEDICO_TERAPISTA
-                .requestMatchers("/api/historias/**").hasRole("MEDICO_TERAPISTA")
+                .requestMatchers("/api/historias/**").hasAnyRole("MEDICO_TERAPISTA")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
@@ -82,7 +77,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

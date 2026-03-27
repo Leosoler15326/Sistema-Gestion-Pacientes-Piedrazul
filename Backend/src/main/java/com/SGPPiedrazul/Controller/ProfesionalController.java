@@ -1,13 +1,13 @@
-package com.SGPPiedrazul.controller;
+package com.SGPPiedrazul.Controller;
 
 import com.SGPPiedrazul.dto.CrearProfesionalDTO;
 import com.SGPPiedrazul.dto.ProfesionalResponseDTO;
 import com.SGPPiedrazul.model.FranjaHoraria;
-import com.SGPPiedrazul.model.Profesional;
 import com.SGPPiedrazul.model.enums.Especialidad;
 import com.SGPPiedrazul.model.enums.Estado;
 import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.service.ProfesionalService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,64 +25,95 @@ public class ProfesionalController {
         this.profesionalService = profesionalService;
     }
 
+    // ─── Listar todos ───
     @GetMapping
-    public ResponseEntity<List<Profesional>> listar() {
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<List<ProfesionalResponseDTO>> listar() {
         return ResponseEntity.ok(profesionalService.listarTodos());
     }
 
+    // ─── Listar activos ───
     @GetMapping("/activos")
-    public ResponseEntity<List<Profesional>> listarActivos() {
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<List<ProfesionalResponseDTO>> listarActivos() {
         return ResponseEntity.ok(profesionalService.listarActivos());
     }
 
+    // ─── Listar por especialidad ───
     @GetMapping("/especialidad/{especialidad}")
-    public ResponseEntity<List<Profesional>> listarPorEspecialidad(
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<List<ProfesionalResponseDTO>> listarPorEspecialidad(
             @PathVariable Especialidad especialidad) {
         return ResponseEntity.ok(profesionalService.listarPorEspecialidad(especialidad));
     }
 
+    // ─── Buscar por ID ───
     @GetMapping("/{id}")
-    public ResponseEntity<Profesional> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(profesionalService.buscarPorId(id));
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<ProfesionalResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(profesionalService.buscarPorIdDTO(id));
     }
 
-    // ─── Crear profesional (con o sin usuario en una sola llamada) ───
+    // ─── Perfil del médico autenticado (obtiene su propio profesional desde el JWT) ───
+    @GetMapping("/mi-perfil")
+    @PreAuthorize("hasAnyRole('MEDICO_TERAPISTA')")
+    public ResponseEntity<ProfesionalResponseDTO> miPerfil() {
+        Long usuarioId = SecurityUtils.getIdUsuarioActual();
+        return ResponseEntity.ok(profesionalService.buscarPorUsuarioId(usuarioId));
+    }
+
+    // ─── Buscar por usuario_id  ───
+    @GetMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<ProfesionalResponseDTO> buscarPorUsuarioId(
+            @PathVariable Long usuarioId) {
+        return ResponseEntity.ok(profesionalService.buscarPorUsuarioId(usuarioId));
+    }
+
+    // ─── Crear profesional (con o sin usuario en una sola transacción) ───
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     public ResponseEntity<ProfesionalResponseDTO> crear(
-            @RequestBody CrearProfesionalDTO dto) {
-
+            @Valid @RequestBody CrearProfesionalDTO dto) {
         String responsable = SecurityUtils.getNombreUsuarioActual();
-        ProfesionalResponseDTO respuesta = profesionalService.crear(dto, responsable);
-        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(profesionalService.crear(dto, responsable));
     }
 
+    // ─── Actualizar datos clínicos ───
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Profesional> actualizar(@PathVariable Long id,
-                                                   @RequestBody Profesional datos) {
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    public ResponseEntity<ProfesionalResponseDTO> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody CrearProfesionalDTO dto) {
         String responsable = SecurityUtils.getNombreUsuarioActual();
-        return ResponseEntity.ok(profesionalService.actualizar(id, datos, responsable));
+        return ResponseEntity.ok(profesionalService.actualizar(id, dto, responsable));
     }
 
+    // ─── Cambiar estado activo/inactivo ───
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Void> cambiarEstado(@PathVariable Long id,
-                                               @RequestParam Estado estado) {
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam Estado estado) {
         String responsable = SecurityUtils.getNombreUsuarioActual();
         profesionalService.cambiarEstado(id, estado, responsable);
         return ResponseEntity.noContent().build();
     }
 
+    // ─── Listar franjas horarias de un profesional ───
     @GetMapping("/{id}/franjas")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<FranjaHoraria>> listarFranjas(@PathVariable Long id) {
         return ResponseEntity.ok(profesionalService.listarFranjas(id));
     }
 
+    // ─── Actualizar franjas horarias ───
     @PutMapping("/{id}/franjas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Void> actualizarFranjas(@PathVariable Long id,
-                                                   @RequestBody List<FranjaHoraria> franjas) {
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> actualizarFranjas(
+            @PathVariable Long id,
+            @RequestBody List<FranjaHoraria> franjas) {
         profesionalService.actualizarFranjas(id, franjas);
         return ResponseEntity.noContent().build();
     }

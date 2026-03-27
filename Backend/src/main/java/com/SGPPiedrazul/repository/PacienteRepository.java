@@ -14,4 +14,5 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     boolean existsByDocumento(String documento);
 
     Optional<Paciente> findByEmail(String email);
+    
 }
