@@ -5,13 +5,19 @@ import Loader from '../../../components/common/Loader';
 import InlineMessage from '../../../components/common/InlineMessage';
 import PageHeader from '../../../components/common/PageHeader';
 import BackButton from '../../../components/common/BackButton';
+import { useAuth } from '../../auth/hooks/useAuth';
+import ProfesionalFranjasSection from '../components/ProfesionalFranjasSection';
 import { useCambiarEstadoProfesional, useProfesionalDetail } from '../hooks/useprofesionales';
-import { ESTADO_PROFESIONAL_OPTIONS } from '../../../constants/enums';
 
 export default function ProfesionalDetailPage() {
   const params = useParams();
   const id = Number(params.id);
   const [message, setMessage] = useState('');
+  const { user } = useAuth();
+  const normalizedRole = String(user?.rol ?? '')
+    .toUpperCase()
+    .replace('ROLE_', '');
+  const esAdmin = normalizedRole === 'ADMINISTRADOR';
 
   const { data, isLoading, isError } = useProfesionalDetail(id);
   const estadoMutation = useCambiarEstadoProfesional();
@@ -83,6 +89,14 @@ export default function ProfesionalDetailPage() {
         ))}
       </div>
     </div>
+
+      <div className="mt-6">
+        <ProfesionalFranjasSection
+          profesionalId={id}
+          intervaloMinutos={data.intervaloMinutos}
+          puedeEditar={esAdmin}
+        />
+      </div>
     </div>
   );
 }

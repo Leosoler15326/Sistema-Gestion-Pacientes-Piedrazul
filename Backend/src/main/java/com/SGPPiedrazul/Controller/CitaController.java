@@ -7,7 +7,9 @@ import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.service.CitaService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/citas")
-@PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
 public class CitaController {
 
     private final CitaService citaService;
@@ -30,6 +31,7 @@ public class CitaController {
     }
 
     @GetMapping("/slots")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<List<CitaDTO.SlotResponse>> obtenerSlots(
             @RequestParam Long profesionalId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
@@ -37,6 +39,7 @@ public class CitaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<CitaDTO.Response> agendar(
             @Valid @RequestBody CitaDTO.AgendarRequest dto) {
         Usuario creadoPor = usuarioRepository
@@ -46,7 +49,19 @@ public class CitaController {
                 .body(citaService.agendar(dto, creadoPor));
     }
 
+    @PostMapping("/agendar-contacto")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR')")
+    public ResponseEntity<CitaDTO.Response> agendarDesdeContacto(
+            @Valid @RequestBody CitaDTO.AgendarContactoRequest dto) {
+        Usuario creadoPor = usuarioRepository
+                .findByNombreUsuario(SecurityUtils.getNombreUsuarioActual())
+                .orElse(null);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(citaService.agendarDesdeContacto(dto, creadoPor));
+    }
+
     @PutMapping("/{id}/reagendar")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<CitaDTO.Response> reagendar(
             @PathVariable Long id,
             @Valid @RequestBody CitaDTO.ReagendarRequest dto) {
@@ -57,6 +72,7 @@ public class CitaController {
     }
 
     @PatchMapping("/{id}/cancelar")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<Void> cancelar(
             @PathVariable Long id,
             @RequestBody CitaDTO.CancelarRequest dto) {
@@ -68,24 +84,48 @@ public class CitaController {
     }
 
     @GetMapping("/profesional")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorProfesional(
-        @RequestParam Long profesionalId,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+            @RequestParam Long profesionalId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
 
+        LocalDate fin = fechaFin != null ? fechaFin : fechaInicio;
         return ResponseEntity.ok(
-            citaService.listarPorProfesionalYRangoFechas(profesionalId, fechaInicio, fechaFin)
+                citaService.listarPorProfesionalYRangoFechas(profesionalId, fechaInicio, fin)
         );
     }
-    
+
+    @GetMapping(value = "/exportar-csv", produces = "text/csv;charset=UTF-8")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<byte[]> exportarCsv(
+            @RequestParam Long profesionalId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        byte[] data = citaService.exportarCsvProfesionalFecha(profesionalId, fecha);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"citas_" + profesionalId + "_" + fecha + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .body(data);
+    }
 
     @GetMapping("/paciente/{pacienteId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorPaciente(
             @PathVariable Long pacienteId) {
         return ResponseEntity.ok(citaService.listarPorPaciente(pacienteId));
     }
 
+    /** Ruta bajo /consulta para no colisionar con GET /{id}. */
+    @GetMapping("/consulta/mis-citas")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<List<CitaDTO.Response>> misCitas() {
+        return ResponseEntity.ok(citaService.listarMisCitasComoPaciente());
+    }
+
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<CitaDTO.Response> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(citaService.buscarPorId(id));
     }

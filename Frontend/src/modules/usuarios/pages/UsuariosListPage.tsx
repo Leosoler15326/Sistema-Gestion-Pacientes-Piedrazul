@@ -1,28 +1,47 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import type { AxiosError } from 'axios';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import { APP_ROUTES } from '../../../app/router/routes';
+import { authStore } from '../../auth/store/auth.store';
 import UsuariosTable from '../components/UsuariosTable';
-import { useDesactivarUsuario, useUsuarios } from '../hooks/useUsuarios';
+import {
+  useDesactivarUsuario,
+  useReactivarUsuario,
+  useUsuarios,
+} from '../hooks/useUsuarios';
+
+type AccionUsuario = { id: number; tipo: 'desactivar' | 'reactivar' };
+
+function mensajeErrorApi(error: unknown): string {
+  const ax = error as AxiosError<{ mensaje?: string }>;
+  const msg = ax.response?.data?.mensaje;
+  if (typeof msg === 'string' && msg.trim()) return msg;
+  return 'No se pudo completar la operación. Revisa la consola o la pestaña Red.';
+}
 
 export default function UsuariosListPage() {
   const { data, isLoading, isError } = useUsuarios();
   const desactivarMutation = useDesactivarUsuario();
-  const [usuarioIdToDisable, setUsuarioIdToDisable] = useState<number | null>(null);
+  const reactivarMutation = useReactivarUsuario();
+  const [accion, setAccion] = useState<AccionUsuario | null>(null);
 
-  const handleConfirmDisable = async () => {
-    if (!usuarioIdToDisable) return;
+  const handleConfirmAccion = async () => {
+    if (!accion) return;
 
     try {
-      setUsuarioIdToDisable(null);
-      await desactivarMutation.mutateAsync(usuarioIdToDisable);
+      if (accion.tipo === 'desactivar') {
+        await desactivarMutation.mutateAsync(accion.id);
+      } else {
+        await reactivarMutation.mutateAsync(accion.id);
+      }
+      setAccion(null);
     } catch (error) {
-      console.error('Error al desactivar usuario:', error);
-      alert('Error al desactivar usuario. Revisa consola y Network.');
+      console.error('Error al cambiar estado del usuario:', error);
+      alert(mensajeErrorApi(error));
     }
   };
 
@@ -58,17 +77,26 @@ export default function UsuariosListPage() {
           description="Aún no existen registros para mostrar."
         />
       ) : (
-        <UsuariosTable items={data} onDesactivar={setUsuarioIdToDisable} />
+        <UsuariosTable
+          items={data}
+          currentUserId={authStore.getUser()?.id}
+          onDesactivar={(id) => setAccion({ id, tipo: 'desactivar' })}
+          onReactivar={(id) => setAccion({ id, tipo: 'reactivar' })}
+        />
       )}
 
       <ConfirmDialog
-        isOpen={Boolean(usuarioIdToDisable)}
-        title="Desactivar usuario"
-        message="¿Estás seguro de desactivar este usuario?"
-        confirmText="Sí, desactivar"
-        onCancel={() => setUsuarioIdToDisable(null)}
-        onConfirm={handleConfirmDisable}
-        loading={desactivarMutation.isPending}
+        isOpen={Boolean(accion)}
+        title={accion?.tipo === 'reactivar' ? 'Reactivar usuario' : 'Desactivar usuario'}
+        message={
+          accion?.tipo === 'reactivar'
+            ? '¿Confirmas que deseas reactivar el acceso de este usuario?'
+            : '¿Estás seguro de desactivar el acceso de este usuario?'
+        }
+        confirmText={accion?.tipo === 'reactivar' ? 'Sí, reactivar' : 'Sí, desactivar'}
+        onCancel={() => setAccion(null)}
+        onConfirm={handleConfirmAccion}
+        loading={desactivarMutation.isPending || reactivarMutation.isPending}
       />
     </div>
   );

@@ -60,8 +60,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
         String mensaje = ex.getMessage();
         if (mensaje != null && (
-                mensaje.contains("no encontrado") ||
-                mensaje.contains("not found") ||
+                mensaje.toLowerCase().contains("no encontrado") ||
+                mensaje.toLowerCase().contains("no encontrada") ||
+                mensaje.toLowerCase().contains("not found") ||
                 mensaje.contains("No hay"))) {
             return buildResponse(HttpStatus.NOT_FOUND, mensaje);
         }

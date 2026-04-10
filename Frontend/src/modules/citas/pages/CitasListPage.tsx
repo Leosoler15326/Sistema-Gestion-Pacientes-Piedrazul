@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import api from '../../../services/api';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import EmptyState from '../../../components/common/EmptyState';
@@ -16,6 +16,7 @@ import {
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { citasService } from '../services/citas.service';
 
 type SearchMode = 'paciente' | 'profesional';
 
@@ -34,6 +35,10 @@ export default function CitasListPage() {
   const { user } = useAuth();
   const normalizedRole = String(user?.rol ?? '').toUpperCase().replace('ROLE_', '');
   const esProfesional = normalizedRole === 'MEDICO_TERAPISTA';
+  const esPaciente = normalizedRole === 'PACIENTE';
+  const esAdmin = normalizedRole === 'ADMINISTRADOR';
+  const esAgendador = normalizedRole === 'AGENDADOR';
+  const puedeExportarCsv = esAdmin || esAgendador || esProfesional;
 
   const [searchParams] = useSearchParams();
   const pacienteIdFromQuery = searchParams.get('pacienteId');
@@ -65,6 +70,7 @@ export default function CitasListPage() {
 
   const [citaIdToCancel, setCitaIdToCancel] = useState<number | null>(null);
   const [message, setMessage] = useState('');
+  const [exportingCsv, setExportingCsv] = useState(false);
 
   const { data: profesionales } = useProfesionalesActivos();
   const { data: pacientesEncontrados, isLoading: pacientesLoading } =
@@ -148,6 +154,10 @@ export default function CitasListPage() {
 
   const cancelMutation = useCancelarCita();
   const activeQuery = searchMode === 'paciente' ? pacienteQuery : profesionalQuery;
+
+  if (esPaciente) {
+    return <Navigate to={APP_ROUTES.PACIENTE_MIS_CITAS} replace />;
+  }
 
   const getTargetProfesionalId = () => {
     if (esProfesional) {
@@ -271,6 +281,32 @@ export default function CitasListPage() {
     setProfesionalParams(undefined);
   };
 
+  const handleExportarCsvDia = async () => {
+    const pid = getTargetProfesionalId();
+    if (!pid || !fechaDesdeProfesional) {
+      setMessage('Selecciona profesional y fecha inicial para exportar el CSV del día.');
+      return;
+    }
+    try {
+      setExportingCsv(true);
+      setMessage('');
+      const blob = await citasService.exportarCsvProfesionalFecha(
+        pid,
+        fechaDesdeProfesional
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `citas_${pid}_${fechaDesdeProfesional}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setMessage('No fue posible exportar el CSV.');
+    } finally {
+      setExportingCsv(false);
+    }
+  };
+
   const handleConfirmCancel = async () => {
     if (!citaIdToCancel) return;
 
@@ -294,18 +330,28 @@ export default function CitasListPage() {
         title="Citas"
         subtitle="Consulta y gestiona citas por paciente o por profesional."
         actions={
-          <Link
-            to={
-              searchMode === 'paciente' && pacienteId && pacienteSeleccionado
-                ? `${APP_ROUTES.CITAS_NUEVA}?pacienteId=${pacienteId}&pacienteNombre=${encodeURIComponent(
-                    pacienteSeleccionado.nombreCompleto
-                  )}`
-                : APP_ROUTES.CITAS_NUEVA
-            }
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Nueva cita
-          </Link>
+          <>
+            {(esAdmin || esAgendador) && (
+              <Link
+                to={APP_ROUTES.CITAS_AGENDAR_CONTACTO}
+                className="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700"
+              >
+                Agendar contacto
+              </Link>
+            )}
+            <Link
+              to={
+                searchMode === 'paciente' && pacienteId && pacienteSeleccionado
+                  ? `${APP_ROUTES.CITAS_NUEVA}?pacienteId=${pacienteId}&pacienteNombre=${encodeURIComponent(
+                      pacienteSeleccionado.nombreCompleto
+                    )}`
+                  : APP_ROUTES.CITAS_NUEVA
+              }
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Nueva cita
+            </Link>
+          </>
         }
       />
 
@@ -495,6 +541,17 @@ export default function CitasListPage() {
               >
                 Ver solo hoy
               </button>
+
+              {puedeExportarCsv && (
+                <button
+                  type="button"
+                  onClick={handleExportarCsvDia}
+                  disabled={exportingCsv}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {exportingCsv ? 'Exportando...' : 'Exportar CSV (día inicial)'}
+                </button>
+              )}
             </div>
 
             <p className="text-xs text-gray-500">
@@ -506,6 +563,15 @@ export default function CitasListPage() {
       </div>
 
       {activeQuery.isLoading && <Loader message="Cargando citas." />}
+
+      {!activeQuery.isLoading &&
+        !activeQuery.isError &&
+        Array.isArray(activeQuery.data) && (
+          <p className="mb-3 text-sm text-slate-600">
+            {activeQuery.data.length} cita
+            {activeQuery.data.length === 1 ? '' : 's'} en esta consulta.
+          </p>
+        )}
 
       {!activeQuery.isLoading && activeQuery.isError && (
         <EmptyState

@@ -1,6 +1,7 @@
 package com.SGPPiedrazul.Controller;
 
 import com.SGPPiedrazul.dto.PacienteDTO;
+import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.service.PacienteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,12 +37,37 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteService.buscarPorNombre(nombre));
     }
 
+    // ─── Autocompletado por prefijo de documento (cédula) ───
+    @GetMapping("/sugerencias-documento")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<List<PacienteDTO.Response>> sugerenciasPorDocumento(
+            @RequestParam String prefijo) {
+        return ResponseEntity.ok(pacienteService.sugerenciasPorDocumento(prefijo));
+    }
+
     // ─── Buscar por documento ───
     @GetMapping("/documento/{documento}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<PacienteDTO.Response> buscarPorDocumento(
             @PathVariable String documento) {
         return ResponseEntity.ok(pacienteService.buscarPorDocumento(documento));
+    }
+
+    @GetMapping("/mi-perfil")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<PacienteDTO.Response> miPerfilPaciente() {
+        return pacienteService.buscarPorUsuarioId(SecurityUtils.getIdUsuarioActual())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/mi-perfil")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<PacienteDTO.Response> completarPerfilPaciente(
+            @Valid @RequestBody PacienteDTO.CompletarPerfilRequest dto) {
+        PacienteDTO.Response r = pacienteService.completarPerfilUsuario(
+                SecurityUtils.getIdUsuarioActual(), dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(r);
     }
 
     // ─── Buscar por ID (detalle completo) ───

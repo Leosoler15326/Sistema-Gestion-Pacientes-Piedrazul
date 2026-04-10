@@ -1,3 +1,5 @@
+export type GeneroPaciente = 'HOMBRE' | 'MUJER' | 'OTRO';
+
 export interface PacienteDto {
   id: number;
   nombres: string;
@@ -6,7 +8,19 @@ export interface PacienteDto {
   documento: string;
   email: string;
   telefono: string;
+  genero?: GeneroPaciente | string;
+  fechaNacimiento?: string;
   totalCitas: number;
+}
+
+export interface CompletarPerfilPacienteDto {
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  genero: GeneroPaciente;
+  fechaNacimiento?: string;
+  email?: string;
 }
 
 export interface CrearPacienteDto {

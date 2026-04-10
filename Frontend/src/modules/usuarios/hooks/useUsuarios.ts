@@ -54,8 +54,21 @@ export const useDesactivarUsuario = () => {
 
   return useMutation({
     mutationFn: (id: number) => usuariosService.desactivar(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+      queryClient.invalidateQueries({ queryKey: ['usuario-detail', id] });
+    },
+  });
+};
+
+export const useReactivarUsuario = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => usuariosService.reactivar(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+      queryClient.invalidateQueries({ queryKey: ['usuario-detail', id] });
     },
   });
 };

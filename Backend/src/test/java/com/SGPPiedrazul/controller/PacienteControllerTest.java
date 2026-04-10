@@ -53,7 +53,8 @@ class PacienteControllerTest {
     void setUp() {
         pacienteResponse = new PacienteDTO.Response(
                 1L, "Juan", "Pérez García",
-                "12345678", "juan@email.com", "3001234567", 2
+                "12345678", "juan@email.com", "3001234567",
+                null, null, 2
         );
 
 
@@ -121,14 +122,14 @@ class PacienteControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar por documento inexistente devuelve 500")
+    @DisplayName("Buscar por documento inexistente devuelve 404")
     void buscarPorDocumento_inexistente_retornaError() throws Exception {
         when(pacienteService.buscarPorDocumento("99999999"))
                 .thenThrow(new RuntimeException(
                         "Paciente no encontrado con documento: 99999999"));
 
         mockMvc.perform(get("/api/pacientes/documento/99999999"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -144,13 +145,13 @@ class PacienteControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar por ID inexistente devuelve 500")
+    @DisplayName("Buscar por ID inexistente devuelve 404")
     void buscarPorId_inexistente_retornaError() throws Exception {
         when(pacienteService.buscarPorId(99L))
                 .thenThrow(new RuntimeException("Paciente no encontrado con id: 99"));
 
         mockMvc.perform(get("/api/pacientes/99"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -213,7 +214,7 @@ class PacienteControllerTest {
     }
 
     @Test
-    @DisplayName("Actualizar paciente inexistente devuelve 500")
+    @DisplayName("Actualizar paciente inexistente devuelve 404")
     void actualizar_inexistente_retornaError() throws Exception {
         when(pacienteService.actualizar(eq(99L), any()))
                 .thenThrow(new RuntimeException("Paciente no encontrado con id: 99"));
@@ -221,6 +222,6 @@ class PacienteControllerTest {
         mockMvc.perform(put("/api/pacientes/99")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pacienteRequest)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 }

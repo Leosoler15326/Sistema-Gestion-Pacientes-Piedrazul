@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { citasService } from '../services/citas.service';
 import type {
+  AgendarContactoRequestDto,
   CancelarCitaRequestDto,
   CreateCitaRequestDto,
   ListarCitasProfesionalParamsDto,
@@ -12,6 +13,18 @@ export function useCreateCita() {
 
   return useMutation({
     mutationFn: (payload: CreateCitaRequestDto) => citasService.agendar(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['citas'] });
+    },
+  });
+}
+
+export function useAgendarDesdeContacto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: AgendarContactoRequestDto) =>
+      citasService.agendarDesdeContacto(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['citas'] });
     },
@@ -67,6 +80,13 @@ export function useCitasPorPaciente(pacienteId?: number) {
     queryKey: ['citas', 'paciente', pacienteId],
     queryFn: () => citasService.listarPorPaciente(pacienteId!),
     enabled: Boolean(pacienteId),
+  });
+}
+
+export function useMisCitasPaciente() {
+  return useQuery({
+    queryKey: ['citas', 'mis-citas'],
+    queryFn: () => citasService.listarMisCitasPaciente(),
   });
 }
 

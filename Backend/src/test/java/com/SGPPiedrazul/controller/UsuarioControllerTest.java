@@ -117,13 +117,13 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar usuario por ID inexistente devuelve 500")
+    @DisplayName("Buscar usuario por ID inexistente devuelve 404")
     void buscarPorId_idInexistente_retornaError() throws Exception {
         when(usuarioService.buscarPorId(99L))
                 .thenThrow(new RuntimeException("Usuario no encontrado con id: 99"));
 
         mockMvc.perform(get("/api/usuarios/99"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -197,7 +197,7 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("Desactivar usuario inexistente devuelve 500")
+    @DisplayName("Desactivar usuario inexistente devuelve 404")
     void desactivar_usuarioInexistente_retornaError() throws Exception {
         try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
             su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("admin");
@@ -205,7 +205,32 @@ class UsuarioControllerTest {
                     .when(usuarioService).desactivar(eq(99L), anyString());
 
             mockMvc.perform(patch("/api/usuarios/99/desactivar"))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isNotFound());
+        }
+    }
+
+    @Test
+    @DisplayName("Reactivar usuario existente devuelve 204")
+    void reactivar_usuarioExistente_retorna204() throws Exception {
+        try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
+            su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("admin");
+            doNothing().when(usuarioService).reactivar(eq(1L), anyString());
+
+            mockMvc.perform(patch("/api/usuarios/1/reactivar"))
+                    .andExpect(status().isNoContent());
+        }
+    }
+
+    @Test
+    @DisplayName("Reactivar usuario inexistente devuelve 404")
+    void reactivar_usuarioInexistente_retornaError() throws Exception {
+        try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
+            su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("admin");
+            doThrow(new RuntimeException("Usuario no encontrado con id: 99"))
+                    .when(usuarioService).reactivar(eq(99L), anyString());
+
+            mockMvc.perform(patch("/api/usuarios/99/reactivar"))
+                    .andExpect(status().isNotFound());
         }
     }
 }

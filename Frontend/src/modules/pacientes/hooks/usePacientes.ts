@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { pacientesService } from '../Services/pacientes.service';
 import type {
   ActualizarPacienteDto,
+  CompletarPerfilPacienteDto,
   CrearPacienteDto,
 } from '../types/paciente.types';
 
@@ -65,5 +66,32 @@ export const useUpdatePaciente = () => {
       queryClient.invalidateQueries({ queryKey: ['pacientes-buscar'] });
       queryClient.invalidateQueries({ queryKey: ['paciente-detail', variables.id] });
     },
+  });
+};
+
+export const useMiPerfilPaciente = () => {
+  return useQuery({
+    queryKey: ['paciente-mi-perfil'],
+    queryFn: () => pacientesService.obtenerMiPerfilPaciente(),
+  });
+};
+
+export const useCompletarMiPerfil = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CompletarPerfilPacienteDto) =>
+      pacientesService.completarMiPerfil(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['paciente-mi-perfil'] });
+    },
+  });
+};
+
+export const useSugerenciasDocumento = (prefijo: string) => {
+  return useQuery({
+    queryKey: ['pacientes-sugerencias-doc', prefijo],
+    queryFn: () => pacientesService.sugerenciasPorDocumento(prefijo),
+    enabled: prefijo.trim().length >= 2,
   });
 };

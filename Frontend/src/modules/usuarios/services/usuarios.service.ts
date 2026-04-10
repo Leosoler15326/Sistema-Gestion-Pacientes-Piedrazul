@@ -54,6 +54,16 @@ export const usuariosService = {
     });
   },
 
+  async reactivar(id: number): Promise<void> {
+    const responsable = authStore.getUser()?.nombreUsuario || 'sistema';
+
+    await api.patch(`${USUARIOS_BASE}/${id}/reactivar`, {}, {
+      headers: {
+        'X-Usuario-Responsable': responsable,
+      },
+    });
+  },
+
   async verificarEmail(token: string): Promise<string> {
     const { data } = await api.get<string>(`${USUARIOS_BASE}/verificar-email`, {
       params: { token },

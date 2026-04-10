@@ -1,11 +1,14 @@
 package com.SGPPiedrazul.dto;
 
+import com.SGPPiedrazul.model.enums.GeneroPaciente;
 import com.SGPPiedrazul.model.enums.TipoAtencion;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class CitaDTO {
 
@@ -37,6 +40,75 @@ public class CitaDTO {
         public void setTipoAtencion(TipoAtencion v) { this.tipoAtencion = v; }
         public String getMotivoConsulta() { return motivoConsulta; }
         public void setMotivoConsulta(String v) { this.motivoConsulta = v; }
+    }
+
+    /** Datos mínimos del paciente para contacto (WhatsApp / recepción). */
+    public static class PacienteContactoDTO {
+
+        @NotBlank(message = "El documento es obligatorio.")
+        private String documento;
+
+        @NotBlank(message = "Los nombres son obligatorios.")
+        private String nombres;
+
+        @NotBlank(message = "Los apellidos son obligatorios.")
+        private String apellidos;
+
+        @NotBlank(message = "El celular es obligatorio.")
+        private String telefono;
+
+        @NotNull(message = "El género es obligatorio.")
+        private GeneroPaciente genero;
+
+        private LocalDate fechaNacimiento;
+
+        private String email;
+
+        public String getDocumento() { return documento; }
+        public void setDocumento(String documento) { this.documento = documento; }
+        public String getNombres() { return nombres; }
+        public void setNombres(String nombres) { this.nombres = nombres; }
+        public String getApellidos() { return apellidos; }
+        public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+        public String getTelefono() { return telefono; }
+        public void setTelefono(String telefono) { this.telefono = telefono; }
+        public GeneroPaciente getGenero() { return genero; }
+        public void setGenero(GeneroPaciente genero) { this.genero = genero; }
+        public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+        public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+    }
+
+    /** Agendar cita creando o actualizando paciente por documento (flujo agendador). */
+    public static class AgendarContactoRequest {
+
+        @NotNull(message = "Los datos del paciente son obligatorios.")
+        @Valid
+        private PacienteContactoDTO paciente;
+
+        @NotNull(message = "El profesional es obligatorio.")
+        private Long profesionalId;
+
+        @NotNull(message = "La fecha y hora son obligatorias.")
+        @Future(message = "La fecha debe ser futura.")
+        private LocalDateTime fechaHora;
+
+        @NotNull(message = "El tipo de atención es obligatorio.")
+        private TipoAtencion tipoAtencion;
+
+        private String motivoConsulta;
+
+        public PacienteContactoDTO getPaciente() { return paciente; }
+        public void setPaciente(PacienteContactoDTO paciente) { this.paciente = paciente; }
+        public Long getProfesionalId() { return profesionalId; }
+        public void setProfesionalId(Long profesionalId) { this.profesionalId = profesionalId; }
+        public LocalDateTime getFechaHora() { return fechaHora; }
+        public void setFechaHora(LocalDateTime fechaHora) { this.fechaHora = fechaHora; }
+        public TipoAtencion getTipoAtencion() { return tipoAtencion; }
+        public void setTipoAtencion(TipoAtencion tipoAtencion) { this.tipoAtencion = tipoAtencion; }
+        public String getMotivoConsulta() { return motivoConsulta; }
+        public void setMotivoConsulta(String motivoConsulta) { this.motivoConsulta = motivoConsulta; }
     }
 
     // ─── Request: Reagendar cita ───

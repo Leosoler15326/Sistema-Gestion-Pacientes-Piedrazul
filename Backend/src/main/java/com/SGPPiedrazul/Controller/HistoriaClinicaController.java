@@ -46,7 +46,7 @@ public class HistoriaClinicaController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
 
         Profesional profesional = profesionalRepository
-                .findById(citaService.buscarPorId(dto.getCitaId()).getProfesionalId())
+                .findById(citaService.obtenerResumenPorId(dto.getCitaId()).getProfesionalId())
                 .orElseThrow(() -> new RuntimeException("Profesional no encontrado."));
 
         return ResponseEntity.status(HttpStatus.CREATED)

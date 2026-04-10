@@ -102,6 +102,10 @@ class HistoriaClinicaControllerTest {
         citaMock = new Cita();
         citaMock.setId(1L);
         citaMock.setProfesional(profesionalMock);
+
+        citaDTOResponseMock = new CitaDTO.Response();
+        citaDTOResponseMock.setId(1L);
+        citaDTOResponseMock.setProfesionalId(2L);
     }
 
     @Test
@@ -113,7 +117,7 @@ class HistoriaClinicaControllerTest {
             when(usuarioRepository.findByNombreUsuario("dgarcia"))
                     .thenReturn(Optional.of(usuarioMock));
 
-            when(citaService.buscarPorId(1L)).thenReturn(citaDTOResponseMock);
+            when(citaService.obtenerResumenPorId(1L)).thenReturn(citaDTOResponseMock);
 
             when(profesionalRepository.findById(2L))
                     .thenReturn(Optional.of(profesionalMock));
@@ -132,7 +136,7 @@ class HistoriaClinicaControllerTest {
     }
 
     @Test
-    @DisplayName("Registrar historia sin profesional devuelve 500")
+    @DisplayName("Registrar historia sin profesional devuelve 404")
     void registrar_sinProfesional_retornaError() throws Exception {
         try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
             su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("dgarcia");
@@ -140,7 +144,7 @@ class HistoriaClinicaControllerTest {
             when(usuarioRepository.findByNombreUsuario("dgarcia"))
                     .thenReturn(Optional.of(usuarioMock));
 
-            when(citaService.buscarPorId(1L)).thenReturn(citaDTOResponseMock);
+            when(citaService.obtenerResumenPorId(1L)).thenReturn(citaDTOResponseMock);
 
             when(profesionalRepository.findById(2L))
                     .thenReturn(Optional.empty()); // 🔥 provoca error
@@ -148,12 +152,12 @@ class HistoriaClinicaControllerTest {
             mockMvc.perform(post("/api/historias")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(historiaRequest)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isNotFound());
         }
     }
 
     @Test
-    @DisplayName("Registrar historia duplicada devuelve 500")
+    @DisplayName("Registrar historia duplicada devuelve 409")
     void registrar_historiaDuplicada_retornaError() throws Exception {
         try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
             su.when(SecurityUtils::getNombreUsuarioActual).thenReturn("dgarcia");
@@ -161,7 +165,7 @@ class HistoriaClinicaControllerTest {
             when(usuarioRepository.findByNombreUsuario("dgarcia"))
                     .thenReturn(Optional.of(usuarioMock));
 
-            when(citaService.buscarPorId(1L)).thenReturn(citaDTOResponseMock);
+            when(citaService.obtenerResumenPorId(1L)).thenReturn(citaDTOResponseMock);
 
             when(profesionalRepository.findById(2L))
                     .thenReturn(Optional.of(profesionalMock));
@@ -173,7 +177,7 @@ class HistoriaClinicaControllerTest {
             mockMvc.perform(post("/api/historias")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(historiaRequest)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isConflict());
         }
     }
 
@@ -212,7 +216,7 @@ class HistoriaClinicaControllerTest {
     }
 
     @Test
-    @DisplayName("Actualizar historia inexistente devuelve 500")
+    @DisplayName("Actualizar historia inexistente devuelve 404")
     void actualizar_inexistente_retornaError() throws Exception {
         HistoriaClinicaDTO.ActualizarRequest dto = new HistoriaClinicaDTO.ActualizarRequest();
         dto.setDescripcion("Nueva descripción");
@@ -224,12 +228,12 @@ class HistoriaClinicaControllerTest {
                     .thenReturn(Optional.of(usuarioMock));
 
             when(historiaClinicaService.actualizar(eq(99L), any(), any()))
-                    .thenThrow(new RuntimeException("No encontrada"));
+                    .thenThrow(new RuntimeException("Historia no encontrada con id: 99"));
 
             mockMvc.perform(put("/api/historias/99")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isNotFound());
         }
     }
 

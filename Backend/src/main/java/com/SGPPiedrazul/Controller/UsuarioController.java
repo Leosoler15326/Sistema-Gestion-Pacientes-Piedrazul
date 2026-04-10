@@ -59,4 +59,11 @@ public class UsuarioController {
         usuarioService.desactivar(id, responsable);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivar(@PathVariable Long id) {
+        String responsable = SecurityUtils.getNombreUsuarioActual();
+        usuarioService.reactivar(id, responsable);
+        return ResponseEntity.noContent().build();
+    }
 }
