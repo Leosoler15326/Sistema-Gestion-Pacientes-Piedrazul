@@ -4,7 +4,7 @@ import com.SGPPiedrazul.dto.CitaDTO;
 import com.SGPPiedrazul.model.Usuario;
 import com.SGPPiedrazul.repository.UsuarioRepository;
 import com.SGPPiedrazul.security.SecurityUtils;
-import com.SGPPiedrazul.service.CitaService;
+import com.SGPPiedrazul.service.ICitaService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +21,10 @@ import java.util.List;
 @RequestMapping("/api/citas")
 public class CitaController {
 
-    private final CitaService citaService;
+    private final ICitaService citaService;
     private final UsuarioRepository usuarioRepository;
 
-    public CitaController(CitaService citaService,
+    public CitaController(ICitaService citaService,
                           UsuarioRepository usuarioRepository) {
         this.citaService = citaService;
         this.usuarioRepository = usuarioRepository;

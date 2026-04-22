@@ -1,48 +1,56 @@
 package com.SGPPiedrazul.service;
 
 import com.SGPPiedrazul.dto.CitaDTO;
+import com.SGPPiedrazul.event.CitaAgendadaEvent;
+import com.SGPPiedrazul.event.CitaCanceladaEvent;
+import com.SGPPiedrazul.event.CitaReagendadaEvent;
 import com.SGPPiedrazul.model.*;
 import com.SGPPiedrazul.model.enums.EstadoCita;
-import com.SGPPiedrazul.model.enums.TipoEvento;
 import com.SGPPiedrazul.repository.*;
 import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.security.UserDetailsImpl;
+import com.SGPPiedrazul.service.cita.CitaEntityMapper;
+import com.SGPPiedrazul.service.export.CitaListExporter;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CitaService {
+public class CitaService implements ICitaService {
 
     private final CitaRepository citaRepository;
     private final ProfesionalRepository profesionalRepository;
     private final PacienteRepository pacienteRepository;
     private final DisponibilidadService disponibilidadService;
-    private final AuditoriaService auditoriaService;
-    private final NotificacionService notificacionService;
     private final ConfiguracionAgendamientoService configuracionAgendamientoService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final CitaEntityMapper citaEntityMapper;
+    private final CitaListExporter citaListExporter;
 
     public CitaService(CitaRepository citaRepository,
                        ProfesionalRepository profesionalRepository,
                        PacienteRepository pacienteRepository,
                        DisponibilidadService disponibilidadService,
-                       AuditoriaService auditoriaService,
-                       NotificacionService notificacionService,
-                       ConfiguracionAgendamientoService configuracionAgendamientoService) {
+                       ConfiguracionAgendamientoService configuracionAgendamientoService,
+                       ApplicationEventPublisher eventPublisher,
+                       CitaEntityMapper citaEntityMapper,
+                       CitaListExporter citaListExporter) {
         this.citaRepository = citaRepository;
         this.profesionalRepository = profesionalRepository;
         this.pacienteRepository = pacienteRepository;
         this.disponibilidadService = disponibilidadService;
-        this.auditoriaService = auditoriaService;
-        this.notificacionService = notificacionService;
         this.configuracionAgendamientoService = configuracionAgendamientoService;
+        this.eventPublisher = eventPublisher;
+        this.citaEntityMapper = citaEntityMapper;
+        this.citaListExporter = citaListExporter;
     }
 
+    @Override
     @Transactional
     public CitaDTO.Response agendar(CitaDTO.AgendarRequest dto, Usuario creadoPor) {
         asegurarAutorizacionPaciente(dto.getPacienteId());
@@ -70,17 +78,16 @@ public class CitaService {
 
         Cita guardada = citaRepository.save(cita);
 
-        auditoriaService.registrar(TipoEvento.CITA_AGENDADA,
-                "Cita agendada para: " + paciente.getNombres()
-                        + " con " + profesional.getNombres()
-                        + " en " + dto.getFechaHora(),
-                creadoPor != null ? creadoPor.getNombreUsuario() : "sistema");
+        String detalle = "Cita agendada para: " + paciente.getNombres()
+                + " con " + profesional.getNombres()
+                + " en " + dto.getFechaHora();
+        String actor = creadoPor != null ? creadoPor.getNombreUsuario() : "sistema";
+        eventPublisher.publishEvent(new CitaAgendadaEvent(guardada, detalle, actor));
 
-        notificacionService.enviarConfirmacionCita(guardada);
-
-        return toResponse(guardada);
+        return citaEntityMapper.toResponse(guardada);
     }
 
+    @Override
     @Transactional
     public CitaDTO.Response agendarDesdeContacto(CitaDTO.AgendarContactoRequest dto, Usuario creadoPor) {
         validarFechaDentroDeVentana(dto.getFechaHora());
@@ -106,14 +113,12 @@ public class CitaService {
 
         Cita guardada = citaRepository.save(cita);
 
-        auditoriaService.registrar(TipoEvento.CITA_AGENDADA,
-                "Cita (contacto) para documento " + paciente.getDocumento()
-                        + " con " + profesional.getNombres() + " en " + dto.getFechaHora(),
-                creadoPor != null ? creadoPor.getNombreUsuario() : "sistema");
+        String detalle = "Cita (contacto) para documento " + paciente.getDocumento()
+                + " con " + profesional.getNombres() + " en " + dto.getFechaHora();
+        String actor = creadoPor != null ? creadoPor.getNombreUsuario() : "sistema";
+        eventPublisher.publishEvent(new CitaAgendadaEvent(guardada, detalle, actor));
 
-        notificacionService.enviarConfirmacionCita(guardada);
-
-        return toResponse(guardada);
+        return citaEntityMapper.toResponse(guardada);
     }
 
     private Paciente upsertPacienteDesdeContacto(CitaDTO.PacienteContactoDTO dto) {
@@ -143,6 +148,7 @@ public class CitaService {
         });
     }
 
+    @Override
     @Transactional
     public CitaDTO.Response reagendar(Long citaId, CitaDTO.ReagendarRequest dto,
                                       Usuario responsable) {
@@ -161,44 +167,48 @@ public class CitaService {
         historial.setFechaNueva(dto.getNuevaFechaHora());
         historial.setMotivo(dto.getMotivo());
         historial.setResponsable(responsable);
+        cita.getHistorial().add(historial);
 
         cita.setFechaHora(dto.getNuevaFechaHora());
         cita.setEstado(EstadoCita.REAGENDADA);
         Cita actualizada = citaRepository.save(cita);
 
-        auditoriaService.registrar(TipoEvento.CITA_REAGENDADA,
-                "Cita " + citaId + " reagendada a " + dto.getNuevaFechaHora(),
-                responsable != null ? responsable.getNombreUsuario() : "sistema");
+        String detalle = "Cita " + citaId + " reagendada a " + dto.getNuevaFechaHora();
+        String actor = responsable != null ? responsable.getNombreUsuario() : "sistema";
+        eventPublisher.publishEvent(new CitaReagendadaEvent(actualizada, detalle, actor));
 
-        notificacionService.enviarConfirmacionReagendamiento(actualizada);
-
-        return toResponse(actualizada);
+        return citaEntityMapper.toResponse(actualizada);
     }
 
+    @Override
     @Transactional
     public void cancelar(Long citaId, CitaDTO.CancelarRequest dto, Usuario responsable) {
         Cita cita = buscarEntidadPorId(citaId);
         cita.setEstado(EstadoCita.CANCELADA);
         citaRepository.save(cita);
 
-        auditoriaService.registrar(TipoEvento.CITA_CANCELADA,
-                "Cita " + citaId + " cancelada. Motivo: " + dto.getMotivo(),
-                responsable != null ? responsable.getNombreUsuario() : "sistema");
+        String actor = responsable != null ? responsable.getNombreUsuario() : "sistema";
+        String motivo = dto.getMotivo() != null && !dto.getMotivo().isBlank()
+                ? dto.getMotivo()
+                : "(sin motivo)";
+        eventPublisher.publishEvent(new CitaCanceladaEvent(citaId, motivo, actor));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public CitaDTO.Response buscarPorId(Long id) {
-        CitaDTO.Response r = toResponse(buscarEntidadPorId(id));
+        CitaDTO.Response r = citaEntityMapper.toResponse(buscarEntidadPorId(id));
         asegurarVisibilidadCita(r);
         return r;
     }
 
-    /** Uso interno (p. ej. historias clínicas) sin filtro de rol PACIENTE. */
+    @Override
     @Transactional(readOnly = true)
     public CitaDTO.Response obtenerResumenPorId(Long id) {
-        return toResponse(buscarEntidadPorId(id));
+        return citaEntityMapper.toResponse(buscarEntidadPorId(id));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<CitaDTO.SlotResponse> obtenerSlots(Long profesionalId, LocalDate fecha) {
         validarDiaDentroDeVentana(fecha);
@@ -210,6 +220,7 @@ public class CitaService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<CitaDTO.Response> listarPorProfesionalYRangoFechas(
             Long profesionalId,
@@ -224,19 +235,21 @@ public class CitaService {
                         fechaInicio.atStartOfDay(),
                         fechaFin.atTime(23, 59, 59))
                 .stream()
-                .map(this::toResponse)
+                .map(citaEntityMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<CitaDTO.Response> listarPorPaciente(Long pacienteId) {
         asegurarPuedeVerPaciente(pacienteId);
         return citaRepository.findByPacienteId(pacienteId)
                 .stream()
-                .map(this::toResponse)
+                .map(citaEntityMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<CitaDTO.Response> listarMisCitasComoPaciente() {
         UserDetailsImpl u = SecurityUtils.getUsuarioActual();
@@ -246,33 +259,15 @@ public class CitaService {
         return listarPorPaciente(p.getId());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public byte[] exportarCsvProfesionalFecha(Long profesionalId, LocalDate fecha) {
         List<CitaDTO.Response> list = listarPorProfesionalYRangoFechas(
                 profesionalId, fecha, fecha);
-        StringBuilder sb = new StringBuilder("\uFEFF");
-        sb.append("id;fechaHora;pacienteDocumento;pacienteNombre;profesional;especialidad;estado;tipoAtencion\n");
-        for (CitaDTO.Response r : list) {
-            sb.append(r.getId()).append(';')
-                    .append(r.getFechaHora() != null ? r.getFechaHora().toString() : "").append(';')
-                    .append(csvCampo(r.getPacienteDocumento())).append(';')
-                    .append(csvCampo(r.getPacienteNombre())).append(';')
-                    .append(csvCampo(r.getProfesionalNombre())).append(';')
-                    .append(csvCampo(r.getEspecialidad())).append(';')
-                    .append(csvCampo(r.getEstado())).append(';')
-                    .append(csvCampo(r.getTipoAtencion())).append('\n');
-        }
-        return sb.toString().getBytes(StandardCharsets.UTF_8);
+        return citaListExporter.export(list);
     }
 
-    private static String csvCampo(String s) {
-        if (s == null) {
-            return "";
-        }
-        String t = s.replace("\"", "\"\"");
-        return "\"" + t + "\"";
-    }
-
+    @Override
     public Cita buscarEntidadPorId(Long id) {
         return citaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(
@@ -342,33 +337,5 @@ public class CitaService {
         if (r.getPacienteId() == null || !r.getPacienteId().equals(p.getId())) {
             throw new RuntimeException("Cita no encontrada con id: " + r.getId());
         }
-    }
-
-    private CitaDTO.Response toResponse(Cita c) {
-        CitaDTO.Response dto = new CitaDTO.Response();
-        dto.setId(c.getId());
-        dto.setFechaHora(c.getFechaHora());
-        dto.setEstado(c.getEstado().name());
-        dto.setTipoAtencion(c.getTipoAtencion().name());
-        dto.setMotivoConsulta(c.getMotivoConsulta());
-
-        if (c.getPaciente() != null) {
-            dto.setPacienteId(c.getPaciente().getId());
-            dto.setPacienteNombre(c.getPaciente().getNombres()
-                    + " " + c.getPaciente().getApellidos());
-            dto.setPacienteDocumento(c.getPaciente().getDocumento());
-        }
-
-        if (c.getProfesional() != null) {
-            dto.setProfesionalId(c.getProfesional().getId());
-            dto.setProfesionalNombre(c.getProfesional().getNombres());
-            dto.setEspecialidad(c.getProfesional().getEspecialidad().name());
-        }
-
-        if (c.getCreadoPor() != null) {
-            dto.setCreadoPor(c.getCreadoPor().getNombreUsuario());
-        }
-
-        return dto;
     }
 }
