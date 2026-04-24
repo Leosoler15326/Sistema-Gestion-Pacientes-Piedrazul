@@ -21,6 +21,9 @@
 
     <properties>
         <java.version>21</java.version>
+        <sonar.projectKey>gestion-medica-backend</sonar.projectKey>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.token>sqp_d47799ecd9aebd2530a42f693383974ca69ed46e</sonar.token>
     </properties>
 
     <dependencies>

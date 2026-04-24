@@ -1,0 +1,6 @@
+projectKey=gestion-medica-frontend
+serverUrl=http://localhost:9000
+serverVersion=26.3.0.120487
+dashboardUrl=http://localhost:9000/dashboard?id=gestion-medica-frontend
+ceTaskId=d94a1c24-d78e-43c5-bc25-a01f70b2e049
+ceTaskUrl=http://localhost:9000/api/ce/task?id=d94a1c24-d78e-43c5-bc25-a01f70b2e049
