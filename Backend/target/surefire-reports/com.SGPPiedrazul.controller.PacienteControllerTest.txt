@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.SGPPiedrazul.controller.PacienteControllerTest
 -------------------------------------------------------------------------------
-Tests run: 14, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 0.411 s <<< FAILURE! -- in com.SGPPiedrazul.controller.PacienteControllerTest
-com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorId_inexistente_retornaError -- Time elapsed: 0.010 s <<< FAILURE!
+Tests run: 14, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 0.402 s <<< FAILURE! -- in com.SGPPiedrazul.controller.PacienteControllerTest
+com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorId_inexistente_retornaError -- Time elapsed: 0.009 s <<< FAILURE!
 java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
 	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
@@ -10,10 +10,10 @@ java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
 	at com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorId_inexistente_retornaError(PacienteControllerTest.java:153)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 
-com.SGPPiedrazul.controller.PacienteControllerTest.actualizar_inexistente_retornaError -- Time elapsed: 0.005 s <<< FAILURE!
+com.SGPPiedrazul.controller.PacienteControllerTest.actualizar_inexistente_retornaError -- Time elapsed: 0.008 s <<< FAILURE!
 java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
 	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
@@ -21,10 +21,10 @@ java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
 	at com.SGPPiedrazul.controller.PacienteControllerTest.actualizar_inexistente_retornaError(PacienteControllerTest.java:224)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 
-com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorDocumento_inexistente_retornaError -- Time elapsed: 0.004 s <<< FAILURE!
+com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorDocumento_inexistente_retornaError -- Time elapsed: 0.006 s <<< FAILURE!
 java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
 	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
@@ -32,6 +32,6 @@ java.lang.AssertionError: Status expected:<500> but was:<404>
 	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
 	at com.SGPPiedrazul.controller.PacienteControllerTest.buscarPorDocumento_inexistente_retornaError(PacienteControllerTest.java:131)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 
