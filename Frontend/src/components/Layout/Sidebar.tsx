@@ -11,6 +11,7 @@ export default function Sidebar() {
 
   const esAdmin = normalizedRole === 'ADMINISTRADOR';
   const esAgendador = normalizedRole === 'AGENDADOR';
+  const esPaciente = normalizedRole === 'PACIENTE';
 
   const puedeVerHistoria =
     normalizedRole === 'ADMINISTRADOR' ||
@@ -19,6 +20,11 @@ export default function Sidebar() {
   const puedeVerPersonal =
     normalizedRole === 'ADMINISTRADOR' ||
     normalizedRole === 'AGENDADOR';
+
+  const puedeVerPacientesCrud =
+    normalizedRole === 'ADMINISTRADOR' ||
+    normalizedRole === 'AGENDADOR' ||
+    normalizedRole === 'MEDICO_TERAPISTA';
 
   const getLinkClass = (isActive: boolean) =>
     [
@@ -59,19 +65,44 @@ export default function Sidebar() {
           Dashboard
         </NavLink>
 
-        <NavLink
-          to={APP_ROUTES.PACIENTES}
-          className={({ isActive }) => getLinkClass(isActive)}
-        >
-          Pacientes
-        </NavLink>
+        {puedeVerPacientesCrud && (
+          <NavLink
+            to={APP_ROUTES.PACIENTES}
+            className={({ isActive }) => getLinkClass(isActive)}
+          >
+            Pacientes
+          </NavLink>
+        )}
 
-        <NavLink
-          to={APP_ROUTES.CITAS}
-          className={({ isActive }) => getLinkClass(isActive)}
-        >
-          Citas
-        </NavLink>
+        {esPaciente ? (
+          <>
+            <NavLink
+              to={APP_ROUTES.PACIENTE_COMPLETAR_PERFIL}
+              className={({ isActive }) => getLinkClass(isActive)}
+            >
+              Mi ficha
+            </NavLink>
+            <NavLink
+              to={APP_ROUTES.PACIENTE_AGENDAR}
+              className={({ isActive }) => getLinkClass(isActive)}
+            >
+              Agendar cita
+            </NavLink>
+            <NavLink
+              to={APP_ROUTES.PACIENTE_MIS_CITAS}
+              className={({ isActive }) => getLinkClass(isActive)}
+            >
+              Mis citas
+            </NavLink>
+          </>
+        ) : (
+          <NavLink
+            to={APP_ROUTES.CITAS}
+            className={({ isActive }) => getLinkClass(isActive)}
+          >
+            Citas
+          </NavLink>
+        )}
 
         {puedeVerHistoria && (
           <NavLink
@@ -91,13 +122,30 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {esAdmin && (
+        {(esAdmin || esAgendador) && (
           <NavLink
-            to={APP_ROUTES.USUARIOS}
+            to={APP_ROUTES.CITAS_AGENDAR_CONTACTO}
             className={({ isActive }) => getLinkClass(isActive)}
           >
-            Usuarios
+            Agendar contacto
           </NavLink>
+        )}
+
+        {esAdmin && (
+          <>
+            <NavLink
+              to={APP_ROUTES.CONFIG_AGENDAMIENTO}
+              className={({ isActive }) => getLinkClass(isActive)}
+            >
+              Config. agendamiento
+            </NavLink>
+            <NavLink
+              to={APP_ROUTES.USUARIOS}
+              className={({ isActive }) => getLinkClass(isActive)}
+            >
+              Usuarios
+            </NavLink>
+          </>
         )}
       </nav>
 

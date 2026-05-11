@@ -1,6 +1,7 @@
 import api from '../../../services/api';
 
 import type {
+  AgendarContactoRequestDto,
   CancelarCitaRequestDto,
   CitaDto,
   CreateCitaRequestDto,
@@ -22,8 +23,6 @@ export const citasService = {
 
     const data = response.data;
 
-    console.log('Respuesta /citas/slots:', data);
-
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.data)) return data.data;
     if (Array.isArray(data?.content)) return data.content;
@@ -33,6 +32,11 @@ export const citasService = {
 
   async agendar(payload: CreateCitaRequestDto): Promise<CitaDto> {
     const { data } = await api.post<CitaDto>(CITAS_BASE, payload);
+    return data;
+  },
+
+  async agendarDesdeContacto(payload: AgendarContactoRequestDto): Promise<CitaDto> {
+    const { data } = await api.post<CitaDto>(`${CITAS_BASE}/agendar-contacto`, payload);
     return data;
   },
 
@@ -54,7 +58,7 @@ export const citasService = {
     await api.patch(`${CITAS_BASE}/${id}/cancelar`, payload);
   },
 
-    async listarPorProfesional(
+  async listarPorProfesional(
     params: ListarCitasProfesionalParamsDto
   ): Promise<CitaDto[]> {
     const { data } = await api.get<CitaDto[]>(`${CITAS_BASE}/profesional`, {
@@ -75,8 +79,24 @@ export const citasService = {
     return data;
   },
 
+  async listarMisCitasPaciente(): Promise<CitaDto[]> {
+    const { data } = await api.get<CitaDto[]>(`${CITAS_BASE}/consulta/mis-citas`);
+    return data;
+  },
+
   async buscarPorId(id: number): Promise<CitaDto> {
     const { data } = await api.get<CitaDto>(`${CITAS_BASE}/${id}`);
     return data;
+  },
+
+  async exportarCsvProfesionalFecha(
+    profesionalId: number,
+    fecha: string
+  ): Promise<Blob> {
+    const response = await api.get(`${CITAS_BASE}/exportar-csv`, {
+      params: { profesionalId, fecha },
+      responseType: 'blob',
+    });
+    return response.data as Blob;
   },
 };

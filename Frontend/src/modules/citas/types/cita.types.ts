@@ -9,8 +9,10 @@ export interface CitaDto {
   id: number;
   pacienteId: number;
   pacienteNombre: string;
+  pacienteDocumento?: string;
   profesionalId: number;
   profesionalNombre: string;
+  especialidad?: string;
   fechaHora: string;
   estado: EstadoCita;
   tipoAtencion: string;
@@ -26,11 +28,30 @@ export interface CreateCitaRequestDto {
 }
 
 export interface ReagendarCitaRequestDto {
-  fechaHora: string;
+  nuevaFechaHora: string;
+  motivo?: string;
 }
 
 export interface CancelarCitaRequestDto {
   motivo?: string;
+}
+
+export interface PacienteContactoDto {
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  genero: 'HOMBRE' | 'MUJER' | 'OTRO';
+  fechaNacimiento?: string;
+  email?: string;
+}
+
+export interface AgendarContactoRequestDto {
+  paciente: PacienteContactoDto;
+  profesionalId: number;
+  fechaHora: string;
+  tipoAtencion: string;
+  motivoConsulta?: string;
 }
 
 export interface SlotDisponibleDto {

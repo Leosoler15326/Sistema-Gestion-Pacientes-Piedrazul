@@ -1,9 +1,13 @@
 package com.SGPPiedrazul.service;
  
 import com.SGPPiedrazul.dto.UsuarioDTO;
+import com.SGPPiedrazul.model.Profesional;
 import com.SGPPiedrazul.model.Usuario;
+import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.model.enums.Estado;
+import com.SGPPiedrazul.model.enums.RolUsuario;
 import com.SGPPiedrazul.model.enums.TipoEvento;
+import com.SGPPiedrazul.repository.ProfesionalRepository;
 import com.SGPPiedrazul.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,17 +24,20 @@ public class UsuarioService {
     private final AuditoriaService auditoriaService;
     private final PacienteService pacienteService;
     private final ProfesionalService profesionalService;
+    private final ProfesionalRepository profesionalRepository;
  
     public UsuarioService(UsuarioRepository usuarioRepository,
                           PasswordEncoder passwordEncoder,
                           AuditoriaService auditoriaService,
                           PacienteService pacienteService,
-                          ProfesionalService profesionalService) {
+                          ProfesionalService profesionalService,
+                          ProfesionalRepository profesionalRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditoriaService = auditoriaService;
         this.pacienteService = pacienteService;
         this.profesionalService = profesionalService;
+        this.profesionalRepository = profesionalRepository;
     }
 
     @Transactional
@@ -78,24 +85,45 @@ public class UsuarioService {
 
     @Transactional
     public void desactivar(Long id, String responsable) {
+        if (id.equals(SecurityUtils.getIdUsuarioActual())) {
+            throw new IllegalArgumentException("No puede desactivar su propio usuario.");
+        }
         Usuario usuario = buscarEntidadPorId(id);
+        if (usuario.getRol() == RolUsuario.ADMINISTRADOR) {
+            throw new IllegalArgumentException("No se puede desactivar un usuario administrador.");
+        }
+        if (usuario.getEstado() == Estado.INACTIVO) {
+            return;
+        }
         usuario.setEstado(Estado.INACTIVO);
         usuarioRepository.save(usuario);
-        /*
-        if(usuario.getRol() == com.SGPPiedrazul.model.enums.RolUsuario.PACIENTE){
-            pacienteService.buscarEntidadPorId(id).setEstado();
 
-            auditoriaService.registrar(TipoEvento.USUARIO_DESACTIVADO, 
-                "Paciente desactivado: " + usuario.getNombreUsuario(), responsable);//falta implementar TipoEvento de pacientes.
-        }else{
-            profesionalService.cambiarEstado(id,Estado.INACTIVO,responsable);//asi deberia implementarse en pacientes
+        Profesional vinculado = profesionalRepository.findByUsuarioId(id);
+        if (vinculado != null) {
+            profesionalService.cambiarEstado(vinculado.getId(), Estado.INACTIVO, responsable);
+        }
 
-            auditoriaService.registrar(TipoEvento.PROFESIONAL_MODIFICADO,
-                "Profesional desactivado: " + usuario.getNombreUsuario(), responsable);
-        }*/
- 
         auditoriaService.registrar(TipoEvento.USUARIO_DESACTIVADO,
                 "Usuario desactivado: " + usuario.getNombreUsuario(), responsable);
+    }
+
+    @Transactional
+    public void reactivar(Long id, String responsable) {
+        Usuario usuario = buscarEntidadPorId(id);
+        if (usuario.getEstado() == Estado.ACTIVO) {
+            return;
+        }
+        usuario.setEstado(Estado.ACTIVO);
+        usuarioRepository.save(usuario);
+
+        Profesional vinculado = profesionalRepository.findByUsuarioId(id);
+        if (vinculado != null) {
+            profesionalService.cambiarEstado(vinculado.getId(), Estado.ACTIVO, responsable);
+        }
+
+        // USUARIO_MODIFICADO: compatible con CHECK antiguos en BD que no incluyen USUARIO_REACTIVADO
+        auditoriaService.registrar(TipoEvento.USUARIO_MODIFICADO,
+                "Usuario reactivado: " + usuario.getNombreUsuario(), responsable);
     }
  
     @Transactional

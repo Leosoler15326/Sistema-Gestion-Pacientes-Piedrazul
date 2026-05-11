@@ -34,14 +34,14 @@ public class ProfesionalController {
 
     // ─── Listar activos ───
     @GetMapping("/activos")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<List<ProfesionalResponseDTO>> listarActivos() {
         return ResponseEntity.ok(profesionalService.listarActivos());
     }
 
     // ─── Listar por especialidad ───
     @GetMapping("/especialidad/{especialidad}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<List<ProfesionalResponseDTO>> listarPorEspecialidad(
             @PathVariable Especialidad especialidad) {
         return ResponseEntity.ok(profesionalService.listarPorEspecialidad(especialidad));
@@ -49,7 +49,7 @@ public class ProfesionalController {
 
     // ─── Buscar por ID ───
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<ProfesionalResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(profesionalService.buscarPorIdDTO(id));
     }

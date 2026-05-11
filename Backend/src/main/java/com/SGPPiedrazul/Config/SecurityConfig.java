@@ -60,11 +60,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PATCH, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")
 
-                // Citas — ADMINISTRADOR, AGENDADOR, MEDICO_TERAPISTA pueden crear/reagendar/cancelar; PACIENTE solo crear
-                .requestMatchers("/api/citas/**").hasAnyRole("ADMINISTRADOR", "AGENDADOR", "MEDICO_TERAPISTA")
+                // Citas — autorización fina con @PreAuthorize en CitaController (incluye PACIENTE en slots/agendar)
+                .requestMatchers("/api/citas/**").authenticated()
 
-                // Historias clínicas — solo MEDICO_TERAPISTA
-                .requestMatchers("/api/historias/**").hasAnyRole("MEDICO_TERAPISTA")
+                // Historias clínicas — alineado con HistoriaClinicaController
+                .requestMatchers("/api/historias/**")
+                    .hasAnyRole("ADMINISTRADOR", "MEDICO_TERAPISTA")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()

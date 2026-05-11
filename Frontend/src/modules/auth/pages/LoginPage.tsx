@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import { authService } from '../services/auth.service';
 import { authStore } from '../store/auth.store';
@@ -88,6 +88,16 @@ export default function LoginPage() {
               )}
 
               <LoginForm onSubmit={handleLogin} loading={loading} />
+
+              <p className="mt-6 text-center text-sm text-slate-600">
+                ¿Eres paciente y aún no tienes cuenta?{' '}
+                <Link
+                  to={APP_ROUTES.REGISTRO_PACIENTE}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  Regístrate aquí
+                </Link>
+              </p>
 
               <div className="mt-8 border-t border-slate-200 pt-5 text-center text-xs text-slate-400">
                 Clínica Piedra Azul · Plataforma interna

@@ -1,6 +1,9 @@
 package com.SGPPiedrazul.model;
 
+import com.SGPPiedrazul.model.enums.GeneroPaciente;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,17 @@ public class Paciente {
 
     @Column(name = "telefono", length = 20)
     private String telefono;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "genero", length = 20)
+    private GeneroPaciente genero;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
     @Column(name = "creado_en", nullable = false, updatable = false)
     private LocalDateTime creadoEn;
@@ -58,9 +72,16 @@ public class Paciente {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
+    public GeneroPaciente getGenero() { return genero; }
+    public void setGenero(GeneroPaciente genero) { this.genero = genero; }
+
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+
     public LocalDateTime getCreadoEn() { return creadoEn; }
 
     public List<Cita> getCitas() { return citas; }
-
-    public void setEstado() {}//falta implementar estado para pacientes.
 }

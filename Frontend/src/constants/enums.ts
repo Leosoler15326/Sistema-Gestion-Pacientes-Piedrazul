@@ -4,6 +4,8 @@ export const TIPO_ATENCION_OPTIONS = [
   'URGENCIA',
 ] as const;
 
+export const GENERO_PACIENTE_OPTIONS = ['HOMBRE', 'MUJER', 'OTRO'] as const;
+
 export const ROL_USUARIO_OPTIONS = [
   'ADMINISTRADOR',
   'MEDICO_TERAPISTA',

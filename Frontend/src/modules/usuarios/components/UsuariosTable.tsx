@@ -4,10 +4,22 @@ import { APP_ROUTES } from '../../../app/router/routes';
 
 interface UsuariosTableProps {
   items: UsuarioDto[];
+  currentUserId?: number;
   onDesactivar?: (id: number) => void;
+  onReactivar?: (id: number) => void;
 }
 
-export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProps) {
+function estadoAcceso(item: UsuarioDto): string {
+  const raw = item.estado ?? (item.activo ? 'ACTIVO' : 'INACTIVO');
+  return String(raw).toUpperCase();
+}
+
+export default function UsuariosTable({
+  items,
+  currentUserId,
+  onDesactivar,
+  onReactivar,
+}: UsuariosTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl bg-white shadow">
       <table className="min-w-full border-collapse">
@@ -29,7 +41,7 @@ export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProp
               <td className="px-4 py-3">{item.email || 'N/A'}</td>
               <td className="px-4 py-3">{item.rol || 'N/A'}</td>
               <td className="px-4 py-3">
-                {item.estado ?? (item.activo ? 'ACTIVO' : 'INACTIVO')}
+                {estadoAcceso(item)}
               </td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-2">
@@ -40,16 +52,36 @@ export default function UsuariosTable({ items, onDesactivar }: UsuariosTableProp
                     Ver
                   </Link>
 
-                  {onDesactivar && (
-                    item.rol === 'ADMINISTRADOR' ? (
+                  {item.rol === 'ADMINISTRADOR' ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="rounded-lg bg-gray-300 px-3 py-1 text-sm text-gray-600"
+                      title="Los administradores no se desactivan desde esta pantalla"
+                    >
+                      Sin cambio de acceso
+                    </button>
+                  ) : item.id === currentUserId ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="rounded-lg bg-gray-300 px-3 py-1 text-sm text-gray-600"
+                      title="No puede desactivar su propio usuario"
+                    >
+                      Tu usuario
+                    </button>
+                  ) : estadoAcceso(item) === 'INACTIVO' ? (
+                    onReactivar && (
                       <button
                         type="button"
-                        disabled
-                        className="rounded-lg bg-gray-300 px-3 py-1 text-sm text-white"
+                        onClick={() => onReactivar(item.id)}
+                        className="rounded-lg bg-emerald-600 px-3 py-1 text-sm text-white"
                       >
-                        No desactivable
+                        Reactivar acceso
                       </button>
-                    ) : (
+                    )
+                  ) : (
+                    onDesactivar && (
                       <button
                         type="button"
                         onClick={() => onDesactivar(item.id)}

@@ -64,6 +64,14 @@ public class DisponibilidadService {
         );
     }
 
+    /** Libre en BD y alineado con franjas + intervalo del profesional. */
+    public boolean esSlotValidoParaAgendar(Profesional profesional, LocalDateTime fechaHora) {
+        if (!validarDisponibilidad(profesional, fechaHora)) {
+            return false;
+        }
+        return calcularSlotsDisponibles(profesional, fechaHora.toLocalDate()).contains(fechaHora);
+    }
+
     // Genera los slots de tiempo dentro de una franja horaria
     private List<LocalDateTime> generarSlots(FranjaHoraria franja, int intervaloMinutos, LocalDate fecha) {
         List<LocalDateTime> slots = new ArrayList<>();

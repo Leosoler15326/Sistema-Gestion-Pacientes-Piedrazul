@@ -141,13 +141,13 @@ class ProfesionalControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar por ID inexistente devuelve 500")
+    @DisplayName("Buscar por ID inexistente devuelve 404")
     void buscarPorId_inexistente_retornaError() throws Exception {
         when(profesionalService.buscarPorIdDTO(99L))
                 .thenThrow(new RuntimeException("Profesional no encontrado con id: 99"));
 
         mockMvc.perform(get("/api/profesionales/99"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -166,7 +166,7 @@ class ProfesionalControllerTest {
     }
 
     @Test
-    @DisplayName("Mi perfil sin profesional vinculado devuelve 500")
+    @DisplayName("Mi perfil sin profesional vinculado devuelve 404")
     void miPerfil_sinVinculo_retornaError() throws Exception {
         try (MockedStatic<SecurityUtils> su = mockStatic(SecurityUtils.class)) {
             su.when(SecurityUtils::getIdUsuarioActual).thenReturn(99L);
@@ -175,7 +175,7 @@ class ProfesionalControllerTest {
                             "No hay profesional vinculado al usuario con id: 99"));
 
             mockMvc.perform(get("/api/profesionales/mi-perfil"))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isNotFound());
         }
     }
 

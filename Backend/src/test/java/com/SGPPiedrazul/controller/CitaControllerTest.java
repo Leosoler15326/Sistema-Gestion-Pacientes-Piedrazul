@@ -138,12 +138,12 @@ class CitaControllerTest {
                     .thenReturn(Optional.of(new Usuario()));
             when(citaService.agendar(any(), any()))
                     .thenThrow(new IllegalStateException(
-                            "El horario seleccionado ya no está disponible."));
+                            "El horario no está disponible o no coincide con las franjas del profesional."));
 
             mockMvc.perform(post("/api/citas")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(agendarRequest)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isConflict());
         }
     }
 
@@ -181,12 +181,12 @@ class CitaControllerTest {
                     .thenReturn(Optional.of(new Usuario()));
             when(citaService.reagendar(eq(1L), any(), any()))
                     .thenThrow(new IllegalStateException(
-                            "El nuevo horario no está disponible."));
+                            "El nuevo horario no está disponible o no coincide con las franjas del profesional."));
 
             mockMvc.perform(put("/api/citas/1/reagendar")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
-                    .andExpect(status().isInternalServerError());
+                    .andExpect(status().isConflict());
         }
     }
 
@@ -217,7 +217,7 @@ class CitaControllerTest {
 
         mockMvc.perform(get("/api/citas/profesional")
                         .param("profesionalId", "1")
-                        .param("fecha", LocalDate.now().toString()))
+                        .param("fechaInicio", LocalDate.now().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].profesionalNombre").value("Dr. García"));
@@ -256,12 +256,12 @@ class CitaControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar cita por ID inexistente devuelve 500")
+    @DisplayName("Buscar cita por ID inexistente devuelve 404")
     void buscarPorId_inexistente_retornaError() throws Exception {
         when(citaService.buscarPorId(99L))
                 .thenThrow(new RuntimeException("Cita no encontrada con id: 99"));
 
         mockMvc.perform(get("/api/citas/99"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 }

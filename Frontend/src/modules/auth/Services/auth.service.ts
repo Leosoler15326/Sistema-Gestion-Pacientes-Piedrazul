@@ -13,8 +13,9 @@ export const authService = {
     return data;
   },
 
-  async register(payload: RegisterRequestDto): Promise<void> {
-    await api.post(`${AUTH_BASE}/registro`, payload);
+  async register(payload: RegisterRequestDto): Promise<LoginResponseDto> {
+    const { data } = await api.post<LoginResponseDto>(`${AUTH_BASE}/registro`, payload);
+    return data;
   },
 
   async refreshToken(refreshToken: string): Promise<LoginResponseDto> {

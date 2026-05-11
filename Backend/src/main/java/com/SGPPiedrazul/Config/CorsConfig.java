@@ -32,7 +32,8 @@ public class CorsConfig {
         config.setAllowedHeaders(List.of(
             "Authorization",
             "Content-Type",
-            "Accept"
+            "Accept",
+            "X-Usuario-Responsable"
         ));
 
         config.setAllowCredentials(true);

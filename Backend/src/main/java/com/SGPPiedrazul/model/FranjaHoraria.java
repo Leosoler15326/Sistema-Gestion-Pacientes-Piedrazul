@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -39,6 +40,8 @@ public class FranjaHoraria {
     public LocalTime getHoraFin() { return horaFin; }
     public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
 
+    @JsonIgnore
     public Profesional getProfesional() { return profesional; }
+
     public void setProfesional(Profesional profesional) { this.profesional = profesional; }
 }

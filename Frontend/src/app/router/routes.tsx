@@ -1,11 +1,19 @@
 export const APP_ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  REGISTRO_PACIENTE: '/registro-paciente',
 
   CITAS: '/citas',
   CITAS_NUEVA: '/citas/nueva',
+  CITAS_AGENDAR_CONTACTO: '/citas/agendar-contacto',
   CITAS_DETALLE: '/citas/:id',
   CITAS_REAGENDAR: '/citas/:id/reagendar',
+
+  PACIENTE_COMPLETAR_PERFIL: '/paciente/mi-ficha',
+  PACIENTE_AGENDAR: '/paciente/agendar-cita',
+  PACIENTE_MIS_CITAS: '/paciente/mis-citas',
+
+  CONFIG_AGENDAMIENTO: '/configuracion/agendamiento',
 
   HISTORIA_CLINICA: '/historia-clinica',
   HISTORIA_CLINICA_NUEVA: '/historia-clinica/nueva',
