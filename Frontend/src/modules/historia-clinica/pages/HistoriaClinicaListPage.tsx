@@ -34,13 +34,6 @@ export default function HistoriaClinicaListPage() {
     data: pacientesEncontrados,
     isLoading: pacientesLoading,
   } = usePacientesPorNombre(nombrePaciente);
-
-  useEffect(() => {
-  if (!pacienteIdFromQuery) return;
-  const parsedId = Number(pacienteIdFromQuery);
-  setPacienteId((prev) => (prev !== parsedId ? parsedId : prev));
-  }, [pacienteIdFromQuery]);
-
   const pacienteSeleccionado = useMemo(() => {
     return pacientesEncontrados?.find((p) => p.id === pacienteId);
   }, [pacientesEncontrados, pacienteId]);
