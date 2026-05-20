@@ -126,7 +126,7 @@ class CitaIntegrationTest {
     void limpiarSecurityContext() {
         SecurityContextHolder.clearContext();
     }
-
+    /*
     @Transactional
     @AfterAll
     @org.springframework.transaction.annotation.Transactional
@@ -139,7 +139,7 @@ class CitaIntegrationTest {
         }
         usuarioRepository.findByNombreUsuario(ADMIN_USERNAME).ifPresent(usuarioRepository::delete);
     }
-
+    */
     // ─── Tests ───────────────────────────────────────────────────────────────
 
     @Test
