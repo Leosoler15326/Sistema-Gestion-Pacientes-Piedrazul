@@ -25,6 +25,7 @@ type ProfesionalPerfilDto = {
   id?: number;
   nombres?: string;
   nombre?: string;
+  especialidad?: string;
 };
 
 const hoy = () => new Date().toISOString().split('T')[0];
