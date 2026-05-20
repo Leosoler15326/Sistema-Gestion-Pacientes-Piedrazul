@@ -1,0 +1,80 @@
+ Cómo testear todo lo implementado
+
+  1. Pruebas unitarias + integración (lo más importante)
+
+  # Entrar al backend
+  cd Backend
+
+  # Correr TODOS los tests (~81 en total)
+  mvn clean verify
+
+  Verás en la consola algo así al final:
+  Tests run: 81, Failures: 0, Errors: 0, Skipped: 0
+  BUILD SUCCESS
+
+  Si quieres correr solo los tests de integración nuevos:
+  mvn test -Dtest="AuthIntegrationTest,PacienteIntegrationTest,CitaIntegrationTest"
+
+  ---
+  2. CI/CD (GitHub Actions)
+
+  1. Haz push de la rama tercer-corte-branch a GitHub
+  2. Ve a tu repo en GitHub → pestaña Actions
+  3. Verás el pipeline corriendo automáticamente con 3 jobs: backend, frontend, notify
+  4. Si todo está verde ✅ el CI funciona
+
+  ---
+  3. Docker (build local)
+
+  # Backend
+  cd Backend
+  docker build -t sgp-backend .
+
+  # Frontend
+  cd Frontend
+  docker build -t sgp-frontend .
+
+  # Verificar que las imágenes se crearon
+  docker images | grep sgp
+
+  ---
+  4. Despliegue en Render.com
+
+  1. Ir a render.com → crear cuenta con GitHub
+  2. New → Blueprint
+  3. Conectar el repositorio y seleccionar render.yaml
+  4. Clic en Apply → Render crea la BD + backend + frontend automáticamente
+  5. En ~5 min tienes URLs públicas
+
+  ---
+  5. OWASP ZAP (seguridad)
+
+  # 1. Levantar la app primero
+  docker-compose up -d        # PostgreSQL
+  cd Backend && mvn spring-boot:run   # backend en :8080
+  cd Frontend && npm run dev          # frontend en :5173
+
+  # 2. Ejecutar ZAP con Docker (en otra terminal)
+  docker run --network=host ghcr.io/zaproxy/zaproxy:stable \
+    zap-baseline.py -t http://localhost:8080 -r zap_report.html
+
+  # 3. Abrir zap_report.html en el navegador → capturar pantallas para el informe
+
+  ---
+  Resumen rápido
+
+  ┌───────────────────────────────┬──────────────────────────────┬─────────┐
+  │          Qué testear          │       Comando / Acción       │ Tiempo  │
+  ├───────────────────────────────┼──────────────────────────────┼─────────┤
+  │ Tests unitarios + integración │ mvn clean verify en Backend/ │ ~2 min  │
+  ├───────────────────────────────┼──────────────────────────────┼─────────┤
+  │ CI/CD                         │ Push a GitHub → ver Actions  │ ~3 min  │
+  ├───────────────────────────────┼──────────────────────────────┼─────────┤
+  │ Docker builds                 │ docker build en cada carpeta │ ~5 min  │
+  ├───────────────────────────────┼──────────────────────────────┼─────────┤
+  │ Render deploy                 │ render.com → Blueprint       │ ~5 min  │
+  ├───────────────────────────────┼──────────────────────────────┼─────────┤
+  │ OWASP ZAP                     │ Docker + app corriendo       │ ~15 min │
+  └───────────────────────────────┴──────────────────────────────┴─────────┘
+
+✻ Baked for 1m 41s
