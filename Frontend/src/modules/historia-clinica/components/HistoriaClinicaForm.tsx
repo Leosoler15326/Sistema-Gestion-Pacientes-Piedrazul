@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.types';
 
 interface HistoriaClinicaFormProps {
@@ -23,16 +23,6 @@ export default function HistoriaClinicaForm({
     citaId: initialCitaId ?? 0,
     descripcion: '',
   });
-
-  useEffect(() => {
-    const nextCitaId = initialCitaId ?? 0;
-    const nextInput = initialCitaId ? String(initialCitaId) : '';
-    setCitaIdInput((prev) => (prev !== nextInput ? nextInput : prev));
-    setForm((prev) => (prev.citaId !== nextCitaId ? { ...prev, citaId: nextCitaId } : prev));
-    if (initialCitaId) {
-      setMessage('');
-    }
-  }, [initialCitaId]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

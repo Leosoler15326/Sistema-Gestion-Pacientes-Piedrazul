@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
@@ -23,7 +23,9 @@ export default function HistoriaClinicaListPage() {
   const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
-  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
+  const [pacienteId, setPacienteId] = useState<number | undefined>(
+    pacienteIdFromQuery ? Number(pacienteIdFromQuery) : undefined
+  );
   const [profesionalId, setProfesionalId] = useState<number | undefined>(undefined);
   const [message, setMessage] = useState('');
 
@@ -32,13 +34,6 @@ export default function HistoriaClinicaListPage() {
     data: pacientesEncontrados,
     isLoading: pacientesLoading,
   } = usePacientesPorNombre(nombrePaciente);
-
-  useEffect(() => {
-    if (!pacienteIdFromQuery) return;
-    const parsedId = Number(pacienteIdFromQuery);
-    setSearchMode((prev) => (prev !== 'paciente' ? 'paciente' : prev));
-    setPacienteId((prev) => (prev !== parsedId ? parsedId : prev));
-  }, [pacienteIdFromQuery]);
 
   const pacienteSeleccionado = useMemo(() => {
     return pacientesEncontrados?.find((p) => p.id === pacienteId);

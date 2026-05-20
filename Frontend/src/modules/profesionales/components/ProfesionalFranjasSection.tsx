@@ -70,6 +70,7 @@ export default function ProfesionalFranjasSection({
   useEffect(() => {
     if (data && Array.isArray(data) && data !== prevDataRef.current) {
       prevDataRef.current = data;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilas(data.length ? desdeApi(data) : []);
     }
   }, [data]);
