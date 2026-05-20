@@ -11,6 +11,7 @@ import {
   useHistoriasPorProfesional,
 } from '../hooks/useHistoriaClinica';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
+import type { ProfesionalDto } from '../../profesionales/types/profesional.types';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 
 type SearchMode = 'paciente' | 'profesional';
@@ -33,10 +34,10 @@ export default function HistoriaClinicaListPage() {
   } = usePacientesPorNombre(nombrePaciente);
 
   useEffect(() => {
-    if (pacienteIdFromQuery) {
-      setSearchMode('paciente');
-      setPacienteId(Number(pacienteIdFromQuery));
-    }
+    if (!pacienteIdFromQuery) return;
+    const parsedId = Number(pacienteIdFromQuery);
+    setSearchMode((prev) => (prev !== 'paciente' ? 'paciente' : prev));
+    setPacienteId((prev) => (prev !== parsedId ? parsedId : prev));
   }, [pacienteIdFromQuery]);
 
   const pacienteSeleccionado = useMemo(() => {
@@ -194,12 +195,12 @@ export default function HistoriaClinicaListPage() {
             >
               <option value="">Selecciona un profesional</option>
               {Array.isArray(profesionales) &&
-                profesionales.map((p: any) => (
+                profesionales.map((p: ProfesionalDto) => (
                   <option
-                    key={p.profesionalId ?? p.id}
-                    value={p.profesionalId ?? p.id}
+                    key={p.profesionalId}
+                    value={p.profesionalId}
                   >
-                    {(p.nombres ?? p.nombre ?? 'Profesional')}
+                    {p.nombres}
                     {p.especialidad ? ` - ${p.especialidad}` : ''}
                   </option>
                 ))}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { authStore } from '../store/auth.store';
 import type { UserRole } from '../types/auth.types';
 
@@ -9,10 +9,13 @@ export const useAuth = () => {
 
   const isAuthenticated = Boolean(accessToken);
 
-  const hasAnyRole = (roles: UserRole[]) => {
-    if (!user) return false;
-    return roles.includes(user.rol);
-  };
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]) => {
+      if (!user) return false;
+      return roles.includes(user.rol);
+    },
+    [user]
+  );
 
   return useMemo(
     () => ({
@@ -22,6 +25,6 @@ export const useAuth = () => {
       isAuthenticated,
       hasAnyRole,
     }),
-    [accessToken, refreshToken, user, isAuthenticated]
+    [accessToken, refreshToken, user, isAuthenticated, hasAnyRole]
   );
 };

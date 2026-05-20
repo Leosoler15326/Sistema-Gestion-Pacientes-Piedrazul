@@ -9,12 +9,15 @@ import type { CreateHistoriaClinicaRequestDto } from '../types/historiaClinica.t
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 import { useCitasPorPaciente } from '../../citas/hooks/UseCitas';
 
-function getErrorMessage(error: any) {
-  const status = error?.response?.status;
+type ApiError = { response?: { status?: number; data?: { message?: string; error?: string; detalle?: string } } };
+
+function getErrorMessage(error: unknown) {
+  const e = error as ApiError;
+  const status = e?.response?.status;
   const backendMessage =
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    error?.response?.data?.detalle;
+    e?.response?.data?.message ||
+    e?.response?.data?.error ||
+    e?.response?.data?.detalle;
 
   if (status === 403) {
     return 'No tienes permisos para registrar la historia clínica.';

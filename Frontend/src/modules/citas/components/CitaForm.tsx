@@ -142,7 +142,7 @@ export default function CitaForm({
     }
   }, [initialPacienteId, initialPacienteNombre]);
    const profesionalesFiltrados = Array.isArray(profesionales)
-    ? profesionales.filter((p: any) =>
+    ? profesionales.filter((p: ProfesionalPerfilDto) =>
         especialidadSeleccionada ? p.especialidad === especialidadSeleccionada : true
       )
     : [];
@@ -470,7 +470,7 @@ export default function CitaForm({
             >
               <option value="">Selecciona un profesional</option>
 
-              {profesionalesFiltrados.map((p: any) => {
+              {profesionalesFiltrados.map((p: ProfesionalPerfilDto) => {
                 const optionValue = p.profesionalId ?? p.id;
                 const optionLabel = `${p.nombres ?? p.nombre ?? 'Profesional'}${
                   p.especialidad ? ` - ${p.especialidad}` : ''

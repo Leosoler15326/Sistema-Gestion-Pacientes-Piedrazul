@@ -25,19 +25,12 @@ export default function HistoriaClinicaForm({
   });
 
   useEffect(() => {
+    const nextCitaId = initialCitaId ?? 0;
+    const nextInput = initialCitaId ? String(initialCitaId) : '';
+    setCitaIdInput((prev) => (prev !== nextInput ? nextInput : prev));
+    setForm((prev) => (prev.citaId !== nextCitaId ? { ...prev, citaId: nextCitaId } : prev));
     if (initialCitaId) {
-      setCitaIdInput(String(initialCitaId));
-      setForm((prev) => ({
-        ...prev,
-        citaId: initialCitaId,
-      }));
       setMessage('');
-    } else {
-      setCitaIdInput('');
-      setForm((prev) => ({
-        ...prev,
-        citaId: 0,
-      }));
     }
   }, [initialCitaId]);
 

@@ -479,7 +479,7 @@ export default function CitasListPage() {
                 >
                   <option value="">Selecciona un profesional</option>
                   {Array.isArray(profesionales) &&
-                    profesionales.map((p: any) => (
+                    profesionales.map((p: ProfesionalPerfilDto) => (
                       <option
                         key={p.profesionalId ?? p.id}
                         value={p.profesionalId ?? p.id}
