@@ -127,6 +127,7 @@ class CitaIntegrationTest {
         SecurityContextHolder.clearContext();
     }
 
+    @Transactional
     @AfterAll
     @org.springframework.transaction.annotation.Transactional
     void tearDown() {
