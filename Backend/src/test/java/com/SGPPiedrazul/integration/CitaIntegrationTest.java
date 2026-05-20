@@ -126,20 +126,6 @@ class CitaIntegrationTest {
     void limpiarSecurityContext() {
         SecurityContextHolder.clearContext();
     }
-    /*
-    @Transactional
-    @AfterAll
-    @org.springframework.transaction.annotation.Transactional
-    void tearDown() {
-        citaRepository.findByPacienteId(pacienteId).forEach(citaRepository::delete);
-        pacienteRepository.findByDocumento(DOC_PACIENTE).ifPresent(pacienteRepository::delete);
-        if (profesionalId != null) {
-            franjaHorariaRepository.deleteByProfesionalId(profesionalId);
-            profesionalRepository.deleteById(profesionalId);
-        }
-        usuarioRepository.findByNombreUsuario(ADMIN_USERNAME).ifPresent(usuarioRepository::delete);
-    }
-    */
     // ─── Tests ───────────────────────────────────────────────────────────────
 
     @Test
