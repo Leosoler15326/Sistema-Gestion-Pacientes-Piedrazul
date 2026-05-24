@@ -7,6 +7,8 @@ import InlineMessage from '../../../components/common/InlineMessage';
 
 function normalizarNombre(valor: string): string {
   return valor
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase()

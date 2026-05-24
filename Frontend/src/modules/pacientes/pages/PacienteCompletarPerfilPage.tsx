@@ -10,6 +10,8 @@ import type { CompletarPerfilPacienteDto, GeneroPaciente } from '../types/pacien
 
 function normalizarNombre(valor: string): string {
   return valor
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase()
@@ -23,6 +25,7 @@ export default function PacienteCompletarPerfilPage() {
   const completarMutation = useCompletarMiPerfil();
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [editando, setEditando] = useState(false);
 
   const [form, setForm] = useState<CompletarPerfilPacienteDto>({
     documento: '',
@@ -59,6 +62,7 @@ export default function PacienteCompletarPerfilPage() {
         ...(form.email?.trim() ? { email: form.email.trim() } : {}),
       };
       await completarMutation.mutateAsync(payload);
+      setEditando(false);
     } catch {
       setErrorMessage('No fue posible guardar tu ficha. Verifica los datos e intenta de nuevo.');
     }
@@ -79,35 +83,51 @@ export default function PacienteCompletarPerfilPage() {
     );
   }
 
-  if (perfil) {
+  if (perfil && !editando) {
     return (
       <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
         <PageHeader
           title="Mi ficha"
-          subtitle="Tu perfil de paciente ya está registrado."
+          subtitle="Tu información como paciente registrada en el sistema."
         />
-        <div className="max-w-xl rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-slate-700">
-            <strong>{perfil.nombreCompleto}</strong>
-          </p>
-          <p className="mt-1 text-sm text-slate-500">Cédula: {perfil.documento}</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Celular: {perfil.telefono}
-            {perfil.email ? ` · Correo: ${perfil.email}` : ''}
-          </p>
+        <div className="max-w-xl rounded-2xl bg-white p-6 shadow-sm space-y-2">
+          <p className="text-slate-800 font-semibold text-base">{perfil.nombreCompleto}</p>
+          <p className="text-sm text-slate-600">Cédula: {perfil.documento}</p>
+          <p className="text-sm text-slate-600">Celular: {perfil.telefono}</p>
+          {perfil.email && (
+            <p className="text-sm text-slate-600">Correo: {perfil.email}</p>
+          )}
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to={APP_ROUTES.PACIENTE_AGENDAR}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white"
             >
               Agendar cita
             </Link>
             <Link
               to={APP_ROUTES.PACIENTE_MIS_CITAS}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-700"
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700"
             >
               Mis citas
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({
+                  documento: perfil.documento ?? '',
+                  nombres: perfil.nombres ?? '',
+                  apellidos: perfil.apellidos ?? '',
+                  telefono: perfil.telefono ?? '',
+                  genero: (perfil.genero as GeneroPaciente) ?? 'OTRO',
+                  fechaNacimiento: perfil.fechaNacimiento ?? '',
+                  email: perfil.email ?? '',
+                });
+                setEditando(true);
+              }}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              Editar mi ficha
+            </button>
           </div>
         </div>
       </div>
@@ -117,8 +137,8 @@ export default function PacienteCompletarPerfilPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
-        title="Completar mi ficha"
-        subtitle="Necesitamos tus datos para poder agendar tus citas."
+        title={editando ? 'Editar mi ficha' : 'Completar mi ficha'}
+        subtitle={editando ? 'Actualiza tus datos de contacto.' : 'Necesitamos tus datos para poder agendar tus citas.'}
       />
 
       {errorMessage && (
@@ -273,13 +293,24 @@ export default function PacienteCompletarPerfilPage() {
           Los campos con <span className="text-red-500">*</span> son obligatorios.
         </p>
 
-        <button
-          type="submit"
-          disabled={completarMutation.isPending}
-          className="w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-60 sm:w-auto"
-        >
-          {completarMutation.isPending ? 'Guardando...' : 'Guardar mi ficha'}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="submit"
+            disabled={completarMutation.isPending}
+            className="rounded-lg bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+          >
+            {completarMutation.isPending ? 'Guardando...' : 'Guardar mi ficha'}
+          </button>
+          {editando && (
+            <button
+              type="button"
+              onClick={() => { setEditando(false); setFieldErrors({}); setErrorMessage(''); }}
+              className="rounded-lg border border-slate-300 px-4 py-3 text-slate-700 hover:bg-slate-50"
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

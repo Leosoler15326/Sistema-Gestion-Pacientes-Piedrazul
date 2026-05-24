@@ -83,6 +83,17 @@ public class CitaController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<CitaDTO.Response> cambiarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody CitaDTO.CambiarEstadoRequest dto) {
+        Usuario responsable = usuarioRepository
+                .findByNombreUsuario(SecurityUtils.getNombreUsuarioActual())
+                .orElse(null);
+        return ResponseEntity.ok(citaService.cambiarEstado(id, dto, responsable));
+    }
+
     @GetMapping("/profesional")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorProfesional(

@@ -23,6 +23,7 @@ export interface CitasRepository {
   agendarDesdeContacto(payload: AgendarContactoRequestDto): Promise<CitaDto>;
   reagendar(id: number, payload: ReagendarCitaRequestDto): Promise<CitaDto>;
   cancelar(id: number, payload?: CancelarCitaRequestDto): Promise<void>;
+  cambiarEstado(id: number, estado: string, observacion?: string): Promise<CitaDto>;
   listarPorProfesional(params: ListarCitasProfesionalParamsDto): Promise<CitaDto[]>;
   listarPorPaciente(pacienteId: number): Promise<CitaDto[]>;
   listarMisCitasPaciente(): Promise<CitaDto[]>;
@@ -73,6 +74,18 @@ class HttpCitasRepository implements CitasRepository {
     payload: CancelarCitaRequestDto = {}
   ): Promise<void> {
     await api.patch(`${CITAS_BASE}/${id}/cancelar`, payload);
+  }
+
+  async cambiarEstado(
+    id: number,
+    estado: string,
+    observacion?: string
+  ): Promise<CitaDto> {
+    const { data } = await api.patch<CitaDto>(`${CITAS_BASE}/${id}/estado`, {
+      estado,
+      observacion,
+    });
+    return data;
   }
 
   async listarPorProfesional(

@@ -21,6 +21,8 @@ public interface ICitaService {
 
     void cancelar(Long citaId, CitaDTO.CancelarRequest dto, Usuario responsable);
 
+    CitaDTO.Response cambiarEstado(Long citaId, CitaDTO.CambiarEstadoRequest dto, Usuario responsable);
+
     CitaDTO.Response buscarPorId(Long id);
 
     CitaDTO.Response obtenerResumenPorId(Long id);

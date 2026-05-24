@@ -195,6 +195,21 @@ public class CitaService implements ICitaService {
     }
 
     @Override
+    @Transactional
+    public CitaDTO.Response cambiarEstado(Long citaId, CitaDTO.CambiarEstadoRequest dto,
+                                          Usuario responsable) {
+        Cita cita = buscarEntidadPorId(citaId);
+
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            throw new IllegalStateException("No se puede cambiar el estado de una cita ya cancelada.");
+        }
+
+        cita.setEstado(dto.getEstado());
+        Cita actualizada = citaRepository.save(cita);
+        return citaEntityMapper.toResponse(actualizada);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public CitaDTO.Response buscarPorId(Long id) {
         CitaDTO.Response r = citaEntityMapper.toResponse(buscarEntidadPorId(id));
