@@ -1,5 +1,6 @@
 import { useState, useMemo, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../../../components/common/PageHeader';
 import InlineMessage from '../../../components/common/InlineMessage';
 import Loader from '../../../components/common/Loader';
@@ -10,6 +11,7 @@ import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesiona
 import { useDisponibilidad } from '../../citas/hooks/UseDisponibilidad';
 import { useCreateCita, useMisCitasPaciente } from '../../citas/hooks/UseCitas';
 import { esFestivoColombia } from '../../../utils/colombianHolidays';
+import { configuracionService } from '../../configuracion/services/configuracion.service';
 
 const ESTADOS_PENDIENTES = ['PROGRAMADA', 'CONFIRMADA', 'REAGENDADA'];
 const ESTADOS_ATENDIDA = ['ATENDIDA', 'COMPLETADA'];
@@ -20,9 +22,9 @@ function getFechaMin(): string {
   return d.toISOString().split('T')[0];
 }
 
-function getFechaMax(): string {
+function getFechaMax(diasAdelante: number): string {
   const d = new Date();
-  d.setDate(d.getDate() + 28);
+  d.setDate(d.getDate() + diasAdelante);
   return d.toISOString().split('T')[0];
 }
 
@@ -54,6 +56,12 @@ export default function PacienteAgendarCitaPage() {
   const navigate = useNavigate();
   const { data: perfil, isLoading: perfilLoading } = useMiPerfilPaciente();
   const { data: misCitas, isLoading: citasLoading } = useMisCitasPaciente();
+  const { data: configData } = useQuery({
+    queryKey: ['config-agendamiento'],
+    queryFn: () => configuracionService.obtenerAgendamiento(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const ventanaDias = (configData?.ventanaSemanasAgendar ?? 4) * 7;
   const { data: profesionales } = useProfesionalesActivos();
   const createMutation = useCreateCita();
 
@@ -272,9 +280,12 @@ export default function PacienteAgendarCitaPage() {
               const pId = p.profesionalId ?? p.id;
               const pNombre = p.nombres ?? p.nombre ?? 'Profesional';
               const pEsp = p.especialidad ? ` — ${ESPECIALIDAD_LABEL[p.especialidad] ?? p.especialidad}` : '';
+              const pHab = (p as { habilidadesAdicionales?: string }).habilidadesAdicionales
+                ? ` (${(p as { habilidadesAdicionales?: string }).habilidadesAdicionales})`
+                : '';
               return (
                 <option key={pId} value={pId}>
-                  {pNombre}{pEsp}
+                  {pNombre}{pEsp}{pHab}
                 </option>
               );
             })}
@@ -289,7 +300,7 @@ export default function PacienteAgendarCitaPage() {
             type="date"
             value={fecha}
             min={getFechaMin()}
-            max={getFechaMax()}
+            max={getFechaMax(ventanaDias)}
             onChange={(e) => handleFechaChange(e.target.value)}
             className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-100 ${
               fechaError ? 'border-red-400 bg-red-50' : 'border-slate-300 focus:border-blue-500'
@@ -300,7 +311,7 @@ export default function PacienteAgendarCitaPage() {
             <p className="mt-1 text-xs text-red-600">{fechaError}</p>
           ) : (
             <p className="mt-1 text-xs text-slate-400">
-              Puedes agendar hasta 4 semanas adelante. No se agenda en domingos ni festivos.
+              Puedes agendar hasta {configData?.ventanaSemanasAgendar ?? 4} semanas adelante. No se agenda en domingos ni festivos.
             </p>
           )}
         </div>

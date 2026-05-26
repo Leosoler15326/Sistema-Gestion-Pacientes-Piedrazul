@@ -11,6 +11,7 @@ import com.SGPPiedrazul.security.SecurityUtils;
 import com.SGPPiedrazul.security.UserDetailsImpl;
 import com.SGPPiedrazul.service.cita.CitaEntityMapper;
 import com.SGPPiedrazul.service.export.CitaListExporter;
+import com.SGPPiedrazul.service.export.PorMedicoCsvExporter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class CitaService implements ICitaService {
     private final ApplicationEventPublisher eventPublisher;
     private final CitaEntityMapper citaEntityMapper;
     private final CitaListExporter citaListExporter;
+    private final PorMedicoCsvExporter porMedicoCsvExporter;
 
     public CitaService(CitaRepository citaRepository,
                        ProfesionalRepository profesionalRepository,
@@ -39,7 +41,8 @@ public class CitaService implements ICitaService {
                        ConfiguracionAgendamientoService configuracionAgendamientoService,
                        ApplicationEventPublisher eventPublisher,
                        CitaEntityMapper citaEntityMapper,
-                       CitaListExporter citaListExporter) {
+                       CitaListExporter citaListExporter,
+                       PorMedicoCsvExporter porMedicoCsvExporter) {
         this.citaRepository = citaRepository;
         this.profesionalRepository = profesionalRepository;
         this.pacienteRepository = pacienteRepository;
@@ -48,6 +51,7 @@ public class CitaService implements ICitaService {
         this.eventPublisher = eventPublisher;
         this.citaEntityMapper = citaEntityMapper;
         this.citaListExporter = citaListExporter;
+        this.porMedicoCsvExporter = porMedicoCsvExporter;
     }
 
     @Override
@@ -155,11 +159,19 @@ public class CitaService implements ICitaService {
         validarFechaDentroDeVentana(dto.getNuevaFechaHora());
         Cita cita = buscarEntidadPorId(citaId);
 
-        if (!disponibilidadService.esSlotValidoParaAgendar(
-                cita.getProfesional(), dto.getNuevaFechaHora())) {
-            throw new IllegalStateException(
-                    "El nuevo horario no está disponible o no coincide con las franjas del profesional.");
+        Profesional profesionalDestino = cita.getProfesional();
+        if (dto.getNuevoProfesionalId() != null) {
+            profesionalDestino = profesionalRepository.findById(dto.getNuevoProfesionalId())
+                    .orElseThrow(() -> new RuntimeException("Profesional de destino no encontrado."));
         }
+
+        if (!disponibilidadService.esSlotValidoParaAgendar(
+                profesionalDestino, dto.getNuevaFechaHora())) {
+            throw new IllegalStateException(
+                    "El nuevo horario no está disponible para el profesional seleccionado.");
+        }
+
+        cita.setProfesional(profesionalDestino);
 
         HistorialCita historial = new HistorialCita();
         historial.setCita(cita);
@@ -280,6 +292,18 @@ public class CitaService implements ICitaService {
         List<CitaDTO.Response> list = listarPorProfesionalYRangoFechas(
                 profesionalId, fecha, fecha);
         return citaListExporter.export(list);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportarCsvTodosFecha(LocalDate fecha) {
+        List<CitaDTO.Response> list = citaRepository
+                .findByFechaHoraBetweenOrderByProfesionalNombresAscFechaHoraAsc(
+                        fecha.atStartOfDay(), fecha.atTime(23, 59, 59))
+                .stream()
+                .map(citaEntityMapper::toResponse)
+                .collect(Collectors.toList());
+        return porMedicoCsvExporter.export(list);
     }
 
     @Override

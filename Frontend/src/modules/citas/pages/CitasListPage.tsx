@@ -308,6 +308,28 @@ export default function CitasListPage() {
     }
   };
 
+  const handleExportarCsvTodos = async () => {
+    if (!fechaDesdeProfesional) {
+      setMessage('Selecciona una fecha para exportar todos los profesionales.');
+      return;
+    }
+    try {
+      setExportingCsv(true);
+      setMessage('');
+      const blob = await citasService.exportarCsvTodosFecha(fechaDesdeProfesional);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `citas_todos_${fechaDesdeProfesional}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setMessage('No fue posible exportar el CSV.');
+    } finally {
+      setExportingCsv(false);
+    }
+  };
+
   const handleConfirmCancel = async () => {
     if (!citaIdToCancel) return;
 
@@ -544,14 +566,24 @@ export default function CitasListPage() {
               </button>
 
               {puedeExportarCsv && (
-                <button
-                  type="button"
-                  onClick={handleExportarCsvDia}
-                  disabled={exportingCsv}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
-                >
-                  {exportingCsv ? 'Exportando...' : 'Exportar CSV (día inicial)'}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleExportarCsvDia}
+                    disabled={exportingCsv}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                  >
+                    {exportingCsv ? 'Exportando...' : 'Exportar CSV (un profesional)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportarCsvTodos}
+                    disabled={exportingCsv}
+                    className="rounded-lg border border-green-300 bg-white px-3 py-2 text-sm text-green-700 hover:bg-green-50 disabled:opacity-60"
+                  >
+                    {exportingCsv ? 'Exportando...' : 'Exportar todos los profesionales'}
+                  </button>
+                </>
               )}
             </div>
 

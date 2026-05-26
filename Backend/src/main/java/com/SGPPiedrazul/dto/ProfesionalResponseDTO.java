@@ -16,6 +16,7 @@ public class ProfesionalResponseDTO {
     private String nombreUsuario;
     private String rolUsuario;
     private Boolean usuarioVinculado;
+    private String habilidadesAdicionales;
 
     public static ProfesionalResponseDTO sinUsuario(Profesional p) {
         ProfesionalResponseDTO dto = new ProfesionalResponseDTO();
@@ -26,6 +27,7 @@ public class ProfesionalResponseDTO {
         dto.intervaloMinutos = p.getIntervaloMinutos();
         dto.estado = p.getEstado().name();
         dto.usuarioVinculado = false;
+        dto.habilidadesAdicionales = p.getHabilidadesAdicionales();
         return dto;
     }
 
@@ -51,4 +53,5 @@ public class ProfesionalResponseDTO {
     public String getNombreUsuario() { return nombreUsuario; }
     public String getRolUsuario() { return rolUsuario; }
     public Boolean getUsuarioVinculado() { return usuarioVinculado; }
+    public String getHabilidadesAdicionales() { return habilidadesAdicionales; }
 }

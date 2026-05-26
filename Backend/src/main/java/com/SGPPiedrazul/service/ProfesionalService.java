@@ -49,6 +49,7 @@ public class ProfesionalService {
         profesional.setTipo(dto.getTipo());
         profesional.setEspecialidad(dto.getEspecialidad());
         profesional.setIntervaloMinutos(dto.getIntervaloMinutos());
+        profesional.setHabilidadesAdicionales(dto.getHabilidadesAdicionales());
         profesional.setEstado(Estado.ACTIVO);
 
         Profesional guardado = profesionalRepository.save(profesional);
@@ -99,6 +100,7 @@ public class ProfesionalService {
         profesional.setTipo(dto.getTipo());
         profesional.setEspecialidad(dto.getEspecialidad());
         profesional.setIntervaloMinutos(dto.getIntervaloMinutos());
+        profesional.setHabilidadesAdicionales(dto.getHabilidadesAdicionales());
 
         Profesional actualizado = profesionalRepository.save(profesional);
 

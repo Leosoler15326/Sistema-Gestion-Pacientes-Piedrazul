@@ -121,10 +121,14 @@ public class CitaDTO {
 
         private String motivo;
 
+        private Long nuevoProfesionalId;
+
         public LocalDateTime getNuevaFechaHora() { return nuevaFechaHora; }
         public void setNuevaFechaHora(LocalDateTime v) { this.nuevaFechaHora = v; }
         public String getMotivo() { return motivo; }
         public void setMotivo(String v) { this.motivo = v; }
+        public Long getNuevoProfesionalId() { return nuevoProfesionalId; }
+        public void setNuevoProfesionalId(Long v) { this.nuevoProfesionalId = v; }
     }
 
     // ─── Request: Cancelar cita ───

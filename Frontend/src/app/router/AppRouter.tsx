@@ -18,6 +18,7 @@ import HistoriaClinicaEditPage from '../../modules/historia-clinica/pages/Histor
 import ProfesionalesListPage from '../../modules/profesionales/pages/ProfesionalesListPage';
 import ProfesionalFormPage from '../../modules/profesionales/pages/ProfesionalFormPage';
 import ProfesionalDetailPage from '../../modules/profesionales/pages/ProfesionalDetailPage';
+import ProfesionalEditPage from '../../modules/profesionales/pages/ProfesionalEditPage';
 
 import UsuariosListPage from '../../modules/usuarios/pages/UsuariosListPage';
 import UsuarioFormPage from '../../modules/usuarios/pages/UsuarioFormPage';
@@ -127,6 +128,10 @@ export default function AppRouter() {
               <Route
                 path={APP_ROUTES.PROFESIONALES_NUEVO}
                 element={<ProfesionalFormPage />}
+              />
+              <Route
+                path={APP_ROUTES.PROFESIONALES_EDITAR}
+                element={<ProfesionalEditPage />}
               />
               <Route path={APP_ROUTES.USUARIOS} element={<UsuariosListPage />} />
               <Route path={APP_ROUTES.USUARIOS_NUEVO} element={<UsuarioFormPage />} />

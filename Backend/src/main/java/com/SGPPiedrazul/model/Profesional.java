@@ -30,6 +30,9 @@ public class Profesional {
     @Column(name = "intervalo_minutos", nullable = false)
     private Integer intervaloMinutos;
 
+    @Column(name = "habilidades_adicionales", length = 300)
+    private String habilidadesAdicionales;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     private Estado estado;
@@ -80,6 +83,9 @@ public class Profesional {
 
     public Integer getIntervaloMinutos() { return intervaloMinutos; }
     public void setIntervaloMinutos(Integer intervaloMinutos) { this.intervaloMinutos = intervaloMinutos; }
+
+    public String getHabilidadesAdicionales() { return habilidadesAdicionales; }
+    public void setHabilidadesAdicionales(String h) { this.habilidadesAdicionales = h; }
 
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }

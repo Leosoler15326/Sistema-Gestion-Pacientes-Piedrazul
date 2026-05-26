@@ -22,6 +22,7 @@ export const APP_ROUTES = {
   PROFESIONALES: '/profesionales',
   PROFESIONALES_NUEVO: '/profesionales/nuevo',
   PROFESIONALES_DETALLE: '/profesionales/:id',
+  PROFESIONALES_EDITAR: '/profesionales/:id/editar',
 
   USUARIOS: '/usuarios',
   USUARIOS_NUEVO: '/usuarios/nuevo',

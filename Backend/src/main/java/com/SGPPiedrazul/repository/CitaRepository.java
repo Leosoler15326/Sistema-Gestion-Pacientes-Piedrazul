@@ -21,6 +21,12 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             LocalDateTime fin
     );
 
+    // Todas las citas en un rango de fechas (para exportación multi-profesional)
+    List<Cita> findByFechaHoraBetweenOrderByProfesionalNombresAscFechaHoraAsc(
+            LocalDateTime inicio,
+            LocalDateTime fin
+    );
+
     // Verifica si ya existe una cita en ese slot exacto
     boolean existsByProfesionalAndFechaHoraAndEstadoNot(
             Profesional profesional,

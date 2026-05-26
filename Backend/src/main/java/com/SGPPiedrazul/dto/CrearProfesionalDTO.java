@@ -11,6 +11,8 @@ public class CrearProfesionalDTO {
     private Especialidad especialidad;
     private Integer intervaloMinutos;
 
+    private String habilidadesAdicionales;
+
     // ─── Datos del Usuario (opcionales) ───
     // Si crearUsuario = true, se crea la cuenta y se vincula automáticamente
     private Boolean crearUsuario = false;
@@ -29,6 +31,9 @@ public class CrearProfesionalDTO {
 
     public Integer getIntervaloMinutos() { return intervaloMinutos; }
     public void setIntervaloMinutos(Integer intervaloMinutos) { this.intervaloMinutos = intervaloMinutos; }
+
+    public String getHabilidadesAdicionales() { return habilidadesAdicionales; }
+    public void setHabilidadesAdicionales(String v) { this.habilidadesAdicionales = v; }
 
     public Boolean getCrearUsuario() { return crearUsuario; }
     public void setCrearUsuario(Boolean crearUsuario) { this.crearUsuario = crearUsuario; }

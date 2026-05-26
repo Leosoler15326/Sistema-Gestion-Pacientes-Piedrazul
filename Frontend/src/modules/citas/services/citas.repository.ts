@@ -29,6 +29,7 @@ export interface CitasRepository {
   listarMisCitasPaciente(): Promise<CitaDto[]>;
   buscarPorId(id: number): Promise<CitaDto>;
   exportarCsvProfesionalFecha(profesionalId: number, fecha: string): Promise<Blob>;
+  exportarCsvTodosFecha(fecha: string): Promise<Blob>;
 }
 
 class HttpCitasRepository implements CitasRepository {
@@ -125,6 +126,14 @@ class HttpCitasRepository implements CitasRepository {
   ): Promise<Blob> {
     const response = await api.get(`${CITAS_BASE}/exportar-csv`, {
       params: { profesionalId, fecha },
+      responseType: 'blob',
+    });
+    return response.data as Blob;
+  }
+
+  async exportarCsvTodosFecha(fecha: string): Promise<Blob> {
+    const response = await api.get(`${CITAS_BASE}/exportar-csv-todos`, {
+      params: { fecha },
       responseType: 'blob',
     });
     return response.data as Blob;

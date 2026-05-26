@@ -121,6 +121,18 @@ public class CitaController {
                 .body(data);
     }
 
+    @GetMapping(value = "/exportar-csv-todos", produces = "text/csv;charset=UTF-8")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<byte[]> exportarCsvTodos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        byte[] data = citaService.exportarCsvTodosFecha(fecha);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"citas_todos_" + fecha + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .body(data);
+    }
+
     @GetMapping("/paciente/{pacienteId}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA','PACIENTE')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorPaciente(

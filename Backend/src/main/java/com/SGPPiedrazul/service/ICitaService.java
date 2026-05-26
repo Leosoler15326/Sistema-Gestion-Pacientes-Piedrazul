@@ -40,5 +40,7 @@ public interface ICitaService {
 
     byte[] exportarCsvProfesionalFecha(Long profesionalId, LocalDate fecha);
 
+    byte[] exportarCsvTodosFecha(LocalDate fecha);
+
     Cita buscarEntidadPorId(Long id);
 }
