@@ -50,6 +50,7 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/registro",
                     "/api/auth/verificar-email",
+                    "/api/auth/recuperar-contrasena",
                     "/api/health",
                     "/api/hash"
                 ).permitAll()

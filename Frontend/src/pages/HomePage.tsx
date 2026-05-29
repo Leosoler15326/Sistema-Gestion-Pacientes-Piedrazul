@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import Loader from '../components/common/Loader';
 import PageHeader from '../components/common/PageHeader';
 import { APP_ROUTES } from '../app/router/routes';
 import { useAuth } from '../modules/auth/hooks/useAuth';
@@ -21,10 +20,11 @@ export default function HomePage() {
   const puedePersonal =
     normalizedRole === 'ADMINISTRADOR' || normalizedRole === 'AGENDADOR';
 
+  const esAdmin = normalizedRole === 'ADMINISTRADOR';
   const [status, setStatus] = useState('Conectando...');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!esAdmin) return;
     api
       .get('/health')
       .then((res) => {
@@ -34,13 +34,8 @@ export default function HomePage() {
       })
       .catch(() => {
         setStatus('Error de conexión');
-      })
-      .finally(() => {
-        setLoading(false);
       });
-  }, []);
-
-  if (loading) return <Loader message="Consultando estado del backend..." />;
+  }, [esAdmin]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -131,10 +126,12 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white p-6 shadow">
-        <h2 className="mb-2 text-lg font-semibold text-slate-800">Estado del backend</h2>
-        <p className="text-green-600">{status}</p>
-      </div>
+      {normalizedRole === 'ADMINISTRADOR' && (
+        <div className="mt-6 rounded-2xl bg-white p-6 shadow">
+          <h2 className="mb-2 text-lg font-semibold text-slate-800">Estado del backend</h2>
+          <p className="text-green-600">{status}</p>
+        </div>
+      )}
     </div>
   );
 }

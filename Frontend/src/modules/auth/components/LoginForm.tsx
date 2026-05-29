@@ -29,7 +29,7 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
           htmlFor="nombreUsuario"
           className="mb-2 block text-sm font-medium text-slate-700"
         >
-          Usuario
+          Cédula
         </label>
         <input
           id="nombreUsuario"
@@ -38,7 +38,7 @@ export default function LoginForm({ onSubmit, loading = false }: LoginFormProps)
           onChange={(e) =>
             setForm((prev) => ({ ...prev, nombreUsuario: e.target.value }))
           }
-          placeholder="Ingresa tu usuario"
+          placeholder="Ingresa tu cédula"
           className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
       </div>

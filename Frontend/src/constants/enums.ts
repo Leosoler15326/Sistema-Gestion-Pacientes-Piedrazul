@@ -5,7 +5,7 @@ export const TIPO_ATENCION_OPTIONS = [
 ] as const;
 
 export const TIPO_ATENCION_LABEL: Record<string, string> = {
-  PRIMERA_VEZ: 'Primera consulta (Consulta General)',
+  PRIMERA_VEZ: 'Cita general',
   CONTROL: 'Control (revisita)',
   URGENCIA: 'Urgencia',
 };

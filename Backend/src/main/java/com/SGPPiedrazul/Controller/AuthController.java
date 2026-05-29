@@ -41,4 +41,18 @@ public class AuthController {
         if (ok) return ResponseEntity.ok("Email verificado correctamente.");
         return ResponseEntity.badRequest().body("Token inválido o expirado.");
     }
+
+    @PostMapping("/cambiar-contrasena")
+    public ResponseEntity<Void> cambiarContrasena(
+            @RequestBody AuthDTO.CambiarContrasenaRequest dto) {
+        authService.cambiarContrasena(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/recuperar-contrasena")
+    public ResponseEntity<Void> recuperarContrasena(
+            @RequestBody AuthDTO.RecuperarContrasenaRequest dto) {
+        authService.recuperarContrasena(dto);
+        return ResponseEntity.noContent().build();
+    }
 }

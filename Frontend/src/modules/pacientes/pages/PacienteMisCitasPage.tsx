@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageHeader from '../../../components/common/PageHeader';
 import EmptyState from '../../../components/common/EmptyState';
@@ -5,7 +6,7 @@ import InlineMessage from '../../../components/common/InlineMessage';
 import Loader from '../../../components/common/Loader';
 import { APP_ROUTES } from '../../../app/router/routes';
 import { ESPECIALIDAD_LABEL, TIPO_ATENCION_LABEL } from '../../../constants/enums';
-import { useMisCitasPaciente } from '../../citas/hooks/UseCitas';
+import { useMisCitasPaciente, useCancelarCita } from '../../citas/hooks/UseCitas';
 
 const ESTADOS_PENDIENTES = ['PROGRAMADA', 'CONFIRMADA', 'REAGENDADA'];
 
@@ -50,6 +51,23 @@ export default function PacienteMisCitasPage() {
   const successMessage = (location.state as { successMessage?: string } | null)
     ?.successMessage;
   const { data, isLoading, isError } = useMisCitasPaciente();
+  const cancelarMutation = useCancelarCita();
+  const [cancelandoId, setCancelandoId] = useState<number | null>(null);
+  const [cancelMsg, setCancelMsg] = useState('');
+
+  const handleCancelar = async (citaId: number) => {
+    if (cancelandoId !== citaId) {
+      setCancelandoId(citaId);
+      return;
+    }
+    try {
+      await cancelarMutation.mutateAsync({ id: citaId });
+      setCancelandoId(null);
+      setCancelMsg('Tu cita fue cancelada.');
+    } catch {
+      setCancelMsg('No fue posible cancelar la cita. Intenta de nuevo.');
+    }
+  };
 
   if (isLoading) {
     return <Loader message="Cargando tus citas..." />;
@@ -86,6 +104,12 @@ export default function PacienteMisCitasPage() {
       {successMessage && (
         <div className="mb-4">
           <InlineMessage type="success" message={successMessage} />
+        </div>
+      )}
+
+      {cancelMsg && (
+        <div className="mb-4">
+          <InlineMessage type={cancelMsg.includes('posible') ? 'error' : 'success'} message={cancelMsg} />
         </div>
       )}
 
@@ -131,13 +155,41 @@ export default function PacienteMisCitasPage() {
                       {ESTADO_LABEL[c.estado] ?? c.estado}
                     </span>
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
                     <Link
                       to={`/citas/${c.id}`}
                       className="text-sm font-medium text-blue-600 hover:underline"
                     >
                       Ver detalle
                     </Link>
+                    {cancelandoId === c.id ? (
+                      <>
+                        <span className="text-sm text-slate-600">¿Seguro que quieres cancelar?</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCancelar(c.id)}
+                          disabled={cancelarMutation.isPending}
+                          className="rounded-lg bg-red-600 px-3 py-1 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {cancelarMutation.isPending ? 'Cancelando...' : 'Sí, cancelar'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCancelandoId(null)}
+                          className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          No, volver
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleCancelar(c.id)}
+                        className="text-sm font-medium text-red-600 hover:underline"
+                      >
+                        Cancelar cita
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

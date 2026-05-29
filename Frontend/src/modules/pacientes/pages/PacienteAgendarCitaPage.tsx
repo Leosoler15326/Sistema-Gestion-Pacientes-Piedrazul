@@ -90,11 +90,8 @@ export default function PacienteAgendarCitaPage() {
   );
 
   const tiposDisponibles = useMemo(() => {
-    if (!tienePrimeraVezAtendida) return [{ value: 'PRIMERA_VEZ', label: TIPO_ATENCION_LABEL.PRIMERA_VEZ }];
-    return [
-      { value: 'PRIMERA_VEZ', label: TIPO_ATENCION_LABEL.PRIMERA_VEZ },
-      { value: 'CONTROL', label: TIPO_ATENCION_LABEL.CONTROL },
-    ];
+    if (!tienePrimeraVezAtendida) return [];
+    return [{ value: 'CONTROL', label: TIPO_ATENCION_LABEL.CONTROL }];
   }, [tienePrimeraVezAtendida]);
 
   const profesionalesFiltrados = useMemo(
@@ -155,7 +152,7 @@ export default function PacienteAgendarCitaPage() {
       setMessage(fechaError || 'Selecciona una fecha válida.');
       return;
     }
-    if (!tipoAtencion) {
+    if (tienePrimeraVezAtendida && !tipoAtencion) {
       setMessage('Selecciona el tipo de consulta.');
       return;
     }
@@ -169,7 +166,7 @@ export default function PacienteAgendarCitaPage() {
         pacienteId: perfil.id,
         profesionalId,
         fechaHora: horaSeleccionada,
-        tipoAtencion,
+        tipoAtencion: tienePrimeraVezAtendida ? tipoAtencion : 'PRIMERA_VEZ',
         motivoConsulta: motivoConsulta.trim() || undefined,
       });
       navigate(APP_ROUTES.PACIENTE_MIS_CITAS, {
@@ -316,24 +313,26 @@ export default function PacienteAgendarCitaPage() {
           )}
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            Tipo de consulta <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={tipoAtencion}
-            onChange={(e) => setTipoAtencion(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            required
-          >
-            <option value="">Selecciona</option>
-            {tiposDisponibles.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {tienePrimeraVezAtendida && (
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Tipo de consulta <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={tipoAtencion}
+              onChange={(e) => setTipoAtencion(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              required
+            >
+              <option value="">Selecciona</option>
+              {tiposDisponibles.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700">

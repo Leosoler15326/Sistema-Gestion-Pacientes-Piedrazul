@@ -3,6 +3,8 @@ import type {
   LoginRequestDto,
   LoginResponseDto,
   RegisterRequestDto,
+  CambiarContrasenaDto,
+  RecuperarContrasenaDto,
 } from '../types/auth.types';
 
 const AUTH_BASE = '/auth';
@@ -30,5 +32,13 @@ export const authService = {
       params: { email },
     });
     return data;
+  },
+
+  async cambiarContrasena(payload: CambiarContrasenaDto): Promise<void> {
+    await api.post(`${AUTH_BASE}/cambiar-contrasena`, payload);
+  },
+
+  async recuperarContrasena(payload: RecuperarContrasenaDto): Promise<void> {
+    await api.post(`${AUTH_BASE}/recuperar-contrasena`, payload);
   },
 };

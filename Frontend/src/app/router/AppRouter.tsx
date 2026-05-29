@@ -3,6 +3,8 @@ import HomePage from '../../pages/HomePage';
 import NotFoundPage from '../../pages/NotFoundPage';
 import LoginPage from '../../modules/auth/pages/LoginPage';
 import RegistroPacientePage from '../../modules/auth/pages/RegistroPacientePage';
+import ForgotPasswordPage from '../../modules/auth/pages/ForgotPasswordPage';
+import CambiarContrasenaPage from '../../modules/auth/pages/CambiarContrasenaPage';
 
 import CitasListPage from '../../modules/citas/pages/CitasListPage';
 import CitaCreatePage from '../../modules/citas/pages/CitaCreatePage';
@@ -46,10 +48,12 @@ export default function AppRouter() {
       <Routes>
         <Route path={APP_ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={APP_ROUTES.REGISTRO_PACIENTE} element={<RegistroPacientePage />} />
+        <Route path={APP_ROUTES.RECUPERAR_CONTRASENA} element={<ForgotPasswordPage />} />
 
         <Route element={<PrivateRoute />}>
           <Route element={<LayoutWrapper />}>
             <Route path={APP_ROUTES.HOME} element={<HomePage />} />
+            <Route path={APP_ROUTES.CAMBIAR_CONTRASENA} element={<CambiarContrasenaPage />} />
 
             <Route path={APP_ROUTES.CITAS} element={<CitasListPage />} />
             <Route path={APP_ROUTES.CITAS_DETALLE} element={<CitaDetailPage />} />

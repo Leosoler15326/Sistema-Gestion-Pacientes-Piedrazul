@@ -7,6 +7,7 @@ import { APP_ROUTES } from '../../../app/router/routes';
 import { GENERO_LABEL } from '../../../constants/enums';
 import { useCompletarMiPerfil, useMiPerfilPaciente } from '../hooks/usePacientes';
 import type { CompletarPerfilPacienteDto, GeneroPaciente } from '../types/paciente.types';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 function normalizarNombre(valor: string): string {
   return valor
@@ -23,12 +24,13 @@ const GENERO_OPTIONS: GeneroPaciente[] = ['HOMBRE', 'MUJER', 'OTRO'];
 export default function PacienteCompletarPerfilPage() {
   const { data: perfil, isLoading, isError } = useMiPerfilPaciente();
   const completarMutation = useCompletarMiPerfil();
+  const { user } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [editando, setEditando] = useState(false);
 
   const [form, setForm] = useState<CompletarPerfilPacienteDto>({
-    documento: '',
+    documento: user?.nombreUsuario ?? '',
     nombres: '',
     apellidos: '',
     telefono: '',
@@ -128,6 +130,12 @@ export default function PacienteCompletarPerfilPage() {
             >
               Editar mi ficha
             </button>
+            <Link
+              to={APP_ROUTES.CAMBIAR_CONTRASENA}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              Cambiar contraseña
+            </Link>
           </div>
         </div>
       </div>
