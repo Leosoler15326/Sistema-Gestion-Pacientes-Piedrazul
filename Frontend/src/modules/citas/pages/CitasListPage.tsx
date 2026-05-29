@@ -348,7 +348,7 @@ export default function CitasListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Citas"
         subtitle="Consulta y gestiona citas por paciente o por profesional."

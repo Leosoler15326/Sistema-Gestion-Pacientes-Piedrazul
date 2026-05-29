@@ -105,7 +105,7 @@ export default function HistoriaClinicaFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Nueva historia clínica"
         subtitle="Busca un paciente, selecciona una cita y registra la historia clínica."

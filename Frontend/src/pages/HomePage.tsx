@@ -38,7 +38,7 @@ export default function HomePage() {
   }, [esAdmin]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Panel principal"
         subtitle="Resumen general del sistema Clínica Piedra Azul"

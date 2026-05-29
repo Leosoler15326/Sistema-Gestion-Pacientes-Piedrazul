@@ -40,7 +40,7 @@ export default function ReagendarModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+      <div className="w-full max-w-md rounded-xl bg-white p-4 shadow-lg sm:p-6">
         <h2 className="mb-4 text-xl font-bold">Reagendar cita</h2>
 
         <div className="space-y-4">

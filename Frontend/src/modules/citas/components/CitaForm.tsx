@@ -258,7 +258,7 @@ export default function CitaForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-2xl bg-white p-6 shadow-sm"
+      className="space-y-6 rounded-2xl bg-white p-4 shadow sm:p-6-sm"
     >
       {(message || perfilError) && (
         <div

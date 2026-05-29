@@ -26,12 +26,12 @@ export default function HistoriaClinicaDetailPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-100 p-6">
+      <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
         <PageHeader
           title={`Historia clínica de la cita #${citaId}`}
           subtitle="Aún no existe una historia clínica para esta cita."
           actions={
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <BackButton />
               <Link
                 to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${citaId}`}
@@ -52,12 +52,12 @@ export default function HistoriaClinicaDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title={`Historia clínica de la cita #${data.citaId}`}
         subtitle="Detalle del registro clínico"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <BackButton />
             <Link
               to={APP_ROUTES.HISTORIA_CLINICA_EDITAR.replace(':id', String(data.citaId))}

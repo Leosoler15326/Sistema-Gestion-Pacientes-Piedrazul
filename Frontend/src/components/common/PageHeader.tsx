@@ -12,7 +12,7 @@ export default function PageHeader({
   actions,
 }: PageHeaderProps) {
   return (
-    <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
+    <div className="mb-4 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm sm:mb-6 sm:gap-4 sm:p-6 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}

@@ -92,7 +92,7 @@ export default function PacienteCompletarPerfilPage() {
           title="Mi ficha"
           subtitle="Tu información como paciente registrada en el sistema."
         />
-        <div className="max-w-xl rounded-2xl bg-white p-6 shadow-sm space-y-2">
+        <div className="max-w-xl rounded-2xl bg-white p-4 shadow-sm sm:p-6 space-y-2">
           <p className="text-slate-800 font-semibold text-base">{perfil.nombreCompleto}</p>
           <p className="text-sm text-slate-600">Cédula: {perfil.documento}</p>
           <p className="text-sm text-slate-600">Celular: {perfil.telefono}</p>
@@ -158,7 +158,7 @@ export default function PacienteCompletarPerfilPage() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-sm"
+        className="max-w-xl space-y-4 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">

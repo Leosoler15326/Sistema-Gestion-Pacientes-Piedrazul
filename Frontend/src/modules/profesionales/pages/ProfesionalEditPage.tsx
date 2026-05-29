@@ -60,7 +60,7 @@ export default function ProfesionalEditPage() {
 
   if (isLoading) return <Loader message="Cargando datos del profesional..." />;
   if (isError || !data) return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <InlineMessage type="error" message="No se pudo cargar el profesional." />
     </div>
   );
@@ -82,7 +82,7 @@ export default function ProfesionalEditPage() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-sm"
+        className="max-w-xl space-y-4 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
       >
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">

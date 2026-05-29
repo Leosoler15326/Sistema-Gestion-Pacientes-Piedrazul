@@ -112,7 +112,7 @@ export default function AgendarContactoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Agendar desde contacto"
         subtitle="Alta rápida tipo WhatsApp: datos del paciente y cita en un solo paso."
@@ -126,7 +126,7 @@ export default function AgendarContactoPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-4xl space-y-6 rounded-2xl bg-white p-6 shadow-sm"
+        className="max-w-4xl space-y-6 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
       >
         <section>
           <h3 className="mb-3 text-sm font-semibold text-slate-800">Paciente</h3>

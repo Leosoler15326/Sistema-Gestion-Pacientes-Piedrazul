@@ -41,7 +41,7 @@ export default function UsuarioEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader title="Editar usuario" subtitle={`Usuario #${id}`} />
 
       {errorMessage && (

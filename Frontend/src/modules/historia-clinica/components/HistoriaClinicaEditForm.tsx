@@ -20,7 +20,7 @@ export default function HistoriaClinicaEditForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-6 shadow">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-4 shadow sm:p-6">
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Descripción

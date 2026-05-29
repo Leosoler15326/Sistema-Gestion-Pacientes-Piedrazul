@@ -50,7 +50,7 @@ export default function HistoriaClinicaForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-6 shadow">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-xl bg-white p-4 shadow sm:p-6">
       {message && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {message}
