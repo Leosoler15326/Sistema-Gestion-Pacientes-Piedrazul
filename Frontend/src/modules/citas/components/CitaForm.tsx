@@ -12,7 +12,15 @@ import type {
   CrearPacienteDto,
   PacienteDto,
 } from '../../pacientes/types/paciente.types';
-import { ESPECIALIDAD_OPTIONS, TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
+import { ESPECIALIDAD_OPTIONS, TIPO_ATENCION_OPTIONS, TIPO_ATENCION_LABEL } from '../../../constants/enums';
+import FestivosDatePicker from '../../../components/common/FestivosDatePicker';
+
+function getFechaMin(): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(12, 0, 0, 0);
+  return d;
+}
 
 interface CitaFormProps {
   onSubmit: (values: CreateCitaRequestDto) => Promise<void>;
@@ -496,17 +504,19 @@ export default function CitaForm({
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-700">Fecha</label>
 
-        <input
-          type="date"
+        <FestivosDatePicker
           value={fecha}
-          onChange={(e) => {
-            setFecha(e.target.value);
+          onChange={(val) => {
+            setFecha(val);
             setHoraSeleccionada('');
             setHoraManual('');
             setMessage('');
           }}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          minDate={getFechaMin()}
         />
+        <p className="mt-1 text-xs text-slate-400">
+          Los días en rojo son festivos colombianos y no tienen atención.
+        </p>
       </div>
 
       <div>
@@ -525,7 +535,7 @@ export default function CitaForm({
           <option value="">Selecciona tipo de atención</option>
           {TIPO_ATENCION_OPTIONS.map((option) => (
             <option key={option} value={option}>
-              {option}
+              {TIPO_ATENCION_LABEL[option] ?? option}
             </option>
           ))}
         </select>

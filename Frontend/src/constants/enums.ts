@@ -7,7 +7,7 @@ export const TIPO_ATENCION_OPTIONS = [
 export const TIPO_ATENCION_LABEL: Record<string, string> = {
   PRIMERA_VEZ: 'Cita general',
   CONTROL: 'Control (revisita)',
-  URGENCIA: 'Urgencia / Prioritaria',
+  URGENCIA: 'Prioritaria',
 };
 
 export const GENERO_PACIENTE_OPTIONS = ['HOMBRE', 'MUJER', 'OTRO'] as const;
