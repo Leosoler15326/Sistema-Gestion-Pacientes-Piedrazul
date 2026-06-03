@@ -55,6 +55,11 @@ public class SecurityConfig {
                     "/api/hash"
                 ).permitAll()
 
+                // Actuator: health público, prometheus restringido a ADMINISTRADOR
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/prometheus", "/actuator/metrics/**")
+                    .hasRole("ADMINISTRADOR")
+
                 // Solo ADMINISTRADOR
                 .requestMatchers("/api/usuarios/**").hasAnyRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.POST, "/api/profesionales/**").hasAnyRole("ADMINISTRADOR")

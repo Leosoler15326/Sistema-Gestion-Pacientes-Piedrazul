@@ -5,10 +5,29 @@ import InlineMessage from '../../../components/common/InlineMessage';
 import Loader from '../../../components/common/Loader';
 import PageHeader from '../../../components/common/PageHeader';
 import BackButton from '../../../components/common/BackButton';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import { APP_ROUTES } from '../../../app/router/routes';
-import { useCitaDetail, useCambiarEstadoCita } from '../hooks/UseCitas';
+import { useCancelarCita, useCitaDetail, useCambiarEstadoCita } from '../hooks/UseCitas';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { ESPECIALIDAD_LABEL, TIPO_ATENCION_LABEL } from '../../../constants/enums';
+
+const IconCalendarEdit = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
+const IconXCircle = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const IconClinica = () => (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  </svg>
+);
 
 function formatFechaHora(value?: string) {
   if (!value) return 'Sin fecha';
@@ -63,7 +82,20 @@ export default function CitaDetailPage() {
 
   const { data, isLoading, isError } = useCitaDetail(id);
   const cambiarEstadoMutation = useCambiarEstadoCita();
+  const cancelarMutation = useCancelarCita();
   const [actionMessage, setActionMessage] = useState('');
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  const handleCancelar = async () => {
+    setConfirmCancel(false);
+    setActionMessage('');
+    try {
+      await cancelarMutation.mutateAsync({ id, payload: { motivo: 'Cancelada desde detalle' } });
+      setActionMessage('La cita fue cancelada.');
+    } catch {
+      setActionMessage('No fue posible cancelar la cita.');
+    }
+  };
 
   const handleCambiarEstado = async (nuevoEstado: string) => {
     setActionMessage('');
@@ -94,21 +126,43 @@ export default function CitaDetailPage() {
         title={`Cita #${data.id}`}
         subtitle="Detalle y gestión de la cita"
         actions={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <BackButton />
+
+            {/* Reagendar — solo si la cita está activa */}
+            {['PROGRAMADA', 'REAGENDADA'].includes(data.estado) && (
+              <Link
+                to={APP_ROUTES.CITAS_REAGENDAR.replace(':id', String(data.id))}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                <IconCalendarEdit /> Reagendar
+              </Link>
+            )}
+
+            {/* Cancelar — solo si la cita está activa */}
+            {['PROGRAMADA', 'REAGENDADA'].includes(data.estado) && (
+              <button
+                type="button"
+                onClick={() => setConfirmCancel(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+              >
+                <IconXCircle /> Cancelar
+              </button>
+            )}
+
             {puedeGestionarHistoria && (
               <>
                 <Link
                   to={`${APP_ROUTES.HISTORIA_CLINICA_NUEVA}?citaId=${data.id}`}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
                 >
-                  Crear historia clínica
+                  <IconClinica /> Nueva historia
                 </Link>
                 <Link
                   to={APP_ROUTES.HISTORIA_CLINICA_DETALLE.replace(':id', String(data.id))}
-                  className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-white"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                 >
-                  Ver historia clínica
+                  Ver historia
                 </Link>
               </>
             )}
@@ -196,6 +250,16 @@ export default function CitaDetailPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmCancel}
+        title="Cancelar cita"
+        message={`¿Confirmas la cancelación de la cita #${data.id}? Esta acción no se puede deshacer.`}
+        confirmText="Sí, cancelar cita"
+        onCancel={() => setConfirmCancel(false)}
+        onConfirm={handleCancelar}
+        loading={cancelarMutation.isPending}
+      />
     </div>
   );
 }

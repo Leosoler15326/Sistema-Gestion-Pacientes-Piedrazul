@@ -12,6 +12,7 @@ import { useDisponibilidad } from '../../citas/hooks/UseDisponibilidad';
 import { useCreateCita, useMisCitasPaciente } from '../../citas/hooks/UseCitas';
 import { esFestivoColombia } from '../../../utils/colombianHolidays';
 import { configuracionService } from '../../configuracion/services/configuracion.service';
+import FestivosDatePicker from '../../../components/common/FestivosDatePicker';
 
 const ESTADOS_PENDIENTES = ['PROGRAMADA', 'CONFIRMADA', 'REAGENDADA'];
 const ESTADOS_ATENDIDA = ['ATENDIDA', 'COMPLETADA'];
@@ -290,27 +291,22 @@ export default function PacienteAgendarCitaPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700">
             Fecha <span className="text-red-500">*</span>
           </label>
-          <input
-            type="date"
+          <FestivosDatePicker
             value={fecha}
-            min={getFechaMin()}
-            max={getFechaMax(ventanaDias)}
-            onChange={(e) => handleFechaChange(e.target.value)}
-            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-100 ${
-              fechaError ? 'border-red-400 bg-red-50' : 'border-slate-300 focus:border-blue-500'
-            }`}
-            required
+            onChange={handleFechaChange}
+            minDate={new Date(getFechaMin() + 'T12:00:00')}
+            maxDate={new Date(getFechaMax(ventanaDias) + 'T12:00:00')}
           />
-          {fechaError ? (
+          {fechaError && (
             <p className="mt-1 text-xs text-red-600">{fechaError}</p>
-          ) : (
-            <p className="mt-1 text-xs text-slate-400">
-              Puedes agendar hasta {configData?.ventanaSemanasAgendar ?? 4} semanas adelante. No se agenda en domingos ni festivos.
-            </p>
           )}
+          <p className="mt-1 text-xs text-slate-400">
+            Puedes agendar hasta {configData?.ventanaSemanasAgendar ?? 4} semanas adelante.
+            Los días en rojo son festivos y no están disponibles.
+          </p>
         </div>
 
         {tienePrimeraVezAtendida && (

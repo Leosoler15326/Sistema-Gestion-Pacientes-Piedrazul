@@ -38,38 +38,55 @@ function toISO(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-export function getFestivosColombia(year: number): Set<string> {
+export interface FestivoInfo {
+  fecha: string;
+  nombre: string;
+}
+
+function getFestivosConNombre(year: number): FestivoInfo[] {
   const easter = easterSunday(year);
-  const festivos = new Set<string>();
+  return [
+    { fecha: `${year}-01-01`, nombre: 'Año Nuevo' },
+    { fecha: toISO(siguienteLunes(new Date(year, 0, 6))), nombre: 'Reyes Magos' },
+    { fecha: toISO(siguienteLunes(new Date(year, 2, 19))), nombre: 'San José' },
+    { fecha: toISO(addDays(easter, -3)), nombre: 'Jueves Santo' },
+    { fecha: toISO(addDays(easter, -2)), nombre: 'Viernes Santo' },
+    { fecha: `${year}-05-01`, nombre: 'Día del Trabajo' },
+    { fecha: toISO(siguienteLunes(addDays(easter, 39))), nombre: 'Ascensión' },
+    { fecha: toISO(siguienteLunes(addDays(easter, 60))), nombre: 'Corpus Christi' },
+    { fecha: toISO(siguienteLunes(addDays(easter, 68))), nombre: 'Sagrado Corazón' },
+    { fecha: toISO(siguienteLunes(new Date(year, 5, 29))), nombre: 'San Pedro y San Pablo' },
+    { fecha: `${year}-07-20`, nombre: 'Independencia de Colombia' },
+    { fecha: `${year}-08-07`, nombre: 'Batalla de Boyacá' },
+    { fecha: toISO(siguienteLunes(new Date(year, 7, 15))), nombre: 'Asunción de la Virgen' },
+    { fecha: toISO(siguienteLunes(new Date(year, 9, 12))), nombre: 'Día de la Raza' },
+    { fecha: toISO(siguienteLunes(new Date(year, 10, 1))), nombre: 'Todos los Santos' },
+    { fecha: toISO(siguienteLunes(new Date(year, 10, 11))), nombre: 'Independencia de Cartagena' },
+    { fecha: `${year}-12-08`, nombre: 'Inmaculada Concepción' },
+    { fecha: `${year}-12-25`, nombre: 'Navidad' },
+  ];
+}
 
-  // Fixed holidays
-  festivos.add(`${year}-01-01`); // Año Nuevo
-  festivos.add(`${year}-05-01`); // Día del Trabajo
-  festivos.add(`${year}-07-20`); // Independencia
-  festivos.add(`${year}-08-07`); // Batalla de Boyacá
-  festivos.add(`${year}-12-08`); // Inmaculada Concepción
-  festivos.add(`${year}-12-25`); // Navidad
-
-  // Holy Week (fixed, not moved)
-  festivos.add(toISO(addDays(easter, -3))); // Jueves Santo
-  festivos.add(toISO(addDays(easter, -2))); // Viernes Santo
-
-  // Mobile holidays (moved to next Monday per Ley Emiliani)
-  festivos.add(toISO(siguienteLunes(new Date(year, 0, 6))));   // Reyes Magos
-  festivos.add(toISO(siguienteLunes(new Date(year, 2, 19))));  // San José
-  festivos.add(toISO(siguienteLunes(addDays(easter, 39))));    // Ascensión
-  festivos.add(toISO(siguienteLunes(addDays(easter, 60))));    // Corpus Christi
-  festivos.add(toISO(siguienteLunes(addDays(easter, 68))));    // Sagrado Corazón
-  festivos.add(toISO(siguienteLunes(new Date(year, 5, 29))));  // San Pedro y San Pablo
-  festivos.add(toISO(siguienteLunes(new Date(year, 7, 15)))); // Asunción de la Virgen
-  festivos.add(toISO(siguienteLunes(new Date(year, 9, 12)))); // Día de la Raza
-  festivos.add(toISO(siguienteLunes(new Date(year, 10, 1)))); // Todos los Santos
-  festivos.add(toISO(siguienteLunes(new Date(year, 10, 11)))); // Independencia de Cartagena
-
-  return festivos;
+export function getFestivosColombia(year: number): Set<string> {
+  return new Set(getFestivosConNombre(year).map((f) => f.fecha));
 }
 
 export function esFestivoColombia(dateString: string): boolean {
   const year = parseInt(dateString.substring(0, 4), 10);
   return getFestivosColombia(year).has(dateString);
+}
+
+/** Returns all Colombian holidays between `desde` and `hasta` (YYYY-MM-DD), inclusive. */
+export function getProximosFestivos(desde: string, hasta: string): FestivoInfo[] {
+  const fromYear = parseInt(desde.substring(0, 4), 10);
+  const toYear = parseInt(hasta.substring(0, 4), 10);
+
+  const todos: FestivoInfo[] = [];
+  for (let y = fromYear; y <= toYear; y++) {
+    todos.push(...getFestivosConNombre(y));
+  }
+
+  return todos
+    .filter((f) => f.fecha >= desde && f.fecha <= hasta)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
 }

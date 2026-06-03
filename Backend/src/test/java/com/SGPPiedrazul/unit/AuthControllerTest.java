@@ -1,4 +1,4 @@
-package com.SGPPiedrazul.controller;
+package com.SGPPiedrazul.unit;
 
 import com.SGPPiedrazul.Controller.AuthController;
 import com.SGPPiedrazul.dto.AuthDTO;

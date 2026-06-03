@@ -68,7 +68,7 @@ public class CitaService implements ICitaService {
 
         if (!disponibilidadService.esSlotValidoParaAgendar(profesional, dto.getFechaHora())) {
             throw new IllegalStateException(
-                    "El horario no está disponible o no coincide con las franjas del profesional.");
+                    disponibilidadService.diagnosticarSlotNoDisponible(profesional, dto.getFechaHora()));
         }
 
         Cita cita = new Cita();
@@ -101,7 +101,7 @@ public class CitaService implements ICitaService {
 
         if (!disponibilidadService.esSlotValidoParaAgendar(profesional, dto.getFechaHora())) {
             throw new IllegalStateException(
-                    "El horario no está disponible o no coincide con las franjas del profesional.");
+                    disponibilidadService.diagnosticarSlotNoDisponible(profesional, dto.getFechaHora()));
         }
 
         Paciente paciente = upsertPacienteDesdeContacto(dto.getPaciente());
