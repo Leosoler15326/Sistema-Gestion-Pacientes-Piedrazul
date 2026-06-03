@@ -8,15 +8,17 @@ import {
 interface ProfesionalFormProps {
   onSubmit: (values: CrearProfesionalDto) => Promise<void>;
   loading?: boolean;
+  tipoFijo?: string;   // pre-selecciona y oculta el selector de tipo
 }
 
 export default function ProfesionalForm({
   onSubmit,
   loading = false,
+  tipoFijo,
 }: ProfesionalFormProps) {
   const [form, setForm] = useState<CrearProfesionalDto>({
     nombres: '',
-    tipo: '',
+    tipo: tipoFijo ?? '',
     especialidad: '',
     intervaloMinutos: 30,
     crearUsuario: false,
@@ -121,26 +123,26 @@ export default function ProfesionalForm({
         />
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          Tipo de profesional
-        </label>
-        <select
-          value={form.tipo}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, tipo: e.target.value }))
-          }
-          className="w-full rounded-lg border px-3 py-2"
-          required
-        >
-          <option value="">Selecciona tipo profesional</option>
-          {TIPO_PROFESIONAL_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
+      {!tipoFijo && (
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Tipo de profesional
+          </label>
+          <select
+            value={form.tipo}
+            onChange={(e) => setForm((prev) => ({ ...prev, tipo: e.target.value }))}
+            className="w-full rounded-lg border px-3 py-2"
+            required
+          >
+            <option value="">Selecciona tipo profesional</option>
+            {TIPO_PROFESIONAL_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option === 'MEDICO' ? 'Médico' : 'Terapista'}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">

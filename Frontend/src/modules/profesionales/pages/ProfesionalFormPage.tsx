@@ -8,17 +8,23 @@ import { useCreateProfesional } from '../hooks/useprofesionales';
 import { useCreateUsuario } from '../../usuarios/hooks/useUsuarios';
 import type { CrearProfesionalDto } from '../types/profesional.types';
 
-type TipoPersonal = 'profesional' | 'agendador';
+type TipoPersonal = 'MEDICO' | 'TERAPISTA' | 'AGENDADOR';
 
 const TIPO_CARDS: { value: TipoPersonal; label: string; desc: string; icon: string }[] = [
   {
-    value: 'profesional',
-    label: 'Médico / Terapista',
+    value: 'MEDICO',
+    label: 'Médico',
     desc: 'Tiene agenda propia, franjas horarias e intervalo de atención.',
     icon: '🩺',
   },
   {
-    value: 'agendador',
+    value: 'TERAPISTA',
+    label: 'Terapista',
+    desc: 'Agenda de terapias con franjas e intervalo configurables.',
+    icon: '🤲',
+  },
+  {
+    value: 'AGENDADOR',
     label: 'Agendador',
     desc: 'Gestiona citas y pacientes. No tiene agenda propia.',
     icon: '📋',
@@ -33,7 +39,6 @@ export default function ProfesionalFormPage() {
   const [tipoPersonal, setTipoPersonal] = useState<TipoPersonal | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Campos del formulario de agendador
   const [agendador, setAgendador] = useState({
     nombreCompleto: '',
     email: '',
@@ -41,7 +46,7 @@ export default function ProfesionalFormPage() {
     contrasena: '',
   });
 
-  /* ── handlers ─────────────────────────────────────── */
+  /* ── submit profesional (médico / terapista) ───────── */
 
   const handleSubmitProfesional = async (values: CrearProfesionalDto) => {
     setErrorMessage('');
@@ -51,16 +56,16 @@ export default function ProfesionalFormPage() {
     });
   };
 
+  /* ── submit agendador ──────────────────────────────── */
+
   const handleSubmitAgendador = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
-
     const { nombreCompleto, email, nombreUsuario, contrasena } = agendador;
     if (!nombreCompleto.trim() || !email.trim() || !nombreUsuario.trim() || !contrasena.trim()) {
       setErrorMessage('Todos los campos son obligatorios.');
       return;
     }
-
     try {
       await createUsuarioMutation.mutateAsync({
         nombreCompleto: nombreCompleto.trim(),
@@ -80,7 +85,7 @@ export default function ProfesionalFormPage() {
     }
   };
 
-  /* ── render ───────────────────────────────────────── */
+  const tipoSeleccionado = TIPO_CARDS.find((c) => c.value === tipoPersonal);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
@@ -95,8 +100,8 @@ export default function ProfesionalFormPage() {
         </div>
       )}
 
-      {/* Selector de tipo */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 max-w-2xl">
+      {/* Selector de tipo — siempre visible */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-3 max-w-3xl">
         {TIPO_CARDS.map((card) => (
           <button
             key={card.value}
@@ -112,7 +117,11 @@ export default function ProfesionalFormPage() {
             }`}
           >
             <span className="text-2xl">{card.icon}</span>
-            <p className={`mt-2 font-semibold ${tipoPersonal === card.value ? 'text-blue-700' : 'text-slate-800'}`}>
+            <p
+              className={`mt-2 font-semibold ${
+                tipoPersonal === card.value ? 'text-blue-700' : 'text-slate-800'
+              }`}
+            >
               {card.label}
             </p>
             <p className="mt-1 text-xs text-slate-500">{card.desc}</p>
@@ -120,22 +129,29 @@ export default function ProfesionalFormPage() {
         ))}
       </div>
 
-      {/* Formulario según tipo */}
-      {tipoPersonal === 'profesional' && (
-        <ProfesionalForm
-          onSubmit={handleSubmitProfesional}
-          loading={createProfesionalMutation.isPending}
-        />
+      {/* Formulario según tipo seleccionado */}
+      {tipoPersonal && (tipoPersonal === 'MEDICO' || tipoPersonal === 'TERAPISTA') && (
+        <div className="max-w-xl">
+          <p className="mb-4 text-sm font-medium text-slate-600">
+            {tipoSeleccionado?.icon} Registrando:{' '}
+            <span className="font-semibold text-slate-800">{tipoSeleccionado?.label}</span>
+          </p>
+          <ProfesionalForm
+            tipoFijo={tipoPersonal}
+            onSubmit={handleSubmitProfesional}
+            loading={createProfesionalMutation.isPending}
+          />
+        </div>
       )}
 
-      {tipoPersonal === 'agendador' && (
+      {tipoPersonal === 'AGENDADOR' && (
         <form
           onSubmit={handleSubmitAgendador}
           className="max-w-xl space-y-4 rounded-xl bg-white p-4 shadow sm:p-6"
         >
           <p className="text-sm text-slate-600">
-            El agendador podrá iniciar sesión y gestionar citas y pacientes, pero no tendrá
-            agenda propia.
+            📋 El agendador podrá iniciar sesión y gestionar citas y pacientes, pero no
+            tendrá agenda propia ni franjas horarias.
           </p>
 
           <div>
@@ -194,22 +210,13 @@ export default function ProfesionalFormPage() {
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={createUsuarioMutation.isPending}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-            >
-              {createUsuarioMutation.isPending ? 'Creando...' : 'Crear agendador'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setTipoPersonal(null)}
-              className="rounded-lg border border-slate-300 px-5 py-2.5 text-slate-700 hover:bg-slate-50"
-            >
-              Cambiar tipo
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={createUsuarioMutation.isPending}
+            className="w-full rounded-lg bg-blue-600 py-2.5 font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+          >
+            {createUsuarioMutation.isPending ? 'Creando agendador...' : 'Crear agendador'}
+          </button>
         </form>
       )}
     </div>
