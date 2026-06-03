@@ -6,7 +6,7 @@ import com.SGPPiedrazul.model.Usuario;
 import com.SGPPiedrazul.repository.ProfesionalRepository;
 import com.SGPPiedrazul.repository.UsuarioRepository;
 import com.SGPPiedrazul.security.SecurityUtils;
-import com.SGPPiedrazul.service.CitaService;
+import com.SGPPiedrazul.service.ICitaService;
 import com.SGPPiedrazul.service.HistoriaClinicaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,12 +24,12 @@ public class HistoriaClinicaController {
     private final HistoriaClinicaService historiaClinicaService;
     private final UsuarioRepository usuarioRepository;
     private final ProfesionalRepository profesionalRepository;
-    private final CitaService citaService;
+    private final ICitaService citaService;
 
     public HistoriaClinicaController(HistoriaClinicaService historiaClinicaService,
                                      UsuarioRepository usuarioRepository,
                                      ProfesionalRepository profesionalRepository,
-                                     CitaService citaService) {
+                                     ICitaService citaService) {
         this.historiaClinicaService = historiaClinicaService;
         this.usuarioRepository = usuarioRepository;
         this.profesionalRepository = profesionalRepository;

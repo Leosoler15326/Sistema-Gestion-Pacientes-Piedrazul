@@ -99,3 +99,23 @@ export function useCita(id?: number) {
 }
 
 export const useCitaDetail = useCita;
+
+export function useCambiarEstadoCita() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      estado,
+      observacion,
+    }: {
+      id: number;
+      estado: string;
+      observacion?: string;
+    }) => citasService.cambiarEstado(id, estado, observacion),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['citas'] });
+      queryClient.invalidateQueries({ queryKey: ['citas', 'detalle', variables.id] });
+    },
+  });
+}

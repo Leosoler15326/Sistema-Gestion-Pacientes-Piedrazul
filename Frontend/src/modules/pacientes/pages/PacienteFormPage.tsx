@@ -24,7 +24,7 @@ export default function PacienteFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Nuevo paciente"
         subtitle="Registra un nuevo paciente en el sistema."

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
 import InlineMessage from '../../../components/common/InlineMessage';
 import PageHeader from '../../../components/common/PageHeader';
 import BackButton from '../../../components/common/BackButton';
+import { APP_ROUTES } from '../../../app/router/routes';
 import { useAuth } from '../../auth/hooks/useAuth';
 import ProfesionalFranjasSection from '../components/ProfesionalFranjasSection';
 import { useCambiarEstadoProfesional, useProfesionalDetail } from '../hooks/useprofesionales';
@@ -45,11 +46,23 @@ export default function ProfesionalDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title={data.nombres}
         subtitle="Detalle del profesional"
-        actions={<BackButton />}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <BackButton />
+            {esAdmin && (
+              <Link
+                to={APP_ROUTES.PROFESIONALES_EDITAR.replace(':id', String(id))}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              >
+                Editar datos
+              </Link>
+            )}
+          </div>
+        }
       />
 
       {message && (
@@ -61,11 +74,14 @@ export default function ProfesionalDetailPage() {
         </div>
       )}
 
-      <div className="space-y-4 rounded-xl bg-white p-6 shadow">
+      <div className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
       <p><strong>Nombre:</strong> {data.nombres}</p>
       <p><strong>Tipo:</strong> {data.tipo}</p>
       <p><strong>Especialidad:</strong> {data.especialidad}</p>
       <p><strong>Intervalo de agenda:</strong> {data.intervaloMinutos} min</p>
+      {data.habilidadesAdicionales && (
+        <p><strong>Habilidades adicionales:</strong> {data.habilidadesAdicionales}</p>
+      )}
       <p><strong>Estado laboral:</strong> {data.estado}</p>
       <p><strong>Acceso al sistema:</strong> {data.usuarioVinculado ? 'Sí' : 'No'}</p>
 
@@ -76,7 +92,7 @@ export default function ProfesionalDetailPage() {
         </>
       )}
 
-      <div className="flex gap-2 pt-4">
+      <div className="flex flex-wrap gap-2 pt-4">
         {['ACTIVO', 'INACTIVO'].map((estado) => (
           <button
             key={estado}

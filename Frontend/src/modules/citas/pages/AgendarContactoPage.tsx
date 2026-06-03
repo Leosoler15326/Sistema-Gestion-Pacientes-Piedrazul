@@ -3,12 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../../components/common/PageHeader';
 import InlineMessage from '../../../components/common/InlineMessage';
 import { APP_ROUTES } from '../../../app/router/routes';
-import { ESPECIALIDAD_OPTIONS, GENERO_PACIENTE_OPTIONS, TIPO_ATENCION_OPTIONS } from '../../../constants/enums';
+import { ESPECIALIDAD_OPTIONS, GENERO_PACIENTE_OPTIONS, TIPO_ATENCION_OPTIONS, TIPO_ATENCION_LABEL } from '../../../constants/enums';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
 import { useDisponibilidad } from '../hooks/UseDisponibilidad';
 import { useAgendarDesdeContacto } from '../hooks/UseCitas';
 import { useSugerenciasDocumento } from '../../pacientes/hooks/usePacientes';
 import type { AgendarContactoRequestDto, PacienteContactoDto } from '../types/cita.types';
+import FestivosDatePicker from '../../../components/common/FestivosDatePicker';
+
+function getFechaMinContacto(): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(12, 0, 0, 0);
+  return d;
+}
 
 export default function AgendarContactoPage() {
   const navigate = useNavigate();
@@ -112,7 +120,7 @@ export default function AgendarContactoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Agendar desde contacto"
         subtitle="Alta rápida tipo WhatsApp: datos del paciente y cita en un solo paso."
@@ -126,7 +134,7 @@ export default function AgendarContactoPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-4xl space-y-6 rounded-2xl bg-white p-6 shadow-sm"
+        className="max-w-4xl space-y-6 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
       >
         <section>
           <h3 className="mb-3 text-sm font-semibold text-slate-800">Paciente</h3>
@@ -276,16 +284,14 @@ export default function AgendarContactoPage() {
             </div>
             <div>
               <label className="mb-1 block text-xs text-slate-600">Fecha</label>
-              <input
-                type="date"
+              <FestivosDatePicker
                 value={fecha}
-                onChange={(e) => {
-                  setFecha(e.target.value);
+                onChange={(val) => {
+                  setFecha(val);
                   setHoraSeleccionada('');
                   setHoraManual('');
                 }}
-                className="w-full rounded-lg border px-3 py-2"
-                required
+                minDate={getFechaMinContacto()}
               />
             </div>
             <div>
@@ -299,7 +305,7 @@ export default function AgendarContactoPage() {
                 <option value="">Selecciona</option>
                 {TIPO_ATENCION_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
-                    {opt}
+                    {TIPO_ATENCION_LABEL[opt] ?? opt}
                   </option>
                 ))}
               </select>

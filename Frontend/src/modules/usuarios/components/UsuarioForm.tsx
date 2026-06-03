@@ -2,6 +2,13 @@ import { useState, type FormEvent } from 'react';
 import type { CrearUsuarioDto } from '../types/usuario.types';
 import { ROL_USUARIO_OPTIONS } from '../../../constants/enums';
 
+const ROL_LABEL: Record<string, string> = {
+  ADMINISTRADOR: 'Administrador',
+  MEDICO_TERAPISTA: 'Médico / Terapista',
+  AGENDADOR: 'Agendador',
+  PACIENTE: 'Paciente',
+};
+
 interface UsuarioFormProps {
   onSubmit: (values: CrearUsuarioDto) => Promise<void>;
   loading?: boolean;
@@ -41,7 +48,7 @@ export default function UsuarioForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
       <input
         type="text"
         placeholder="Nombre de usuario"
@@ -97,7 +104,7 @@ export default function UsuarioForm({
         <option value="">Selecciona un rol</option>
         {ROL_USUARIO_OPTIONS.map((option) => (
           <option key={option} value={option}>
-            {option}
+            {ROL_LABEL[option] ?? option}
           </option>
         ))}
       </select>

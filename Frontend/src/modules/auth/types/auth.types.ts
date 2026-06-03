@@ -33,3 +33,14 @@ export interface AuthUserDto {
   nombreCompleto: string;
   rol: UserRole;
 }
+
+export interface CambiarContrasenaDto {
+  contrasenaActual: string;
+  nuevaContrasena: string;
+}
+
+export interface RecuperarContrasenaDto {
+  nombreUsuario: string;
+  email: string;
+  nuevaContrasena: string;
+}

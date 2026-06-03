@@ -1,0 +1,78 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# render.yaml – Despliegue en Render.com (gratuito, sin tarjeta de crédito)
+# Documentación: https://render.com/docs/blueprint-spec
+#
+# INSTRUCCIONES:
+# 1. Crea cuenta en https://render.com (usa GitHub para autenticarte)
+# 2. En el dashboard → "New" → "Blueprint"
+# 3. Conecta el repositorio GitHub y selecciona este archivo
+# 4. Render creará automáticamente los 3 servicios (DB + backend + frontend)
+# ─────────────────────────────────────────────────────────────────────────────
+
+databases:
+  - name: sgp-piedrazul-db
+    databaseName: sgp_piedrazul
+    user: sgp_user
+    plan: free          # 256 MB RAM, 1 GB almacenamiento, disponible 90 días gratis
+
+services:
+  # ─── Backend: Spring Boot ───────────────────────────────────────────────
+  - type: web
+    name: sgp-backend
+    runtime: docker
+    dockerfilePath: ./Backend/Dockerfile
+    dockerContext: ./Backend
+    plan: free           # 512 MB RAM, se duerme tras 15 min inactivo
+    healthCheckPath: /api/health
+
+    envVars:
+      # Conexión a la base de datos (Render inyecta la URL automáticamente)
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: sgp-piedrazul-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sgp-piedrazul-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sgp-piedrazul-db
+          property: password
+
+      # JWT (Render genera un valor aleatorio seguro)
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: "3600000"
+      - key: JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+
+      # JPA – no ejecutar SQL de inicialización, Hibernate gestiona el esquema
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: SPRING_SQL_INIT_MODE
+        value: never
+
+      # CORS – URL del frontend en Render
+      - key: FRONTEND_URL
+        fromService:
+          name: sgp-frontend
+          type: web
+          property: host
+
+  # ─── Frontend: React + Nginx ─────────────────────────────────────────────
+  - type: web
+    name: sgp-frontend
+    runtime: docker
+    dockerfilePath: ./Frontend/Dockerfile
+    dockerContext: ./Frontend
+    plan: free
+
+    buildArgs:
+      # URL del backend para que Axios apunte al servicio correcto
+      - key: VITE_API_URL
+        fromService:
+          name: sgp-backend
+          type: web
+          property: host

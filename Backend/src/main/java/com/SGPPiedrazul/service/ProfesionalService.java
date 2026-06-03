@@ -49,6 +49,7 @@ public class ProfesionalService {
         profesional.setTipo(dto.getTipo());
         profesional.setEspecialidad(dto.getEspecialidad());
         profesional.setIntervaloMinutos(dto.getIntervaloMinutos());
+        profesional.setHabilidadesAdicionales(dto.getHabilidadesAdicionales());
         profesional.setEstado(Estado.ACTIVO);
 
         Profesional guardado = profesionalRepository.save(profesional);
@@ -99,6 +100,7 @@ public class ProfesionalService {
         profesional.setTipo(dto.getTipo());
         profesional.setEspecialidad(dto.getEspecialidad());
         profesional.setIntervaloMinutos(dto.getIntervaloMinutos());
+        profesional.setHabilidadesAdicionales(dto.getHabilidadesAdicionales());
 
         Profesional actualizado = profesionalRepository.save(profesional);
 
@@ -117,6 +119,19 @@ public class ProfesionalService {
         Profesional profesional = buscarEntidadPorId(id);
         profesional.setEstado(nuevoEstado);
         profesionalRepository.save(profesional);
+
+        // Si el profesional tiene usuario vinculado, sincronizar su estado
+        if (profesional.getUsuario() != null) {
+            Usuario usuario = profesional.getUsuario();
+            usuario.setEstado(nuevoEstado);
+            usuarioRepository.save(usuario);
+
+            auditoriaService.registrar(TipoEvento.USUARIO_MODIFICADO,
+                    "Usuario " + usuario.getNombreUsuario()
+                    + " " + (nuevoEstado == Estado.ACTIVO ? "activado" : "desactivado")
+                    + " al cambiar estado del profesional " + profesional.getNombres(),
+                    usuarioResponsable);
+        }
 
         auditoriaService.registrar(TipoEvento.PROFESIONAL_MODIFICADO,
                 "Estado del profesional " + profesional.getNombres()

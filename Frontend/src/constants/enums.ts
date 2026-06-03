@@ -4,7 +4,19 @@ export const TIPO_ATENCION_OPTIONS = [
   'URGENCIA',
 ] as const;
 
+export const TIPO_ATENCION_LABEL: Record<string, string> = {
+  PRIMERA_VEZ: 'Cita general',
+  CONTROL: 'Control (revisita)',
+  URGENCIA: 'Prioritaria',
+};
+
 export const GENERO_PACIENTE_OPTIONS = ['HOMBRE', 'MUJER', 'OTRO'] as const;
+
+export const GENERO_LABEL: Record<string, string> = {
+  HOMBRE: 'Hombre',
+  MUJER: 'Mujer',
+  OTRO: 'Prefiero no indicar',
+};
 
 export const ROL_USUARIO_OPTIONS = [
   'ADMINISTRADOR',
@@ -23,6 +35,12 @@ export const ESPECIALIDAD_OPTIONS = [
   'QUIROPRAXIA',
   'FISIOTERAPIA',
 ] as const;
+
+export const ESPECIALIDAD_LABEL: Record<string, string> = {
+  TERAPIA_NEURAL: 'Terapia Neural',
+  QUIROPRAXIA: 'Quiropraxia',
+  FISIOTERAPIA: 'Fisioterapia',
+};
 
 export const ESTADO_PROFESIONAL_OPTIONS = [
   'ACTIVO',

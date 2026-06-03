@@ -4,7 +4,7 @@ import com.SGPPiedrazul.dto.CitaDTO;
 import com.SGPPiedrazul.model.Usuario;
 import com.SGPPiedrazul.repository.UsuarioRepository;
 import com.SGPPiedrazul.security.SecurityUtils;
-import com.SGPPiedrazul.service.CitaService;
+import com.SGPPiedrazul.service.ICitaService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +21,10 @@ import java.util.List;
 @RequestMapping("/api/citas")
 public class CitaController {
 
-    private final CitaService citaService;
+    private final ICitaService citaService;
     private final UsuarioRepository usuarioRepository;
 
-    public CitaController(CitaService citaService,
+    public CitaController(ICitaService citaService,
                           UsuarioRepository usuarioRepository) {
         this.citaService = citaService;
         this.usuarioRepository = usuarioRepository;
@@ -83,6 +83,17 @@ public class CitaController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<CitaDTO.Response> cambiarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody CitaDTO.CambiarEstadoRequest dto) {
+        Usuario responsable = usuarioRepository
+                .findByNombreUsuario(SecurityUtils.getNombreUsuarioActual())
+                .orElse(null);
+        return ResponseEntity.ok(citaService.cambiarEstado(id, dto, responsable));
+    }
+
     @GetMapping("/profesional")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
     public ResponseEntity<List<CitaDTO.Response>> listarPorProfesional(
@@ -106,6 +117,18 @@ public class CitaController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"citas_" + profesionalId + "_" + fecha + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .body(data);
+    }
+
+    @GetMapping(value = "/exportar-csv-todos", produces = "text/csv;charset=UTF-8")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','AGENDADOR','MEDICO_TERAPISTA')")
+    public ResponseEntity<byte[]> exportarCsvTodos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        byte[] data = citaService.exportarCsvTodosFecha(fecha);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"citas_todos_" + fecha + ".csv\"")
                 .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
                 .body(data);
     }

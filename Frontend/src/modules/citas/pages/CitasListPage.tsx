@@ -25,6 +25,7 @@ type ProfesionalPerfilDto = {
   id?: number;
   nombres?: string;
   nombre?: string;
+  especialidad?: string;
 };
 
 const hoy = () => new Date().toISOString().split('T')[0];
@@ -307,6 +308,28 @@ export default function CitasListPage() {
     }
   };
 
+  const handleExportarCsvTodos = async () => {
+    if (!fechaDesdeProfesional) {
+      setMessage('Selecciona una fecha para exportar todos los profesionales.');
+      return;
+    }
+    try {
+      setExportingCsv(true);
+      setMessage('');
+      const blob = await citasService.exportarCsvTodosFecha(fechaDesdeProfesional);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `citas_todos_${fechaDesdeProfesional}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setMessage('No fue posible exportar el CSV.');
+    } finally {
+      setExportingCsv(false);
+    }
+  };
+
   const handleConfirmCancel = async () => {
     if (!citaIdToCancel) return;
 
@@ -325,7 +348,7 @@ export default function CitasListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Citas"
         subtitle="Consulta y gestiona citas por paciente o por profesional."
@@ -479,7 +502,7 @@ export default function CitasListPage() {
                 >
                   <option value="">Selecciona un profesional</option>
                   {Array.isArray(profesionales) &&
-                    profesionales.map((p: any) => (
+                    profesionales.map((p: ProfesionalPerfilDto) => (
                       <option
                         key={p.profesionalId ?? p.id}
                         value={p.profesionalId ?? p.id}
@@ -543,14 +566,24 @@ export default function CitasListPage() {
               </button>
 
               {puedeExportarCsv && (
-                <button
-                  type="button"
-                  onClick={handleExportarCsvDia}
-                  disabled={exportingCsv}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
-                >
-                  {exportingCsv ? 'Exportando...' : 'Exportar CSV (día inicial)'}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleExportarCsvDia}
+                    disabled={exportingCsv}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                  >
+                    {exportingCsv ? 'Exportando...' : 'Exportar CSV (un profesional)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportarCsvTodos}
+                    disabled={exportingCsv}
+                    className="rounded-lg border border-green-300 bg-white px-3 py-2 text-sm text-green-700 hover:bg-green-50 disabled:opacity-60"
+                  >
+                    {exportingCsv ? 'Exportando...' : 'Exportar todos los profesionales'}
+                  </button>
+                </>
               )}
             </div>
 

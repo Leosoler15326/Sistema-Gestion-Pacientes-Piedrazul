@@ -30,6 +30,7 @@ export interface CreateCitaRequestDto {
 export interface ReagendarCitaRequestDto {
   nuevaFechaHora: string;
   motivo?: string;
+  nuevoProfesionalId?: number;
 }
 
 export interface CancelarCitaRequestDto {

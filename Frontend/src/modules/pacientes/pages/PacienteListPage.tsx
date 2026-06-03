@@ -41,7 +41,7 @@ export default function PacientesListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Pacientes"
         subtitle="Consulta y gestiona pacientes registrados."
@@ -55,14 +55,14 @@ export default function PacientesListPage() {
         }
       />
 
-      <div className="mb-6 rounded-xl bg-white p-4 shadow">
-        <div className="flex gap-3">
+      <div className="mb-4 rounded-xl bg-white p-4 shadow sm:mb-6">
+        <div className="flex flex-wrap gap-2">
           <input
             type="text"
             placeholder="Buscar por nombre"
             value={nombreBusqueda}
             onChange={(e) => setNombreBusqueda(e.target.value)}
-            className="rounded-lg border px-3 py-2"
+            className="flex-1 rounded-lg border px-3 py-2 min-w-0"
           />
           <button
             type="button"

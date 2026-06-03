@@ -25,6 +25,7 @@ export interface ProfesionalDto {
   nombreUsuario?: string | null;
   rolUsuario?: string | null;
   usuarioVinculado?: boolean;
+  habilidadesAdicionales?: string | null;
 }
 
 export interface CrearProfesionalDto {
@@ -32,6 +33,7 @@ export interface CrearProfesionalDto {
   tipo: TipoProfesional;
   especialidad: Especialidad;
   intervaloMinutos: number;
+  habilidadesAdicionales?: string | null;
   crearUsuario: boolean;
   nombreUsuario?: string;
   contrasena?: string;
@@ -42,6 +44,7 @@ export interface ActualizarProfesionalDto {
   tipo?: TipoProfesional;
   especialidad?: Especialidad;
   intervaloMinutos?: number;
+  habilidadesAdicionales?: string | null;
 }
 
 export interface FranjaHorariaDto {

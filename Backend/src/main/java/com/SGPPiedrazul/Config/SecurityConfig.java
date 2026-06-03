@@ -50,9 +50,15 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/registro",
                     "/api/auth/verificar-email",
+                    "/api/auth/recuperar-contrasena",
                     "/api/health",
                     "/api/hash"
                 ).permitAll()
+
+                // Actuator: health público, prometheus restringido a ADMINISTRADOR
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/prometheus", "/actuator/metrics/**")
+                    .hasRole("ADMINISTRADOR")
 
                 // Solo ADMINISTRADOR
                 .requestMatchers("/api/usuarios/**").hasAnyRole("ADMINISTRADOR")
@@ -78,8 +84,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

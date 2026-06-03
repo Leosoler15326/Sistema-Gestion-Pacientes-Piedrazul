@@ -2,6 +2,8 @@ export const APP_ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTRO_PACIENTE: '/registro-paciente',
+  RECUPERAR_CONTRASENA: '/recuperar-contrasena',
+  CAMBIAR_CONTRASENA: '/cambiar-contrasena',
 
   CITAS: '/citas',
   CITAS_NUEVA: '/citas/nueva',
@@ -22,6 +24,7 @@ export const APP_ROUTES = {
   PROFESIONALES: '/profesionales',
   PROFESIONALES_NUEVO: '/profesionales/nuevo',
   PROFESIONALES_DETALLE: '/profesionales/:id',
+  PROFESIONALES_EDITAR: '/profesionales/:id/editar',
 
   USUARIOS: '/usuarios',
   USUARIOS_NUEVO: '/usuarios/nuevo',

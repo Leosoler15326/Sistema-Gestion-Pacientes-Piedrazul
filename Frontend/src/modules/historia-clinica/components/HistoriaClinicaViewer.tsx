@@ -6,7 +6,7 @@ interface HistoriaClinicaViewerProps {
 
 export default function HistoriaClinicaViewer({ item }: HistoriaClinicaViewerProps) {
   return (
-    <div className="space-y-4 rounded-xl bg-white p-6 shadow">
+    <div className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
       <p><strong>ID:</strong> {item.id}</p>
       <p><strong>Cita ID:</strong> {item.citaId}</p>
 

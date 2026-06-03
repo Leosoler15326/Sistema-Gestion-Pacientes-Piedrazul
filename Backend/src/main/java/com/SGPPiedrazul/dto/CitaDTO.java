@@ -1,5 +1,6 @@
 package com.SGPPiedrazul.dto;
 
+import com.SGPPiedrazul.model.enums.EstadoCita;
 import com.SGPPiedrazul.model.enums.GeneroPaciente;
 import com.SGPPiedrazul.model.enums.TipoAtencion;
 import jakarta.validation.Valid;
@@ -120,10 +121,14 @@ public class CitaDTO {
 
         private String motivo;
 
+        private Long nuevoProfesionalId;
+
         public LocalDateTime getNuevaFechaHora() { return nuevaFechaHora; }
         public void setNuevaFechaHora(LocalDateTime v) { this.nuevaFechaHora = v; }
         public String getMotivo() { return motivo; }
         public void setMotivo(String v) { this.motivo = v; }
+        public Long getNuevoProfesionalId() { return nuevoProfesionalId; }
+        public void setNuevoProfesionalId(Long v) { this.nuevoProfesionalId = v; }
     }
 
     // ─── Request: Cancelar cita ───
@@ -132,6 +137,20 @@ public class CitaDTO {
 
         public String getMotivo() { return motivo; }
         public void setMotivo(String v) { this.motivo = v; }
+    }
+
+    // ─── Request: Cambiar estado de cita ───
+    public static class CambiarEstadoRequest {
+
+        @NotNull(message = "El estado es obligatorio.")
+        private EstadoCita estado;
+
+        private String observacion;
+
+        public EstadoCita getEstado() { return estado; }
+        public void setEstado(EstadoCita e) { this.estado = e; }
+        public String getObservacion() { return observacion; }
+        public void setObservacion(String o) { this.observacion = o; }
     }
 
     // ─── Response ───

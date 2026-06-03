@@ -62,7 +62,7 @@ export default function ConfigAgendamientoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Configuración de agendamiento"
         subtitle="Ventana máxima en semanas para que pacientes y agenda elijan fechas de cita."
@@ -81,7 +81,7 @@ export default function ConfigAgendamientoPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-lg space-y-4 rounded-2xl bg-white p-6 shadow-sm"
+        className="max-w-lg space-y-4 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
       >
         <p className="text-sm text-slate-600">
           Valor actual en servidor:{' '}

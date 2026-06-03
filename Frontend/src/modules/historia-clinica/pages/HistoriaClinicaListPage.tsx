@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import EmptyState from '../../../components/common/EmptyState';
 import Loader from '../../../components/common/Loader';
@@ -11,6 +11,7 @@ import {
   useHistoriasPorProfesional,
 } from '../hooks/useHistoriaClinica';
 import { useProfesionalesActivos } from '../../profesionales/hooks/useprofesionales';
+import type { ProfesionalDto } from '../../profesionales/types/profesional.types';
 import { usePacientesPorNombre } from '../../pacientes/hooks/usePacientes';
 
 type SearchMode = 'paciente' | 'profesional';
@@ -22,7 +23,9 @@ export default function HistoriaClinicaListPage() {
   const [searchMode, setSearchMode] = useState<SearchMode>('paciente');
   const [nombrePaciente, setNombrePaciente] = useState('');
   const [profesionalIdInput, setProfesionalIdInput] = useState('');
-  const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
+  const [pacienteId, setPacienteId] = useState<number | undefined>(
+    pacienteIdFromQuery ? Number(pacienteIdFromQuery) : undefined
+  );
   const [profesionalId, setProfesionalId] = useState<number | undefined>(undefined);
   const [message, setMessage] = useState('');
 
@@ -31,14 +34,6 @@ export default function HistoriaClinicaListPage() {
     data: pacientesEncontrados,
     isLoading: pacientesLoading,
   } = usePacientesPorNombre(nombrePaciente);
-
-  useEffect(() => {
-    if (pacienteIdFromQuery) {
-      setSearchMode('paciente');
-      setPacienteId(Number(pacienteIdFromQuery));
-    }
-  }, [pacienteIdFromQuery]);
-
   const pacienteSeleccionado = useMemo(() => {
     return pacientesEncontrados?.find((p) => p.id === pacienteId);
   }, [pacientesEncontrados, pacienteId]);
@@ -73,7 +68,7 @@ export default function HistoriaClinicaListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title="Historias clínicas"
         subtitle="Consulta historias clínicas por paciente o por profesional."
@@ -194,12 +189,12 @@ export default function HistoriaClinicaListPage() {
             >
               <option value="">Selecciona un profesional</option>
               {Array.isArray(profesionales) &&
-                profesionales.map((p: any) => (
+                profesionales.map((p: ProfesionalDto) => (
                   <option
-                    key={p.profesionalId ?? p.id}
-                    value={p.profesionalId ?? p.id}
+                    key={p.profesionalId}
+                    value={p.profesionalId}
                   >
-                    {(p.nombres ?? p.nombre ?? 'Profesional')}
+                    {p.nombres}
                     {p.especialidad ? ` - ${p.especialidad}` : ''}
                   </option>
                 ))}

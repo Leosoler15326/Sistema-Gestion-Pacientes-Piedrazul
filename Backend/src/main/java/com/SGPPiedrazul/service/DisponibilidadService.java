@@ -72,6 +72,28 @@ public class DisponibilidadService {
         return calcularSlotsDisponibles(profesional, fechaHora.toLocalDate()).contains(fechaHora);
     }
 
+    /**
+     * Returns a specific error message explaining why a slot cannot be booked.
+     * Call only after esSlotValidoParaAgendar returned false.
+     */
+    public String diagnosticarSlotNoDisponible(Profesional profesional, LocalDateTime fechaHora) {
+        if (!validarDisponibilidad(profesional, fechaHora)) {
+            return "El horario " + fechaHora.toLocalTime()
+                    + " ya está ocupado para ese profesional. Elige otro horario.";
+        }
+        List<LocalDateTime> slots = calcularSlotsDisponibles(profesional, fechaHora.toLocalDate());
+        if (slots.isEmpty()) {
+            return "El profesional no tiene franja de atención el "
+                    + fechaHora.toLocalDate().getDayOfWeek().toString().toLowerCase()
+                    + ". Elige otro día.";
+        }
+        return "El horario " + fechaHora.toLocalTime()
+                + " no corresponde a ninguna franja del profesional ese día."
+                + " Horarios disponibles: " + slots.stream()
+                        .map(s -> s.toLocalTime().toString())
+                        .collect(java.util.stream.Collectors.joining(", ")) + ".";
+    }
+
     // Genera los slots de tiempo dentro de una franja horaria
     private List<LocalDateTime> generarSlots(FranjaHoraria franja, int intervaloMinutos, LocalDate fecha) {
         List<LocalDateTime> slots = new ArrayList<>();

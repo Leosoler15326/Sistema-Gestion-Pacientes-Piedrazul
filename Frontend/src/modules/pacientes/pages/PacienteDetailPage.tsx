@@ -24,12 +24,12 @@ export default function PacienteDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title={`Paciente #${data.nombreCompleto}`}
         subtitle="Detalle del paciente"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <BackButton />
             <Link
               to={APP_ROUTES.PACIENTES_EDITAR.replace(':id', String(data.id))}
@@ -41,7 +41,7 @@ export default function PacienteDetailPage() {
         }
       />
 
-      <div className="space-y-4 rounded-xl bg-white p-6 shadow">
+      <div className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
         <p><strong>Nombres:</strong> {data.nombres}</p>
         <p><strong>Apellidos:</strong> {data.apellidos}</p>
         <p><strong>Nombre completo:</strong> {data.nombreCompleto}</p>

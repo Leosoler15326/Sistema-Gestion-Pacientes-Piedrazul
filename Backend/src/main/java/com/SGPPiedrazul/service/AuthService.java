@@ -142,6 +142,42 @@ public class AuthService {
         );
     }
  
+    // ─── Cambiar contraseña (usuario autenticado) ───
+    @Transactional
+    public void cambiarContrasena(AuthDTO.CambiarContrasenaRequest dto) {
+        String nombreUsuario = com.SGPPiedrazul.security.SecurityUtils.getNombreUsuarioActual();
+        Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+
+        if (!passwordEncoder.matches(dto.getContrasenaActual(), usuario.getContrasena())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta.");
+        }
+        usuario.setContrasena(passwordEncoder.encode(dto.getNuevaContrasena()));
+        usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(TipoEvento.USUARIO_MODIFICADO,
+                "Contraseña cambiada por el propio usuario: " + nombreUsuario, nombreUsuario);
+    }
+
+    // ─── Recuperar contraseña (sin sesión, verifica cédula + correo) ───
+    @Transactional
+    public void recuperarContrasena(AuthDTO.RecuperarContrasenaRequest dto) {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(dto.getNombreUsuario())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se encontró una cuenta con esa cédula y correo."));
+
+        if (!dto.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+            throw new IllegalArgumentException(
+                    "No se encontró una cuenta con esa cédula y correo.");
+        }
+        usuario.setContrasena(passwordEncoder.encode(dto.getNuevaContrasena()));
+        usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(TipoEvento.USUARIO_MODIFICADO,
+                "Contraseña recuperada para: " + usuario.getNombreUsuario(),
+                usuario.getNombreUsuario());
+    }
+
     // ─── Verificación de email ───
     @Transactional
     public boolean verificarEmail(String token) {

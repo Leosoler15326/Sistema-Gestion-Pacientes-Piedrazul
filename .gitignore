@@ -1,0 +1,13 @@
+# Claude Code (configuración local de la máquina, no va al repo)
+.claude/
+
+# Carpetas con espacios / temporales
+sistema piedra azul/
+
+# Variables de entorno
+.env
+*.env.local
+
+# Sistemas operativos
+.DS_Store
+Thumbs.db

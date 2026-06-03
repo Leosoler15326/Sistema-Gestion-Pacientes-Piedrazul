@@ -24,12 +24,12 @@ export default function UsuarioDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <PageHeader
         title={data.nombreCompleto||data.nombres|| `Detalle de usuario`}
         subtitle="Detalle del usuario"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <BackButton />
             <Link
               to={APP_ROUTES.USUARIOS_EDITAR.replace(':id', String(data.id))}
@@ -41,7 +41,7 @@ export default function UsuarioDetailPage() {
         }
       />
 
-      <div className="space-y-4 rounded-xl bg-white p-6 shadow">
+      <div className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
         <p><strong>Usuario:</strong> {data.nombreUsuario || data.username || 'N/A'}</p>
         <p><strong>Nombre completo:</strong> {data.nombreCompleto || data.nombres || 'N/A'}</p>
         <p><strong>Email:</strong> {data.email || 'N/A'}</p>

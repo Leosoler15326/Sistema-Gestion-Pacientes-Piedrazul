@@ -26,7 +26,7 @@ export default function PacienteEditForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-4 shadow sm:p-6">
       <input
         type="text"
         value={form.nombres ?? ''}

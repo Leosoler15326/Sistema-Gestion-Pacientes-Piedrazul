@@ -30,8 +30,9 @@ export const historiaClinicaService = {
         `${HISTORIA_BASE}/cita/${citaId}`
       );
       return data;
-    } catch (error: any) {
-      if (error?.response?.status === 404 || error?.response?.status === 400) {
+    } catch (error: unknown) {
+      const e = error as { response?: { status?: number } };
+      if (e?.response?.status === 404 || e?.response?.status === 400) {
         return null;
       }
       throw error;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InlineMessage from '../../../components/common/InlineMessage';
 import Loader from '../../../components/common/Loader';
 import {
@@ -65,9 +65,12 @@ export default function ProfesionalFranjasSection({
   const guardarMutation = useActualizarFranjasProfesional();
   const [filas, setFilas] = useState<Fila[]>([]);
   const [mensaje, setMensaje] = useState('');
+  const prevDataRef = useRef<typeof data>(undefined);
 
   useEffect(() => {
-    if (data && Array.isArray(data)) {
+    if (data && Array.isArray(data) && data !== prevDataRef.current) {
+      prevDataRef.current = data;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilas(data.length ? desdeApi(data) : []);
     }
   }, [data]);

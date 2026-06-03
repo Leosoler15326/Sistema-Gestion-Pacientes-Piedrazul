@@ -89,7 +89,16 @@ export default function LoginPage() {
 
               <LoginForm onSubmit={handleLogin} loading={loading} />
 
-              <p className="mt-6 text-center text-sm text-slate-600">
+              <p className="mt-4 text-center text-sm text-slate-500">
+                <Link
+                  to={APP_ROUTES.RECUPERAR_CONTRASENA}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </p>
+
+              <p className="mt-3 text-center text-sm text-slate-600">
                 ¿Eres paciente y aún no tienes cuenta?{' '}
                 <Link
                   to={APP_ROUTES.REGISTRO_PACIENTE}
