@@ -38,7 +38,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://${VPS_IP}:8080   # ← URL real del backend en el VPS
+        VITE_API_URL: http://${VPS_IP}:8080/api   # ← URL real del backend en el VPS
     container_name: sgp_frontend
     restart: unless-stopped
     ports:
