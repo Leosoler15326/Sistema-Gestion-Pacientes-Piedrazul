@@ -66,6 +66,16 @@ export default function ProfesionalFormPage() {
       setErrorMessage('Todos los campos son obligatorios.');
       return;
     }
+    // Validaciones cliente antes de llamar al backend
+    if (contrasena.trim().length < 6) {
+      setErrorMessage('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrorMessage('El correo electrónico no tiene un formato válido.');
+      return;
+    }
+
     try {
       await createUsuarioMutation.mutateAsync({
         nombreCompleto: nombreCompleto.trim(),
@@ -78,10 +88,15 @@ export default function ProfesionalFormPage() {
         state: { successMessage: 'Agendador creado correctamente.' },
       });
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-        'No fue posible crear el agendador.';
-      setErrorMessage(msg);
+      type ApiError = { response?: { data?: { mensaje?: string; errores?: Record<string, string> } } };
+      const data = (err as ApiError)?.response?.data;
+      if (data?.errores) {
+        // Errores de validación @Valid → mostrar el primero
+        const primerError = Object.values(data.errores)[0];
+        setErrorMessage(primerError ?? 'Error de validación.');
+      } else {
+        setErrorMessage(data?.mensaje ?? 'No fue posible crear el agendador.');
+      }
     }
   };
 
